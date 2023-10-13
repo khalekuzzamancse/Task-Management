@@ -13,14 +13,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +52,7 @@ Make the Login screen as:
 https://tinyurl.com/yx39k9u5
 
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun Login() {
@@ -53,38 +60,59 @@ fun Login() {
         mutableStateOf(false)
     }
 
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("User Login")},
+                navigationIcon = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(imageVector = Icons.Filled.Menu, contentDescription =null )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
 
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxSize()
-    ) {
+                )
+        }
+    ) {innterPadding->
+        Column(
+            modifier = Modifier
+                .padding(innterPadding)
+                .fillMaxSize()
+                .padding(start=16.dp,end=16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        LoginInputField(
-            label = "Phone Number",
-            leadingIcon = Icons.Default.Person,
-            keyboardType = KeyboardType.Number,
-            onValueChange = {
+            LoginInputField(
+                label = "Phone Number",
+                leadingIcon = Icons.Default.Person,
+                keyboardType = KeyboardType.Number,
+                onValueChange = {
 
-            })
-        VerticalSpacer()
-        LoginInputField(
-            label = "Password",
-            leadingIcon = Icons.Default.Lock,
-            trailingIcon = if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-            keyboardType = KeyboardType.Password,
-            onValueChange = {
-            },
-            onTrailingIconClick = { showPassword = !showPassword },
-            visualTransformation = if (!showPassword) PasswordVisualTransformation else null
-        )
-        VerticalSpacer()
-        ForgetPassword()
-        LoginButton(Modifier.padding(8.dp))
-        OtherSignInOptions()
+                })
+            VerticalSpacer()
+            LoginInputField(
+                label = "Password",
+                leadingIcon = Icons.Default.Lock,
+                trailingIcon = if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                keyboardType = KeyboardType.Password,
+                onValueChange = {
+                },
+                onTrailingIconClick = { showPassword = !showPassword },
+                visualTransformation = if (!showPassword) PasswordVisualTransformation else null
+            )
+            VerticalSpacer()
+            ForgetPassword()
+            LoginButton(Modifier.padding(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            OtherSignInOptions()
 
+
+        }
 
     }
+
 
 
 
