@@ -2,7 +2,6 @@ package com.khalekuzzamanjustcse.taskmanagement.ui.theme
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -53,9 +52,11 @@ https://tinyurl.com/yx39k9u5
 
  */
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun Login() {
+fun LoginScreen(
+    onLoginButtonClicked:()->Unit ={},
+    onNavIconClicked:()->Unit ={},
+) {
     var showPassword by remember {
         mutableStateOf(false)
     }
@@ -64,7 +65,7 @@ fun Login() {
         topBar = {
             TopAppBar(title = { Text("User Login")},
                 navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = onNavIconClicked) {
                         Icon(imageVector = Icons.Filled.Menu, contentDescription =null )
                     }
                 },
@@ -104,7 +105,9 @@ fun Login() {
             )
             VerticalSpacer()
             ForgetPassword()
-            LoginButton(Modifier.padding(8.dp))
+            LoginButton(Modifier.padding(8.dp)){
+                onLoginButtonClicked()
+            }
             Spacer(modifier = Modifier.height(16.dp))
             OtherSignInOptions()
 
@@ -174,10 +177,10 @@ private fun ForgetPassword(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun LoginButton(modifier: Modifier = Modifier) {
+private fun LoginButton(modifier: Modifier = Modifier,onClick: () -> Unit) {
     Button(
         modifier = modifier.fillMaxWidth(),
-        onClick = { /*TODO*/ }) {
+        onClick =onClick) {
         Text(text = "Login".uppercase())
     }
 }

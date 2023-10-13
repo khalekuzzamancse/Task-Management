@@ -48,6 +48,7 @@ android {
     }
 }
 dependencies {
+    implementation("androidx.navigation:navigation-compose:2.7.3")
 
     val composeBom = platform("androidx.compose:compose-bom:2023.09.02")
     implementation(composeBom)
