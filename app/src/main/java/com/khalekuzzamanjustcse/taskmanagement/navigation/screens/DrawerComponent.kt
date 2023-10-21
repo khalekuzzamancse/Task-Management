@@ -30,6 +30,7 @@ object DrawerItemsProvider {
             ModalDrawerItem(Screen.Register.route, Icons.Filled.Create),
             ModalDrawerItem(Screen.Logout.route, Icons.Filled.Logout),
             ModalDrawerItem(Screen.FriendRequest.route, Icons.Filled.Logout),
+            ModalDrawerItem(Screen.Friends.route, Icons.Filled.Logout),
         )
     )
     val drawerGroups = listOf(group)

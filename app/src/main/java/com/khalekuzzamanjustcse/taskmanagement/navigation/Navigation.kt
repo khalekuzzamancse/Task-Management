@@ -17,9 +17,10 @@ import androidx.navigation.compose.rememberNavController
 import com.khalekuzzamanjustcse.taskmanagement.ContactScreen
 import com.khalekuzzamanjustcse.taskmanagement.FetchContact
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
-import com.khalekuzzamanjustcse.taskmanagement.data.FriendRequest
+import com.khalekuzzamanjustcse.taskmanagement.data.FriendManager
 import com.khalekuzzamanjustcse.taskmanagement.data.UserCollections
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithDrawer
+import com.khalekuzzamanjustcse.taskmanagement.ui.FriendListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.FriendRequestListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.LoginScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.RegisterScreen
@@ -51,6 +52,10 @@ sealed interface Screen {
 
     data object FriendRequest : Screen {
         override val route = "FriendRequest"
+    }
+
+    data object Friends : Screen {
+        override val route = "Friends"
     }
 }
 
@@ -120,7 +125,7 @@ fun NavGraph() {
                     users = UserCollections().allUsers()
                 }
                 UserListScreen(onNavIconClicked = openDrawer, contacts = users) {
-                    FriendRequest().addNewFriendRequest(it)
+                    FriendManager().addNewFriendRequest(it)
                 }
             }
 
@@ -160,14 +165,38 @@ fun NavGraph() {
                     mutableStateOf(emptyList<User>())
                 }
 
-                LaunchedEffect(Unit){
-                   users=FriendRequest().getFriendRequest()
+                LaunchedEffect(Unit) {
+                    users = FriendManager().getFriendRequest()
                 }
                 FriendRequestListScreen(
-                    contacts =users,
+                    contacts = users,
                     onNavIconClicked = {},
-                    onAcceptButtonClick = {}
+                    onAcceptButtonClick = {
+                        FriendManager().addNewFriend(it)
+                    }
                 )
+
+            }
+
+        }
+        composable(route = Screen.Friends.route) {
+            ScreenWithDrawer(
+                drawerState = drawerState,
+                closeDrawer = onCloseDrawer,
+                onDrawerItemClick = onDrawerItemClick
+            ) {
+                var users by remember {
+                    mutableStateOf(emptyList<User>())
+                }
+
+                LaunchedEffect(Unit) {
+                    users = FriendManager().getFriends()
+                }
+                FriendListScreen(
+                    contacts = users,
+                    onNavIconClicked = {},
+                )
+
             }
 
         }
