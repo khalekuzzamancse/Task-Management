@@ -36,26 +36,6 @@ import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.data.FriendManager
 
 
-@Preview
-@Composable
-fun FriendRequestListScreenPreview() {
-
-
-
-    FriendRequestListScreen(
-        listOf(
-            User("Abul", "000000000"),
-            User("Babul", "11111111"),
-            User("Cabul", "22222222", true),
-            User("Dabul", "33333333333", false, true),
-        ),
-        onNavIconClicked = {},
-        onAcceptButtonClick = {
-            Log.i("FriendRequestTo: ", it)
-        }
-    )
-
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,7 +52,7 @@ fun FriendRequestListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Users") },
+                title = { Text("Friends Request") },
                 navigationIcon = {
                     IconButton(onClick = onNavIconClicked) {
                         Icon(imageVector = Icons.Filled.Menu, contentDescription = null)

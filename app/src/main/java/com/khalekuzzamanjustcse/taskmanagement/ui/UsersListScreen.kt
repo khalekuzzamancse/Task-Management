@@ -133,8 +133,7 @@ fun UserCard(
             }
             Spacer(modifier = Modifier.weight(1f)) // U
             if (!contact.isFriend) {
-              val icon=if(contact.isSendRequest)
-                  Icons.Filled.PersonRemove else Icons.Filled.PersonAdd
+              val icon=if(contact.isSendRequest) Icons.Filled.PersonRemove else Icons.Filled.PersonAdd
                 IconButton(
                     onClick = onAddFriendIconClick,
                 ) {

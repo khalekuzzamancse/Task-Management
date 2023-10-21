@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data.FirebaseFireStore
 import com.khalekuzzamanjustcse.taskmanagement.data.UserCollections
-import com.khalekuzzamanjustcse.taskmanagement.navigation.NavGraph
+import com.khalekuzzamanjustcse.taskmanagement.navigation.navgraph.NavGraph
 import com.khalekuzzamanjustcse.taskmanagement.ui.theme.TaskManagementTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -40,7 +40,7 @@ fun FriendListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Users") },
+                title = { Text("Friends") },
                 navigationIcon = {
                     IconButton(onClick = onNavIconClicked) {
                         Icon(imageVector = Icons.Filled.Menu, contentDescription = null)

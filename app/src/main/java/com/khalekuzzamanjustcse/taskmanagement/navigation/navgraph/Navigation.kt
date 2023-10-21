@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement.navigation
+package com.khalekuzzamanjustcse.taskmanagement.navigation.navgraph
 
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -26,38 +26,6 @@ import com.khalekuzzamanjustcse.taskmanagement.ui.LoginScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.RegisterScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.User
 import com.khalekuzzamanjustcse.taskmanagement.ui.UserListScreen
-
-sealed interface Screen {
-    val route: String
-
-    data object Login : Screen {
-        override val route = "Login"
-    }
-
-    data object Logout : Screen {
-        override val route = "Logout"
-    }
-
-    data object Contact : Screen {
-        override val route = "Contact"
-    }
-
-    data object Users : Screen {
-        override val route = "Users"
-    }
-
-    data object Register : Screen {
-        override val route = "Register"
-    }
-
-    data object FriendRequest : Screen {
-        override val route = "FriendRequest"
-    }
-
-    data object Friends : Screen {
-        override val route = "Friends"
-    }
-}
 
 
 @Composable

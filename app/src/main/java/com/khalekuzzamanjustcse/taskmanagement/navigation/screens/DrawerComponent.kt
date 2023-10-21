@@ -7,7 +7,7 @@ import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.khalekuzzamanjustcse.taskmanagement.navigation.Screen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.navgraph.Screen
 
 
 data class ModalDrawerItem(
