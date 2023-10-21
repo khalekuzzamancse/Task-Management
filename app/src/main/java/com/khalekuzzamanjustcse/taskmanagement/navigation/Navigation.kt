@@ -3,6 +3,7 @@ package com.khalekuzzamanjustcse.taskmanagement.navigation
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,9 +16,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.khalekuzzamanjustcse.taskmanagement.ContactScreen
 import com.khalekuzzamanjustcse.taskmanagement.FetchContact
-import com.khalekuzzamanjustcse.taskmanagement.FirebaseFireStore
+import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
+import com.khalekuzzamanjustcse.taskmanagement.data.FriendRequest
+import com.khalekuzzamanjustcse.taskmanagement.data.UserCollections
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithDrawer
+import com.khalekuzzamanjustcse.taskmanagement.ui.FriendRequestListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.LoginScreen
+import com.khalekuzzamanjustcse.taskmanagement.ui.RegisterScreen
+import com.khalekuzzamanjustcse.taskmanagement.ui.User
+import com.khalekuzzamanjustcse.taskmanagement.ui.UserListScreen
 
 sealed interface Screen {
     val route: String
@@ -26,12 +33,24 @@ sealed interface Screen {
         override val route = "Login"
     }
 
+    data object Logout : Screen {
+        override val route = "Logout"
+    }
+
     data object Contact : Screen {
         override val route = "Contact"
     }
 
     data object Users : Screen {
         override val route = "Users"
+    }
+
+    data object Register : Screen {
+        override val route = "Register"
+    }
+
+    data object FriendRequest : Screen {
+        override val route = "FriendRequest"
     }
 }
 
@@ -53,6 +72,7 @@ fun NavGraph() {
         navigationAction.navigateTo(it)
     }
     val context = LocalContext.current
+
 
     NavHost(
         navController = navController,
@@ -93,11 +113,61 @@ fun NavGraph() {
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
-                val users by remember {
-                    mutableStateOf(FirebaseFireStore().readAllDocs("Users"))
+                var users by remember {
+                    mutableStateOf(emptyList<User>())
+                }
+                LaunchedEffect(Unit) {
+                    users = UserCollections().allUsers()
+                }
+                UserListScreen(onNavIconClicked = openDrawer, contacts = users) {
+                    FriendRequest().addNewFriendRequest(it)
+                }
+            }
+
+        }
+        composable(route = Screen.Register.route) {
+            ScreenWithDrawer(
+                drawerState = drawerState,
+                closeDrawer = onCloseDrawer,
+                onDrawerItemClick = onDrawerItemClick
+            ) {
+                RegisterScreen()
+            }
+
+        }
+        composable(route = Screen.Logout.route) {
+            ScreenWithDrawer(
+                drawerState = drawerState,
+                closeDrawer = onCloseDrawer,
+                onDrawerItemClick = onDrawerItemClick
+            ) {
+                AuthManager().signOut()
+                LoginScreen(
+                    onLoginButtonClicked = {
+                    },
+                    onNavIconClicked = openDrawer
+                )
+            }
+
+        }
+        composable(route = Screen.FriendRequest.route) {
+            ScreenWithDrawer(
+                drawerState = drawerState,
+                closeDrawer = onCloseDrawer,
+                onDrawerItemClick = onDrawerItemClick
+            ) {
+                var users by remember {
+                    mutableStateOf(emptyList<User>())
                 }
 
-                ContactScreen(onNavIconClicked = openDrawer, contacts = users)
+                LaunchedEffect(Unit){
+                   users=FriendRequest().getFriendRequest()
+                }
+                FriendRequestListScreen(
+                    contacts =users,
+                    onNavIconClicked = {},
+                    onAcceptButtonClick = {}
+                )
             }
 
         }

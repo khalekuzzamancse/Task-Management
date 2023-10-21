@@ -8,12 +8,15 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
+import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
+import com.khalekuzzamanjustcse.taskmanagement.data.FirebaseFireStore
+import com.khalekuzzamanjustcse.taskmanagement.data.UserCollections
 import com.khalekuzzamanjustcse.taskmanagement.navigation.NavGraph
 import com.khalekuzzamanjustcse.taskmanagement.ui.theme.TaskManagementTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
@@ -56,15 +59,15 @@ class MainActivity : ComponentActivity() {
 
 
         //
-        auth = Firebase.auth
 
-        if (auth.currentUser == null) {
-            Log.i("CurrentUser", "NUll")
-            //  signIn("khalekuzzaman91@gmail.com", "12345678")
-        } else
-            Log.i("CurrentUser", "${auth.currentUser!!.email}")
-
-
+        val scope = CoroutineScope(Dispatchers.Default)
+        scope.launch {
+            val email=AuthManager().singedInUserEmail()
+            Log.i("PhoneNumberFound:Email",email.toString())
+            val phone= FirebaseFireStore().getUserPhoneNumber(email)
+            Log.i("PhoneNumberFound:Phone", phone.toString())
+            Log.i("AllUserList","${UserCollections().allUsers()}")
+        }
 
 
     }
@@ -76,76 +79,3 @@ class MainActivity : ComponentActivity() {
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }
-
-
-class FirebaseAuth(
-    private val onSignInSuccess: () -> Unit = {},
-    private val onSignInFailed: () -> Unit = {},
-) {
-    private val auth = Firebase.auth
-    fun createAccount(email: String, password: String) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-
-                } else {
-                }
-            }
-    }
-
-    fun signIn(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    onSignInSuccess()
-                    Log.i("CurrentUser: ", "signInWithEmail:success")
-                } else {
-                    onSignInFailed()
-                    Log.i("CurrentUser: ", "signInWithEmail:fail")
-                }
-            }
-    }
-
-    fun signOut() {
-        auth.signOut()
-    }
-}
-
-class FirebaseFireStore {
-    private val db = Firebase.firestore
-    fun readAllDocs(collectionName: String): List<Contact> {
-        val users = mutableListOf<Contact>()
-        db.collection(collectionName)
-            .addSnapshotListener { value, e ->
-                if (e != null) {
-                    return@addSnapshotListener
-                }
-
-                for (doc in value!!) {
-
-                    val name = doc.getString("Name")
-                    val phoneNumber = doc.getString("PhoneNumber")
-                    if (name != null && phoneNumber != null) {
-                        users.add(Contact(name = name, phone = phoneNumber))
-                    }
-
-                }
-            }
-        return users
-    }
-
-    fun addUser(email: String, phone: String, name: String) {
-        val user = hashMapOf(
-            "PhoneNumber" to phone,
-            "Email" to email,
-            "Name" to name
-        )
-        db.collection("Users").document(phone)
-            .set(user)
-            .addOnSuccessListener { }
-            .addOnFailureListener { }
-    }
-}
-
-
-

@@ -19,9 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.khalekuzzamanjustcse.taskmanagement.FirebaseAuth
-import com.khalekuzzamanjustcse.taskmanagement.FirebaseFireStore
+import com.google.firebase.auth.FirebaseAuth
 import com.khalekuzzamanjustcse.taskmanagement.PasswordVisualTransformation
+import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
+import com.khalekuzzamanjustcse.taskmanagement.data.FirebaseFireStore
 
 class RegisterData {
     var phoneNumber = ""
@@ -110,7 +111,7 @@ fun RegisterScreen() {
             visualTransformation = if (!showPassword) PasswordVisualTransformation else null
         )
         LoginButton(Modifier.padding(8.dp)) {
-            val auth = FirebaseAuth()
+            val auth = AuthManager()
             auth.createAccount(data.email, data.password)
             FirebaseFireStore().addUser(data.email,data.phoneNumber,data.name)
         }

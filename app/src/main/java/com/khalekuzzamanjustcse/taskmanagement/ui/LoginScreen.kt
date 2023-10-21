@@ -1,5 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.PasswordVisualTransformation
 import com.khalekuzzamanjustcse.taskmanagement.R
+import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
 
 
 /*
@@ -50,6 +52,24 @@ Make the Login screen as:
 https://tinyurl.com/yx39k9u5
 
  */
+class LoginState{
+    var email: String=""
+    private set
+    var password: String=""
+        private set
+    fun onEmailInput(email: String){
+        this.email = email
+    }
+    fun onPasswordInput(password: String){
+        this.password = password
+    }
+
+    override fun toString(): String {
+        return "LoginState(email='$email', password='$password')"
+    }
+
+
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
@@ -58,6 +78,9 @@ fun LoginScreen(
 ) {
     var showPassword by remember {
         mutableStateOf(false)
+    }
+    val state = remember {
+        LoginState()
     }
 
     Scaffold(
@@ -80,25 +103,22 @@ fun LoginScreen(
             modifier = Modifier
                 .padding(innterPadding)
                 .fillMaxSize()
-                .padding(start=16.dp,end=16.dp),
+                .padding(start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             LoginInputField(
-                label = "Phone Number",
+                label = "Email",
                 leadingIcon = Icons.Default.Person,
-                keyboardType = KeyboardType.Number,
-                onValueChange = {
-
-                })
+                keyboardType = KeyboardType.Email,
+                onValueChange = state::onEmailInput)
             VerticalSpacer()
             LoginInputField(
                 label = "Password",
                 leadingIcon = Icons.Default.Lock,
                 trailingIcon = if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                 keyboardType = KeyboardType.Password,
-                onValueChange = {
-                },
+                onValueChange = state::onPasswordInput,
                 onTrailingIconClick = { showPassword = !showPassword },
                 visualTransformation = if (!showPassword) PasswordVisualTransformation else null
             )
@@ -106,10 +126,10 @@ fun LoginScreen(
             ForgetPassword()
             LoginButton(Modifier.padding(8.dp)){
                 onLoginButtonClicked()
+                AuthManager().signIn(state.email,state.password)
             }
             Spacer(modifier = Modifier.height(16.dp))
             OtherSignInOptions()
-
 
         }
 
