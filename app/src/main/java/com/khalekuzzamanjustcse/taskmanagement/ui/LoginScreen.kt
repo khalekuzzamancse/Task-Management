@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement.ui.theme
+package com.khalekuzzamanjustcse.taskmanagement.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.PasswordVisualTransformation
 import com.khalekuzzamanjustcse.taskmanagement.R
@@ -177,7 +176,7 @@ private fun ForgetPassword(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun LoginButton(modifier: Modifier = Modifier,onClick: () -> Unit) {
+ fun LoginButton(modifier: Modifier = Modifier,onClick: () -> Unit) {
     Button(
         modifier = modifier.fillMaxWidth(),
         onClick =onClick) {
@@ -186,7 +185,7 @@ private fun LoginButton(modifier: Modifier = Modifier,onClick: () -> Unit) {
 }
 
 @Composable
-private fun VerticalSpacer() {
+ fun VerticalSpacer() {
     Spacer(
         modifier = Modifier
             .height(8.dp)
@@ -195,7 +194,7 @@ private fun VerticalSpacer() {
 }
 
 @Composable
-private fun LoginInputField(
+ fun LoginInputField(
     modifier: Modifier = Modifier,
     label: String,
     leadingIcon: ImageVector,

@@ -43,17 +43,17 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactScreen(
-    onNavIconClicked:()->Unit,
+    contacts: List<Contact>,
+    onNavIconClicked: () -> Unit,
 ) {
-    val context= LocalContext.current
-    val contacts=FetchContact(context).getContact()
-
+    val context = LocalContext.current
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Contact") },
+            TopAppBar(
+                title = { Text("Contact") },
                 navigationIcon = {
                     IconButton(onClick = onNavIconClicked) {
-                        Icon(imageVector = Icons.Filled.Menu, contentDescription =null )
+                        Icon(imageVector = Icons.Filled.Menu, contentDescription = null)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -63,17 +63,17 @@ fun ContactScreen(
 
                 )
         }
-    ) {innterPadding->
+    ) { innterPadding ->
         Column(
             modifier = Modifier
                 .padding(innterPadding)
                 .fillMaxSize()
-                .padding(start=16.dp,end=16.dp),
+                .padding(start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             LazyColumn {
-                items(items=contacts) { contact ->
+                items(items = contacts) { contact ->
                     ContactCard(contact)
                 }
             }
@@ -83,17 +83,15 @@ fun ContactScreen(
 
     }
 
-
-
 }
+
 @Composable
 fun ContactCard(contact: Contact) {
-
-
-    Card(modifier= Modifier
-        .fillMaxWidth()
-        .padding(8.dp),
-        elevation =CardDefaults.cardElevation()
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation()
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
@@ -111,33 +109,32 @@ fun ContactCard(contact: Contact) {
 }
 
 
-
 data class Contact(
-    val name:String,
-    val phone:String,
+    val name: String,
+    val phone: String,
 )
 
-class FetchContact (private val context: Context) {
-       fun getContact():List<Contact>{
-           val contacts= mutableListOf<Contact>()
-            val uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
-            val contentResolver = context.contentResolver
-            val projection = arrayOf(
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER
-            )
-            val cursor = contentResolver.query(uri, projection, null, null, null)
-            while (cursor!!.moveToNext()) {
-                val nameColumnId =
-                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-                val name = cursor.getString(nameColumnId)
-                val numberColumnId =
-                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                val number = cursor.getString(numberColumnId)
-                contacts.add(Contact(name,number))
-                Log.i("ContactFetched", "$name : $number")
-            }
-            cursor.close()
-           return contacts
+class FetchContact(private val context: Context) {
+    fun getContact(): List<Contact> {
+        val contacts = mutableListOf<Contact>()
+        val uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
+        val contentResolver = context.contentResolver
+        val projection = arrayOf(
+            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+            ContactsContract.CommonDataKinds.Phone.NUMBER
+        )
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+        while (cursor!!.moveToNext()) {
+            val nameColumnId =
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val name = cursor.getString(nameColumnId)
+            val numberColumnId =
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            val number = cursor.getString(numberColumnId)
+            contacts.add(Contact(name, number))
+            Log.i("ContactFetched", "$name : $number")
         }
+        cursor.close()
+        return contacts.sortedBy { it.name }
+    }
 }
