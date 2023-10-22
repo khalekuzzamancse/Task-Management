@@ -14,8 +14,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.khalekuzzamanjustcse.taskmanagement.ContactScreen
-import com.khalekuzzamanjustcse.taskmanagement.FetchContact
+import com.khalekuzzamanjustcse.taskmanagement.ui.ContactScreen
+import com.khalekuzzamanjustcse.taskmanagement.ui.FetchContact
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data.FriendManager
 import com.khalekuzzamanjustcse.taskmanagement.data.UserCollections
