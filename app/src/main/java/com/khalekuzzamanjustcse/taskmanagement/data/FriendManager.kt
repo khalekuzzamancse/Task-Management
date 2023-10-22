@@ -11,6 +11,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
+data class FriendRequest(
+    val user: User,
+    val hasNotified: Boolean
+)
+
 class FriendManager {
     private val db = Firebase.firestore
     fun addNewFriendRequest(phoneNoTo: String) {
@@ -45,34 +50,36 @@ class FriendManager {
         }
     }
 
-    suspend fun getFriendRequest(): List<User> {
+    suspend fun getFriendRequest(): List<FriendRequest> {
         val email = AuthManager().singedInUserEmail()
         val signInUserPhoneNo = FirebaseFireStore().getUserPhoneNumber(email)
-        val users = mutableListOf<User>()
+        val requests = mutableListOf<FriendRequest>()
         return try {
             val querySnapshot = withContext(Dispatchers.IO) {
                 db.collection("FriendRequest")
-                    .whereEqualTo("to", signInUserPhoneNo)
+                    .whereEqualTo("receiver", signInUserPhoneNo)
                     .get()
                     .await()
             }
             if (!querySnapshot.isEmpty) {
                 for (document in querySnapshot.documents) {
-                    val requestFrom = document.getString("from")
-                    if (requestFrom != null) {
+                    val requestFrom = document.getString("sender")
+                    val hasNotified = document.getBoolean("hasBeenNotified")
+                    if (requestFrom != null&&hasNotified!=null) {
                         val user = UserCollections().user(requestFrom)
-                        user?.let {
-                            users.add(it)
+                        user?.let {it->
+                            requests.add(FriendRequest(it,hasNotified))
                         }
                     }
                 }
 
             }
-            users
+            requests
         } catch (_: Exception) {
-            users
+            requests
         }
     }
+
     suspend fun getFriends(): List<User> {
         val email = AuthManager().singedInUserEmail()
         val signInUserPhoneNo = FirebaseFireStore().getUserPhoneNumber(email)
@@ -80,10 +87,12 @@ class FriendManager {
         return try {
             val querySnapshot = withContext(Dispatchers.IO) {
                 db.collection("Friends")
-                    .where(Filter.or(
-                        Filter.equalTo("user1Id", signInUserPhoneNo),
-                        Filter.equalTo("user2Id", signInUserPhoneNo)
-                ))
+                    .where(
+                        Filter.or(
+                            Filter.equalTo("user1Id", signInUserPhoneNo),
+                            Filter.equalTo("user2Id", signInUserPhoneNo)
+                        )
+                    )
                     .get()
                     .await()
             }
@@ -91,8 +100,9 @@ class FriendManager {
                 for (document in querySnapshot.documents) {
                     val user1Id = document.getString("user1Id")
                     val user2Id = document.getString("user2Id")
-                    if (user1Id != null&&user2Id != null) {
-                        val friendIdOfCurrentUser=if(user1Id!=signInUserPhoneNo)user1Id else user2Id
+                    if (user1Id != null && user2Id != null) {
+                        val friendIdOfCurrentUser =
+                            if (user1Id != signInUserPhoneNo) user1Id else user2Id
                         val user = UserCollections().user(friendIdOfCurrentUser)
                         user?.let {
                             users.add(it)

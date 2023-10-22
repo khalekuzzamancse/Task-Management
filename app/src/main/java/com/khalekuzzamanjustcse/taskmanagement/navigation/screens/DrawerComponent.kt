@@ -3,6 +3,7 @@ package com.khalekuzzamanjustcse.taskmanagement.navigation.screens
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
@@ -24,6 +25,7 @@ object DrawerItemsProvider {
     private val group = ModalDrawerGroup(
         name = "",
         members = listOf(
+            ModalDrawerItem(Screen.Home.route, Icons.Filled.Home),
             ModalDrawerItem(Screen.Login.route, Icons.Filled.Login),
             ModalDrawerItem(Screen.Contact.route, Icons.Filled.Contacts),
             ModalDrawerItem(Screen.Users.route, Icons.Filled.Person),

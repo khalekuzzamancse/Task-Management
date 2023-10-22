@@ -1,7 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement
 
 
-
 import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
@@ -20,7 +19,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
+import com.khalekuzzamanjustcse.taskmanagement.data.FriendManager
 
+
+class NotificationFactory(
+    private val context: Context
+) {
+    suspend fun observeFriendRequest() {
+        val request = FriendManager().getFriendRequest()
+        request.forEach {
+            if (!it.hasNotified) {
+                createNotification(context, "${it.user.name} send a friend request.")
+            }
+        }
+    }
+
+}
 
 
 @Composable
@@ -48,9 +62,9 @@ fun ShowNotificationScreen() {
 
 }
 
- fun createNotification(
+fun createNotification(
     context: Context,
-    message:String="The App is running",
+    message: String = "The App is running",
 ) {
     val notificationManager = BaseApplication.notificationManager
 
@@ -59,8 +73,8 @@ fun ShowNotificationScreen() {
         .setContentText(message)
         .setSmallIcon(R.drawable.ic_launcher_foreground)
         .setAutoCancel(true)
-        .addAction(0, "Start", createPendingIntent(context,message))
-        .setContentIntent(createPendingIntent(context,message))
+        .addAction(0, "Start", createPendingIntent(context, message))
+        .setContentIntent(createPendingIntent(context, message))
         .build()
 
     notificationManager.notify(100, notification)
@@ -68,7 +82,7 @@ fun ShowNotificationScreen() {
 
 private fun createPendingIntent(
     context: Context,
-    message:String,
+    message: String,
 ): PendingIntent {
 
     val flag = PendingIntent.FLAG_IMMUTABLE

@@ -14,6 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.khalekuzzamanjustcse.taskmanagement.createNotification
 import com.khalekuzzamanjustcse.taskmanagement.ui.ContactScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.FetchContact
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
@@ -22,6 +23,7 @@ import com.khalekuzzamanjustcse.taskmanagement.data.UserCollections
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithDrawer
 import com.khalekuzzamanjustcse.taskmanagement.ui.FriendListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.FriendRequestListScreen
+import com.khalekuzzamanjustcse.taskmanagement.ui.HomePage
 import com.khalekuzzamanjustcse.taskmanagement.ui.LoginScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.RegisterScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.User
@@ -50,8 +52,19 @@ fun NavGraph() {
     NavHost(
         navController = navController,
         route = "MainScreen",
-        startDestination = Screen.Login.route
+        startDestination = Screen.Home.route
     ) {
+
+        composable(route = Screen.Home.route) {
+            ScreenWithDrawer(
+                drawerState = drawerState,
+                closeDrawer = onCloseDrawer,
+                onDrawerItemClick = onDrawerItemClick
+            ) {
+                HomePage()
+            }
+
+        }
         composable(route = Screen.Login.route) {
             ScreenWithDrawer(
                 drawerState = drawerState,
@@ -130,9 +143,10 @@ fun NavGraph() {
                 var users by remember {
                     mutableStateOf(emptyList<User>())
                 }
-
                 LaunchedEffect(Unit) {
-                    users = FriendManager().getFriendRequest()
+                    val request = FriendManager().getFriendRequest()
+                    users = request.map { it.user }
+
                 }
                 FriendRequestListScreen(
                     contacts = users

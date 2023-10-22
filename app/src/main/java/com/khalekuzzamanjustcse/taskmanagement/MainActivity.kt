@@ -3,6 +3,7 @@ package com.khalekuzzamanjustcse.taskmanagement
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import com.khalekuzzamanjustcse.taskmanagement.navigation.navgraph.NavGraph
 import com.khalekuzzamanjustcse.taskmanagement.ui.theme.TaskManagementTheme
@@ -14,7 +15,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             TaskManagementTheme {
                 val context = LocalContext.current
-                createNotification(context, message = "Hello,The App is running")
+                LaunchedEffect(Unit){
+                    NotificationFactory(context).observeFriendRequest()
+                }
                 NavGraph()
             }
 

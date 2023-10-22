@@ -20,13 +20,14 @@ class UserCollections {
             for (document in querySnapshot) {
                 val name = document.getString("Name")
                 val phoneNumber = document.getString("PhoneNumber")
-                if (name != null && phoneNumber != null) {
-                    users.add(User(name = name, phone = phoneNumber))
+                val email = document.getString("Email")
+                if (name != null && phoneNumber != null && email != null) {
+                    users.add(User(name = name, phone = phoneNumber, email = email))
                 }
             }
         } catch (_: Exception) {
         }
-        return users
+        return users.filter { it.email != AuthManager().singedInUserEmail().toString() }
     }
 
     suspend fun user(phone: String): User? {
@@ -35,7 +36,7 @@ class UserCollections {
             val name = document.getString("Name")
             val phoneNumber = document.getString("PhoneNumber")
             if (name != null && phoneNumber != null) {
-              return  User(name = name, phone = phoneNumber)
+                return User(name = name, phone = phoneNumber)
             }
         } catch (_: Exception) {
         }
@@ -79,12 +80,13 @@ class FirebaseFireStore {
             .addOnFailureListener { }
     }
 
-    fun addFriendRequest(from: String, to: String) {
+    fun addFriendRequest(sender: String, receiver: String) {
         val requestEdge = hashMapOf(
-            "from" to from,
-            "to" to to,
+            "sender" to sender,
+            "receiver" to receiver,
+            "hasBeenNotified" to false
         )
-        db.collection("FriendRequest").document(from + to)
+        db.collection("FriendRequest").document(sender + receiver)
             .set(requestEdge)
             .addOnSuccessListener { }
             .addOnFailureListener { }
