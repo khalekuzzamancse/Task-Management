@@ -26,6 +26,7 @@ import com.khalekuzzamanjustcse.taskmanagement.ui.FriendRequestListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.HomePage
 import com.khalekuzzamanjustcse.taskmanagement.ui.LoginScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.RegisterScreen
+import com.khalekuzzamanjustcse.taskmanagement.ui.TaskScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.User
 import com.khalekuzzamanjustcse.taskmanagement.ui.UserListScreen
 
@@ -173,6 +174,17 @@ fun NavGraph() {
                     contacts = users,
                     onNavIconClicked = {},
                 )
+
+            }
+
+        }
+        composable(route = Screen.Task.route) {
+            ScreenWithDrawer(
+                drawerState = drawerState,
+                closeDrawer = onCloseDrawer,
+                onDrawerItemClick = onDrawerItemClick
+            ) {
+                TaskScreen()
 
             }
 
