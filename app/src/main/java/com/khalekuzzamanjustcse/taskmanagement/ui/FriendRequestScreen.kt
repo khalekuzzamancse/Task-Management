@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DoneOutline
+import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -69,7 +69,7 @@ fun FriendRequestListScreen(
                         IconButton(
                             onClick = {},
                         ) {
-                            Icon(imageVector = Icons.Filled.DoneOutline, contentDescription = null)
+                            Icon(imageVector = Icons.Filled.AddCircleOutline, contentDescription = null)
                         }
                     }
 
