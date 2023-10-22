@@ -64,6 +64,7 @@ fun FriendListScreen(
 
             LazyColumn {
                 items(items = contacts) { contact ->
+
                     FriendCard(contact)
                 }
             }
