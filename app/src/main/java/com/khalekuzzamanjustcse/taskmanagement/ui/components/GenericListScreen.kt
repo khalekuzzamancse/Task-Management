@@ -77,6 +77,7 @@ fun <T> GenericListScreen(
                 .padding(start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             LazyColumn {
                 items(items) { item ->
                     itemContent(item)
