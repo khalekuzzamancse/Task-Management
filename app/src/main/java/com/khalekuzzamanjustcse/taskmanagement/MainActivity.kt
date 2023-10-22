@@ -8,6 +8,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data.FirebaseFireStore
@@ -21,10 +29,14 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private lateinit var auth: FirebaseAuth
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TaskManagementTheme {
+                val context = LocalContext.current
+                createNotification(context, message = "Hello,The App is running")
                 NavGraph()
             }
 
