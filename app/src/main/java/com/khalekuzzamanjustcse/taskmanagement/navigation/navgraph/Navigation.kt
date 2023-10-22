@@ -92,9 +92,7 @@ fun NavGraph() {
                 LaunchedEffect(Unit) {
                     users = UserCollections().allUsers()
                 }
-                UserListScreen(onNavIconClicked = openDrawer, contacts = users) {
-                    FriendManager().addNewFriendRequest(it)
-                }
+                UserListScreen(contacts = users, onNavIconClicked = openDrawer)
             }
 
         }
@@ -137,12 +135,8 @@ fun NavGraph() {
                     users = FriendManager().getFriendRequest()
                 }
                 FriendRequestListScreen(
-                    contacts = users,
-                    onNavIconClicked = {},
-                    onAcceptButtonClick = {
-                        FriendManager().addNewFriend(it)
-                    }
-                )
+                    contacts = users
+                ) {}
 
             }
 
@@ -160,6 +154,7 @@ fun NavGraph() {
                 LaunchedEffect(Unit) {
                     users = FriendManager().getFriends()
                 }
+
                 FriendListScreen(
                     contacts = users,
                     onNavIconClicked = {},

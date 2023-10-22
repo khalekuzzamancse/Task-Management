@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.khalekuzzamanjustcse.taskmanagement.ui.components.UserInfoCard
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,8 +65,7 @@ fun FriendListScreen(
 
             LazyColumn {
                 items(items = contacts) { contact ->
-
-                    FriendCard(contact)
+                    UserInfoCard(name = contact.name, phone = contact.phone)
                 }
             }
 
@@ -75,29 +75,3 @@ fun FriendListScreen(
 
 }
 
-@Composable
-fun FriendCard(
-    contact: User,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation()
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = "Contact Icon",
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
-                Text(text = contact.name, fontWeight = FontWeight.Bold)
-                Text(text = contact.phone, color = Color.Gray)
-            }
-            Spacer(modifier = Modifier.weight(1f)) // U
-        }
-
-    }
-
-}

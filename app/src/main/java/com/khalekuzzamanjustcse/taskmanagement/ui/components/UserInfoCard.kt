@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +13,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,6 +37,13 @@ fun UserInfoCardPreview() {
             UserInfoCard(name = "Mr Bean", phone = "01738813865")
             UserInfoCard(name = "Mr Azad Ali", phone = "01738813865")
             UserInfoCard(name = "Mr Bean Karim", phone = "01738813865")
+            UserInfoCard(name = "Mr Bean Karim", phone = "01738813865"){
+                IconButton(
+                    onClick = {  },
+                ) {
+                    Icon(imageVector =  Icons.Filled.PersonAdd, contentDescription = null)
+                }
+            }
         }
 
     }
@@ -44,6 +55,7 @@ fun UserInfoCard(
     modifier: Modifier = Modifier,
     name: String,
     phone: String,
+    endExtraContent:@Composable RowScope.()->Unit={},
 ) {
     Surface(
         modifier = modifier
@@ -54,16 +66,14 @@ fun UserInfoCard(
     ) {
         Row(
             modifier = Modifier
-                .padding(8.dp)
-            ,
+                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceTint)
-                    .padding(8.dp)
-                ,
+                    .padding(8.dp),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Person,
@@ -84,6 +94,7 @@ fun UserInfoCard(
                 )
             }
             Spacer(modifier = Modifier.weight(1f)) // U
+            endExtraContent()
         }
 
     }
