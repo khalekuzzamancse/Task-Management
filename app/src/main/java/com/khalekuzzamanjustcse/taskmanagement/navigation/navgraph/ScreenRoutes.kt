@@ -36,5 +36,8 @@ sealed interface Screen {
     data object Task : Screen {
         override val route = "Task"
     }
+    data object MyTask : Screen {
+        override val route = "MyTask"
+    }
 
 }

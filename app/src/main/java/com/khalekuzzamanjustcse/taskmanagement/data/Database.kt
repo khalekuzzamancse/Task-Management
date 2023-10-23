@@ -27,7 +27,7 @@ class UserCollections {
             }
         } catch (_: Exception) {
         }
-        return users.filter { it.email != AuthManager().singedInUserEmail().toString() }
+        return users.filter { it.email == AuthManager().singedInUserEmail().toString() }
     }
 
     suspend fun user(phone: String): User? {
@@ -127,7 +127,7 @@ class FirebaseFireStore {
                     .await()
             }
             if (!querySnapshot.isEmpty) {
-                val document = querySnapshot.documents
+                val  document = querySnapshot.documents
             }
         } catch (_: Exception) {
 

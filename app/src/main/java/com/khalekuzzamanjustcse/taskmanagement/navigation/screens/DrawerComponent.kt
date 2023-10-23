@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Task
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.khalekuzzamanjustcse.taskmanagement.navigation.navgraph.Screen
 
@@ -35,6 +36,7 @@ object DrawerItemsProvider {
             ModalDrawerItem(Screen.FriendRequest.route, Icons.Filled.Logout),
             ModalDrawerItem(Screen.Friends.route, Icons.Filled.Logout),
             ModalDrawerItem(Screen.Task.route, Icons.Filled.Task),
+            ModalDrawerItem(Screen.MyTask.route, Icons.Filled.Today),
         )
     )
     val drawerGroups = listOf(group)

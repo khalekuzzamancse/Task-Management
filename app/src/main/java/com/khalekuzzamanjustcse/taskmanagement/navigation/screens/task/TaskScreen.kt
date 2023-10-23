@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task_screen
+package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
