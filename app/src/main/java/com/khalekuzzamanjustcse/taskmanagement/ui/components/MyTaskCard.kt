@@ -37,11 +37,9 @@ fun MyTaskCard(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
             .clickable {
                 onLongClick()
             },
-        tonalElevation = 8.dp,
         shape = MaterialTheme.shapes.medium,
     ) {
         Row(

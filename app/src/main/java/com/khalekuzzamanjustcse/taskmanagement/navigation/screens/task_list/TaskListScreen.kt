@@ -15,7 +15,7 @@ val dummyTaskList = listOf(
                 "Follow the reference books and the IIT Delhi videos." ,
         "Mr Bean",
         false,
-        "2023-10-23 08:00 AM"
+        "23 OCT 2023"
     ),
     MyTask("Task 2", "Description for Task 2", "Jane Smith", false, "2023-10-24 10:30 AM"),
     MyTask(
