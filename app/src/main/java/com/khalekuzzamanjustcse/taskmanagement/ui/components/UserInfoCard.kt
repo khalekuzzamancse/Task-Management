@@ -67,20 +67,19 @@ fun UserInfoCard(
 ) {
     Surface(
         modifier = modifier
+            .padding(4.dp)
             .fillMaxWidth()
-            .padding(8.dp)
             .combinedClickable(
                 onLongClick = onLongClick
             ) {
 
             },
-        tonalElevation = 8.dp,
-        shape = MaterialTheme.shapes.medium,
-        color =if(selected) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primaryContainer
+//        shape = MaterialTheme.shapes.medium,
+        color =if(selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
     ) {
         Row(
-            modifier = Modifier
-                .padding(8.dp),
+            modifier = Modifier,
+//                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (selected) {
