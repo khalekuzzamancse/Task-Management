@@ -22,9 +22,6 @@ sealed interface Screen {
         override val route = "Users"
     }
 
-    data object Register : Screen {
-        override val route = "Register"
-    }
 
     data object FriendRequest : Screen {
         override val route = "FriendRequest"

@@ -8,7 +8,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.khalekuzzamanjustcse.taskmanagement.data.FriendManager
-import com.khalekuzzamanjustcse.taskmanagement.navigation.navgraph.Screen
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.GenericListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.UserInfoCard
 

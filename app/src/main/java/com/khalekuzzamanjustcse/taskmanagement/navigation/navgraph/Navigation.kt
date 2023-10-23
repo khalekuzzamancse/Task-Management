@@ -20,11 +20,12 @@ import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data.FriendManager
 import com.khalekuzzamanjustcse.taskmanagement.data.UserCollections
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithDrawer
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.AuthScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.FriendListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.FriendRequestListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.HomePage
-import com.khalekuzzamanjustcse.taskmanagement.ui.LoginScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui.RegisterScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.LoginScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.RegisterScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.create_task.TaskScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.MyTaskListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.User
@@ -72,12 +73,7 @@ fun NavGraph() {
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
-                LoginScreen(
-                    onLoginButtonClicked = {
-
-                    },
-                    onNavIconClicked = openDrawer
-                )
+              AuthScreen()
             }
 
         }
@@ -107,16 +103,6 @@ fun NavGraph() {
                     users = UserCollections().allUsers()
                 }
                 UserListScreen(contacts = users, onNavIconClicked = openDrawer)
-            }
-
-        }
-        composable(route = Screen.Register.route) {
-            ScreenWithDrawer(
-                drawerState = drawerState,
-                closeDrawer = onCloseDrawer,
-                onDrawerItemClick = onDrawerItemClick
-            ) {
-                RegisterScreen()
             }
 
         }

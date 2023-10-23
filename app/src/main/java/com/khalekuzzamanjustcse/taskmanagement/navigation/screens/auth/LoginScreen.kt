@@ -1,9 +1,9 @@
-package com.khalekuzzamanjustcse.taskmanagement.ui
+package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -73,7 +74,9 @@ class LoginState{
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
+    scaffoldPadding:PaddingValues = PaddingValues(0.dp),
     onLoginButtonClicked:()->Unit ={},
+    onRegisterButtonClicked:()->Unit ={},
     onNavIconClicked:()->Unit ={},
 ) {
     var showPassword by remember {
@@ -82,26 +85,9 @@ fun LoginScreen(
     val state = remember {
         LoginState()
     }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("User Login")},
-                navigationIcon = {
-                    IconButton(onClick = onNavIconClicked) {
-                        Icon(imageVector = Icons.Filled.Menu, contentDescription =null )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-
-                )
-        }
-    ) {innterPadding->
         Column(
             modifier = Modifier
-                .padding(innterPadding)
+                .padding(scaffoldPadding)
                 .fillMaxSize()
                 .padding(start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -130,10 +116,19 @@ fun LoginScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
             OtherSignInOptions()
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Or Signup using"
+            )
+            TextButton(onClick = onRegisterButtonClicked) {
+                Text(
+                    text = "Register"
+                )
+            }
 
         }
 
-    }
+
 
 
 

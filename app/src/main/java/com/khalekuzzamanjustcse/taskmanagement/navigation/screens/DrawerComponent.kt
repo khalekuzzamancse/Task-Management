@@ -31,7 +31,6 @@ object DrawerItemsProvider {
             ModalDrawerItem(Screen.Login.route, Icons.Filled.Login),
             ModalDrawerItem(Screen.Contact.route, Icons.Filled.Contacts),
             ModalDrawerItem(Screen.Users.route, Icons.Filled.Person),
-            ModalDrawerItem(Screen.Register.route, Icons.Filled.Create),
             ModalDrawerItem(Screen.Logout.route, Icons.Filled.Logout),
             ModalDrawerItem(Screen.FriendRequest.route, Icons.Filled.Logout),
             ModalDrawerItem(Screen.Friends.route, Icons.Filled.Logout),
