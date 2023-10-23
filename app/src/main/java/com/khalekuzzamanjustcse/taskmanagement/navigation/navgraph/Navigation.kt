@@ -25,8 +25,8 @@ import com.khalekuzzamanjustcse.taskmanagement.ui.FriendRequestListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.HomePage
 import com.khalekuzzamanjustcse.taskmanagement.ui.LoginScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.RegisterScreen
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task.TaskScreen
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task_list.MyTaskListScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.create_task.TaskScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.MyTaskListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.User
 import com.khalekuzzamanjustcse.taskmanagement.ui.UserListScreen
 

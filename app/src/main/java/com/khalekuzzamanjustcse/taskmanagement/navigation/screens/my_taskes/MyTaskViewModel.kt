@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task_list
+package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes
 
 import androidx.lifecycle.ViewModel
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.MyTask

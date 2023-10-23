@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task_list
+package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

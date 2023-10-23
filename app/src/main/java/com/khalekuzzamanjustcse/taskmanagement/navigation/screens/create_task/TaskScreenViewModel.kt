@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task
+package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.create_task
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
