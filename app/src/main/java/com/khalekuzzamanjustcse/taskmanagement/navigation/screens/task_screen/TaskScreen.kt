@@ -1,9 +1,10 @@
-package com.khalekuzzamanjustcse.taskmanagement.ui
+package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task_screen
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,12 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,35 +35,39 @@ import com.khalekuzzamanjustcse.taskmanagement.ui.components.UserInfoCard
 @Preview
 @Composable
 fun TaskScreen() {
-    var showUser by remember {
-        mutableStateOf(false)
-    }
-    Box(modifier = Modifier.fillMaxSize()) {
 
+    val screenState = remember {
+        TaskScreenViewModel()
+    }
+    val showUser = screenState.userSelectedMode.collectAsState().value
+    Box(modifier = Modifier.fillMaxSize()) {
         if (showUser) {
-            AssignUser(modifier = Modifier.matchParentSize()) {
-                showUser = false
-            }
-        }
-        else{
+            AssignUser(
+                modifier = Modifier.matchParentSize(),
+                onLongClick = screenState::onLongClick,
+                users = screenState.users.collectAsState().value,
+                onCrossClick = { screenState.onUserSelectedModeChanged(false) },
+                onDone = { screenState.onUserSelectedModeChanged(false)}
+            )
+        } else {
             Column(
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxSize()
             ) {
                 Button(onClick = {
-                    showUser = true
+                    screenState.onUserSelectedModeChanged(true)
                 }) {
                     Text(text = "Choose User")
                 }
-                InputField(label = "Title", onValueChange = {})
+                InputField(label = "Title", onValueChange = screenState::onTitleChanged)
                 InputFieldArea(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp),
                     label = "Description",
-                    onValueChange = {
-                    })
+                    onValueChange = screenState::onDescriptionChanged
+                )
             }
         }
     }
@@ -71,7 +77,6 @@ fun TaskScreen() {
 fun InputField(
     modifier: Modifier = Modifier,
     label: String,
-    leadingIcon: ImageVector? = null,
     trailingIcon: ImageVector? = null,
     visualTransformation: VisualTransformation? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
@@ -146,33 +151,30 @@ data class TaskAssignedUser(
 
 
 @Composable
-fun BoxScope.AssignUser(
+fun AssignUser(
     modifier: Modifier = Modifier,
+    users: List<TaskAssignedUser> = emptyList(),
+    onLongClick: (Int) -> Unit = {},
+    onDone: () -> Unit = {},
     onCrossClick: () -> Unit = {},
 ) {
-    var users by remember {
-        mutableStateOf(
-            listOf(
-                TaskAssignedUser(name = "Mr Bean Karim", phone = "01738813861", selected = false),
-                TaskAssignedUser(name = "Mr Bean Karim", phone = "01738813862", selected = false),
-                TaskAssignedUser(name = "Mr Bean Karim", phone = "01738813863", selected = false),
-                TaskAssignedUser(name = "Mr Bean Karim", phone = "01738813864", selected = false),
-            )
-        )
-    }
-    val onLongClick: (Int) -> Unit = { index ->
-        val user = users[index]
-        val tmp = users.map { it }.toMutableList()
-        tmp.removeAt(index)
-        tmp.add(user.copy(selected = !user.selected))
-        users = tmp
-    }
 
     Column(modifier = modifier) {
-        Button(onClick = onCrossClick) {
-            Icon(imageVector = Icons.Filled.Cancel, contentDescription = null)
-            Text(text = "Cancel")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = onCrossClick) {
+                Icon(imageVector = Icons.Filled.Cancel, contentDescription = null)
+                Text(text = "Cancel")
+            }
+            Button(onClick = onDone) {
+                Icon(imageVector = Icons.Filled.Done, contentDescription = null)
+                Text(text = "Done")
+            }
         }
+
         users.forEachIndexed { i, it ->
             UserInfoCard(
                 name = it.name,

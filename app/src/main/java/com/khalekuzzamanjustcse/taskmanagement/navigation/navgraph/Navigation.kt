@@ -14,7 +14,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.khalekuzzamanjustcse.taskmanagement.createNotification
 import com.khalekuzzamanjustcse.taskmanagement.ui.ContactScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.FetchContact
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
@@ -26,7 +25,7 @@ import com.khalekuzzamanjustcse.taskmanagement.ui.FriendRequestListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.HomePage
 import com.khalekuzzamanjustcse.taskmanagement.ui.LoginScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.RegisterScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui.TaskScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task_screen.TaskScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.User
 import com.khalekuzzamanjustcse.taskmanagement.ui.UserListScreen
 
