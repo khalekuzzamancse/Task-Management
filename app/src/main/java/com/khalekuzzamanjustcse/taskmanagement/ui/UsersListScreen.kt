@@ -62,7 +62,7 @@ fun UserListScreen(
             }
         },
         screenTitle = "Contacts",
-        onNavIconClicked = onNavIconClicked
+        onBack = onNavIconClicked
     )
 
 

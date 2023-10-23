@@ -68,7 +68,7 @@ fun MyTaskListScreen() {
                 )
             },
             screenTitle = "My Task",
-            onNavIconClicked = { }
+            onBack = { }
         )
     }
 

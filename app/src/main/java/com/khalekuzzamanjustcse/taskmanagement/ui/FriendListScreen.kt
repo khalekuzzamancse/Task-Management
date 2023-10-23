@@ -15,8 +15,8 @@ fun FriendListScreen(
         itemContent = { contact ->
             UserInfoCard(name = contact.name, phone = contact.phone)
         },
-        screenTitle = "Contacts",
-        onNavIconClicked =onNavIconClicked
+        screenTitle = "My Friends",
+        onBack =onNavIconClicked
     )
 
 }

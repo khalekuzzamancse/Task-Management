@@ -14,6 +14,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithTopBarTitleBackArrow
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.UserInfoCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,22 +25,10 @@ fun AssignUser(
     onLongClick: (Int) -> Unit = {},
     onCrossClick: () -> Unit = {},
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Select Users") },
-                navigationIcon = {
-                    IconButton(onClick = onCrossClick) {
-                        Icon(Icons.Filled.ArrowBack, null)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-            )
-        }
-    ) { scaffoldPadding ->
+    ScreenWithTopBarTitleBackArrow(
+        title = "Choose Users",
+        onBackArrowClick =onCrossClick)
+    { scaffoldPadding ->
         Column(modifier = modifier.padding(scaffoldPadding)) {
             users.forEachIndexed { i, it ->
                 UserInfoCard(

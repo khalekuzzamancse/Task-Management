@@ -25,8 +25,8 @@ fun FriendRequestListScreen(
                 }
             }
         },
-        screenTitle = "Contacts",
-        onNavIconClicked =onNavIconClicked
+        screenTitle = "Friend Requests",
+        onBack =onNavIconClicked
     )
 
 

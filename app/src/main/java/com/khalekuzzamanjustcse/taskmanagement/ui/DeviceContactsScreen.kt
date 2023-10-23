@@ -4,6 +4,7 @@ import android.content.Context
 import android.provider.ContactsContract
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.GenericListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.UserInfoCard
 
@@ -19,7 +20,7 @@ fun ContactScreen(
             UserInfoCard(name = contact.name, phone = contact.phone)
         },
         screenTitle = "Contacts",
-        onNavIconClicked =onNavIconClicked
+        onBack =onNavIconClicked
     )
 
 }

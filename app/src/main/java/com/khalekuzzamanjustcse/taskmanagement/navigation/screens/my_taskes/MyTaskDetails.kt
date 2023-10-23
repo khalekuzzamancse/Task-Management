@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithTopBarTitleBackArrow
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.MyTask
 
 @Preview
@@ -45,22 +46,11 @@ fun TaskDetails(
     description: String,
     onClose: () -> Unit,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Task Details") },
-                navigationIcon = {
-                    IconButton(onClick = onClose) {
-                        Icon(Icons.Filled.ArrowBack, null)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-            )
-        }
-    ) { scaffoldPadding ->
+    ScreenWithTopBarTitleBackArrow(
+        title = "Task Details",
+        onBackArrowClick = onClose
+    )
+    { scaffoldPadding ->
         Column(
             modifier = Modifier
                 .padding(scaffoldPadding)

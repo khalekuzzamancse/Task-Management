@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithTopBarTitleBackArrow
 import com.khalekuzzamanjustcse.taskmanagement.ui.Contact
 
 @Preview
@@ -41,7 +42,7 @@ fun GenericListScreenPreview() {
             UserInfoCard(name = contact.name, phone = contact.phone)
         },
         screenTitle = "Contacts",
-        onNavIconClicked = {  }
+        onNavIconClicked = { }
     )
 
 }
@@ -72,6 +73,36 @@ fun <T> GenericListScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(start = 16.dp, end = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            LazyColumn {
+                items(items) { item ->
+                    itemContent(item)
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T> GenericListScreen(
+    modifier: Modifier = Modifier,
+    items: List<T>,
+    screenTitle: String,
+    onBack: () -> Unit,
+    itemContent: @Composable (T) -> Unit,
+) {
+    ScreenWithTopBarTitleBackArrow(
+        title = screenTitle,
+        onBackArrowClick = onBack
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(start = 16.dp, end = 16.dp),

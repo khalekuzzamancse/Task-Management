@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.PasswordVisualTransformation
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data.FirebaseFireStore
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithTopBarTitleBackArrow
 
 class RegisterData {
     var phoneNumber = ""
@@ -64,22 +65,10 @@ class RegisterData {
 @Preview
 @Composable
 fun RegisterScreen() {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "User Registration") },
-                navigationIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Filled.ArrowBack, null)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-            )
-        }
-    ) { scaffoldPadding ->
+    ScreenWithTopBarTitleBackArrow(
+        title = "User Registration",
+        onBackArrowClick = { /*TODO*/ })
+    { scaffoldPadding ->
         Column(
             modifier = Modifier
                 .padding(scaffoldPadding)
