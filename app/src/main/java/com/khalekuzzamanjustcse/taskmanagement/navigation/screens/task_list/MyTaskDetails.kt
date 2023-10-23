@@ -2,7 +2,9 @@ package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task_list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
@@ -50,18 +52,23 @@ fun TaskDetails(
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Assigned by : $assigner",
             style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = timeStamp,
             style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = description,
-            style = MaterialTheme.typography.titleMedium,
         )
     }
 }
