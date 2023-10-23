@@ -1,18 +1,13 @@
 package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.task
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -29,7 +24,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.khalekuzzamanjustcse.taskmanagement.ui.components.UserInfoCard
 
 
 @Preview
@@ -47,7 +41,6 @@ fun TaskScreen() {
                 onLongClick = screenState::onLongClick,
                 users = screenState.users.collectAsState().value,
                 onCrossClick = { screenState.onUserSelectedModeChanged(false) },
-                onDone = { screenState.onUserSelectedModeChanged(false)}
             )
         } else {
             Column(
@@ -150,40 +143,3 @@ data class TaskAssignedUser(
 )
 
 
-@Composable
-fun AssignUser(
-    modifier: Modifier = Modifier,
-    users: List<TaskAssignedUser> = emptyList(),
-    onLongClick: (Int) -> Unit = {},
-    onDone: () -> Unit = {},
-    onCrossClick: () -> Unit = {},
-) {
-
-    Column(modifier = modifier) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(onClick = onCrossClick) {
-                Icon(imageVector = Icons.Filled.Cancel, contentDescription = null)
-                Text(text = "Cancel")
-            }
-            Button(onClick = onDone) {
-                Icon(imageVector = Icons.Filled.Done, contentDescription = null)
-                Text(text = "Done")
-            }
-        }
-
-        users.forEachIndexed { i, it ->
-            UserInfoCard(
-                name = it.name,
-                phone = it.phone,
-                selected = it.selected,
-                onLongClick = { onLongClick(i) }
-            )
-        }
-
-    }
-
-}
