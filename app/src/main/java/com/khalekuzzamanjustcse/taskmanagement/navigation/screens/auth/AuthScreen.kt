@@ -23,32 +23,28 @@ fun AuthScreen() {
     }
     val registrationMode = viewModel.openRegistrationFrom.collectAsState().value
     if (!registrationMode) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = "User Login") },
-                    navigationIcon = {
-                        IconButton(onClick = {}) {
-                            Icon(Icons.Filled.Menu, null)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                )
-            }
-        ) { scaffoldPadding ->
+        CommonScreen(
+            title = "Login ",
+            onBackArrowClick = viewModel::onRegistrationDone,
+            isLoading = false,
+            showSnackBar =viewModel.showSnackBar.collectAsState().value,
+            snackBarMessage = viewModel.snackBarMessage.collectAsState().value,
+        ) {scaffoldPadding->
             LoginScreen(
                 scaffoldPadding = scaffoldPadding,
-                onRegisterButtonClicked = viewModel::onRegistrationRequest
+                onRegisterButtonClicked = viewModel::onRegistrationRequest,
+                state = viewModel.loginState.collectAsState().value,
+                onLoginButtonClicked = viewModel::onLoginRequest
             )
         }
+
     } else {
         CommonScreen(
             title = "Registration Form",
             onBackArrowClick = viewModel::onRegistrationDone,
-            false
+            isLoading = false,
+            showSnackBar =viewModel.showSnackBar.collectAsState().value,
+            snackBarMessage = viewModel.snackBarMessage.collectAsState().value,
         ) {
             RegisterScreen(
                 scaffoldPadding = it,

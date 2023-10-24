@@ -2,15 +2,11 @@ package com.khalekuzzamanjustcse.taskmanagement.data
 
 import android.util.Log
 import com.google.firebase.Firebase
-import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class AuthManager(
-    private val onSignInSuccess: () -> Unit = {},
-    private val onSignInFailed: () -> Unit = {},
+    private val onSuccess: () -> Unit = {},
+    private val onFailed: () -> Unit = {},
 ) {
     private val auth = Firebase.auth
     private val user = auth.currentUser
@@ -25,14 +21,17 @@ class AuthManager(
 
     }
 
-    fun signIn(email: String, password: String) {
+    fun signIn(
+        email: String,
+        password: String,
+    ) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    onSignInSuccess()
+                    onSuccess()
                     Log.i("CurrentUser: ", "signInWithEmail:success")
                 } else {
-                    onSignInFailed()
+                    onFailed()
                     Log.i("CurrentUser: ", "signInWithEmail:fail")
                 }
             }

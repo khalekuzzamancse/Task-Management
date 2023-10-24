@@ -1,5 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.navigation.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -27,7 +27,7 @@ import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.DrawerItemsPro
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.CircularProgressBar
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun ScreenWithDrawer(
     drawerState: DrawerState,
@@ -54,12 +54,20 @@ fun CommonScreen(
     title: String,
     onBackArrowClick: () -> Unit,
     isLoading: Boolean,
-    showSnackBar: Boolean =false,
-    snackBarMessage: String ="",
+    showSnackBar: Boolean = false,
+    snackBarMessage: String = "",
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val hostState = remember { SnackbarHostState() }
+    val show:()->Unit ={
+        scope.launch {
+            hostState.showSnackbar(snackBarMessage)
+        }
+    }
+    Log.i("SnackbarMessage:","$showSnackBar")
+
+
 
     Scaffold(
         snackbarHost = {
@@ -81,9 +89,10 @@ fun CommonScreen(
         }
     ) { scaffoldPadding ->
         if (isLoading) {
-            Box(modifier = Modifier
-                .padding(scaffoldPadding)
-                .fillMaxSize(),
+            Box(
+                modifier = Modifier
+                    .padding(scaffoldPadding)
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             )
             {
@@ -92,12 +101,8 @@ fun CommonScreen(
         } else {
             content(scaffoldPadding)
         }
-        LaunchedEffect(showSnackBar){
-            if(showSnackBar){
-                scope.launch {
-                    hostState.showSnackbar(snackBarMessage)
-                }
-            }
+        if (showSnackBar) {
+            show()
         }
     }
 }

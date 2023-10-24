@@ -116,11 +116,7 @@ fun NavGraph() {
                 onDrawerItemClick = onDrawerItemClick
             ) {
                 AuthManager().signOut()
-                LoginScreen(
-                    onLoginButtonClicked = {
-                    },
-                    onNavIconClicked = openDrawer
-                )
+
             }
 
         }

@@ -71,20 +71,18 @@ class LoginState{
 
 
 }
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     scaffoldPadding:PaddingValues = PaddingValues(0.dp),
-    onLoginButtonClicked:()->Unit ={},
+    state: LoginState,
+    onLoginButtonClicked:()->Unit,
     onRegisterButtonClicked:()->Unit ={},
     onNavIconClicked:()->Unit ={},
 ) {
     var showPassword by remember {
         mutableStateOf(false)
     }
-    val state = remember {
-        LoginState()
-    }
+
         Column(
             modifier = Modifier
                 .padding(scaffoldPadding)
