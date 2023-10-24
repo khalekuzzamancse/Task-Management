@@ -17,11 +17,13 @@ fun ContactScreen(
     GenericListScreen(
         items = viewModel.users.collectAsState().value,
         isLoading = viewModel.isLoading.collectAsState().value,
+        showSnackBar = viewModel.showSnackBar.collectAsState().value,
+        snackBarMessage = viewModel.snackBarMessage,
         itemContent = { contact ->
             UserInfoCard(name = contact.name, phone = contact.phone)
         },
         screenTitle = "Contacts",
-        onBack =onNavIconClicked,
+        onBack = onNavIconClicked,
     )
 
 }

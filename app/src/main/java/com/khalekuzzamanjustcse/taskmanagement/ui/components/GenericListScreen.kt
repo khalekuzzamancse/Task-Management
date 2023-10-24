@@ -95,12 +95,16 @@ fun <T> GenericListScreen(
     screenTitle: String,
     isLoading: Boolean ,
     onBack: () -> Unit,
+    showSnackBar: Boolean =false,
+    snackBarMessage: String ="",
     itemContent: @Composable (T) -> Unit,
 ) {
     CommonScreen(
         title = screenTitle,
         onBackArrowClick = onBack,
         isLoading = isLoading,
+        showSnackBar=showSnackBar,
+        snackBarMessage = snackBarMessage
     ) { innerPadding ->
         Column(
             modifier = modifier
