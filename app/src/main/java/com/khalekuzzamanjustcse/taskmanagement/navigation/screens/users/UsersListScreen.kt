@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement.ui
+package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.users
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PersonAdd
@@ -6,6 +6,8 @@ import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.khalekuzzamanjustcse.taskmanagement.data.FriendManager
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.GenericListScreen
@@ -30,18 +32,21 @@ fun UserListScreenPreview() {
             User("Mr Bean C", "22222222", isFriend = true),
             User("Mr Bean D", "33333333333", isFriend = false, isSendRequest = true),
         ),
-        onNavIconClicked = {}
+        onNavIconClicked = {},
+        isLoading = true
     )
 }
 
 @Composable
 fun UserListScreen(
-    contacts: List<User>,
-    onNavIconClicked: () -> Unit,
+    contacts: List<User> =emptyList(),
+    isLoading:Boolean,
+    onNavIconClicked: () -> Unit ={},
 ) {
 
     GenericListScreen(
         items = contacts,
+        isLoading = isLoading,
         itemContent = { contact ->
             UserInfoCard(name = contact.name, phone = contact.phone) {
                 if (!contact.isFriend) {

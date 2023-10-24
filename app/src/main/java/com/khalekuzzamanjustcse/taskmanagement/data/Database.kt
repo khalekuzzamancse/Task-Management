@@ -4,7 +4,7 @@ import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.firestore
-import com.khalekuzzamanjustcse.taskmanagement.ui.User
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.users.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext

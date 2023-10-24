@@ -9,7 +9,6 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,12 +17,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.PasswordVisualTransformation
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data.FirebaseFireStore
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithTopBarTitleBackArrow
 
 class RegisterData {
     var phoneNumber = ""

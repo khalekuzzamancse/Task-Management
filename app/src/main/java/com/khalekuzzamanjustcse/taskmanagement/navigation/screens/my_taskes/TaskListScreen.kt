@@ -68,6 +68,7 @@ fun MyTaskListScreen() {
                 )
             },
             screenTitle = "My Task",
+            isLoading = true,
             onBack = { }
         )
     }

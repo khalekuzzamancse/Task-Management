@@ -17,6 +17,8 @@ class TaskScreenViewModel : ViewModel() {
     fun onUserSelectedModeChanged(show: Boolean) {
         _userSelectedMode.value = show
     }
+    private  val _isLoading=MutableStateFlow(true)
+    val isLoading = _isLoading.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -31,6 +33,7 @@ class TaskScreenViewModel : ViewModel() {
                     }
             withContext(Dispatchers.Main){
                 _users.value=newUser
+                _isLoading.value=false
             }
         }
     }

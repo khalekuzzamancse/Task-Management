@@ -1,7 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -14,7 +13,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithTopBarTitleBackArrow
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.CommonScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,9 +45,10 @@ fun AuthScreen() {
             )
         }
     } else {
-        ScreenWithTopBarTitleBackArrow(
+        CommonScreen(
             title = "Registration Form",
-            onBackArrowClick = viewModel::onRegistrationDone
+            onBackArrowClick = viewModel::onRegistrationDone,
+            false
         ) {
             RegisterScreen(
                 scaffoldPadding = it,

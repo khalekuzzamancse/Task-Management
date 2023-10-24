@@ -3,33 +3,34 @@ package com.khalekuzzamanjustcse.taskmanagement.navigation.navgraph
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.khalekuzzamanjustcse.taskmanagement.ui.ContactScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui.FetchContact
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.ContactScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.FetchContact
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
-import com.khalekuzzamanjustcse.taskmanagement.data.FriendManager
-import com.khalekuzzamanjustcse.taskmanagement.data.UserCollections
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithDrawer
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.AuthScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui.FriendListScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui.FriendRequestListScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friends.FriendListScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.HomePage
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.LoginScreen
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.RegisterScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.create_task.TaskScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.DeviceContactViewModel
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestScreenViewModel
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friends.FriendListScreenViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.MyTaskListScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui.User
-import com.khalekuzzamanjustcse.taskmanagement.ui.UserListScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.users.UserListScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.users.UsersScreenViewModel
 
 
 @Composable
@@ -73,7 +74,7 @@ fun NavGraph() {
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
-              AuthScreen()
+                AuthScreen()
             }
 
         }
@@ -83,10 +84,13 @@ fun NavGraph() {
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
+
+                val viewModel = remember {
+                    DeviceContactViewModel(context)
+                }
                 ContactScreen(
-                    onNavIconClicked = openDrawer,
-                    contacts = FetchContact(context).getContact()
-                )
+                    viewModel = viewModel,
+                    onNavIconClicked = openDrawer,)
             }
 
         }
@@ -96,13 +100,13 @@ fun NavGraph() {
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
-                var users by remember {
-                    mutableStateOf(emptyList<User>())
+                val viewModel = remember {
+                    UsersScreenViewModel()
                 }
-                LaunchedEffect(Unit) {
-                    users = UserCollections().allUsers()
-                }
-                UserListScreen(contacts = users, onNavIconClicked = openDrawer)
+                UserListScreen(
+                    contacts = viewModel.users.collectAsState().value,
+                    isLoading = viewModel.isLoading.collectAsState().value,
+                )
             }
 
         }
@@ -127,17 +131,15 @@ fun NavGraph() {
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
-                var users by remember {
-                    mutableStateOf(emptyList<User>())
+                val viewModel = remember {
+                    FriendRequestScreenViewModel()
                 }
-                LaunchedEffect(Unit) {
-                    val request = FriendManager().getFriendRequest()
-                    users = request.map { it.user }
+
+                FriendRequestListScreen(
+                    viewModel = viewModel
+                ) {
 
                 }
-                FriendRequestListScreen(
-                    contacts = users
-                ) {}
 
             }
 
@@ -148,16 +150,13 @@ fun NavGraph() {
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
-                var users by remember {
-                    mutableStateOf(emptyList<User>())
-                }
 
-                LaunchedEffect(Unit) {
-                    users = FriendManager().getFriends()
+                val viewModel = remember {
+                    FriendListScreenViewModel()
                 }
 
                 FriendListScreen(
-                    contacts = users,
+                    viewModel = viewModel,
                     onNavIconClicked = {},
                 )
 

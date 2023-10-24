@@ -40,6 +40,7 @@ fun TaskScreen() {
                 modifier = Modifier.matchParentSize(),
                 onLongClick = screenState::onLongClick,
                 users = screenState.users.collectAsState().value,
+                isLoading = screenState.isLoading.collectAsState().value,
                 onCrossClick = { screenState.onUserSelectedModeChanged(false) },
             )
         } else {

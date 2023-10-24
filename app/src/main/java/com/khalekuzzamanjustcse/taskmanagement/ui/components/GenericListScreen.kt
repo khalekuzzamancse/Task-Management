@@ -20,8 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithTopBarTitleBackArrow
-import com.khalekuzzamanjustcse.taskmanagement.ui.Contact
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.CommonScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.Contact
 
 @Preview
 @Composable
@@ -88,18 +88,19 @@ fun <T> GenericListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> GenericListScreen(
     modifier: Modifier = Modifier,
     items: List<T>,
     screenTitle: String,
+    isLoading: Boolean ,
     onBack: () -> Unit,
     itemContent: @Composable (T) -> Unit,
 ) {
-    ScreenWithTopBarTitleBackArrow(
+    CommonScreen(
         title = screenTitle,
-        onBackArrowClick = onBack
+        onBackArrowClick = onBack,
+        isLoading = isLoading,
     ) { innerPadding ->
         Column(
             modifier = modifier

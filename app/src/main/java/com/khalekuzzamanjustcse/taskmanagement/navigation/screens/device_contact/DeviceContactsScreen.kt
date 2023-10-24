@@ -1,26 +1,27 @@
-package com.khalekuzzamanjustcse.taskmanagement.ui
+package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact
 
 import android.content.Context
 import android.provider.ContactsContract
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.GenericListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.UserInfoCard
 
 
 @Composable
 fun ContactScreen(
-    contacts: List<Contact>,
+    viewModel: DeviceContactViewModel,
     onNavIconClicked: () -> Unit,
 ) {
     GenericListScreen(
-        items = contacts,
+        items = viewModel.users.collectAsState().value,
+        isLoading = viewModel.isLoading.collectAsState().value,
         itemContent = { contact ->
             UserInfoCard(name = contact.name, phone = contact.phone)
         },
         screenTitle = "Contacts",
-        onBack =onNavIconClicked
+        onBack =onNavIconClicked,
     )
 
 }
@@ -32,6 +33,8 @@ data class Contact(
 )
 
 class FetchContact(private val context: Context) {
+
+
     fun getContact(): List<Contact> {
         val contacts = mutableListOf<Contact>()
         val uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
