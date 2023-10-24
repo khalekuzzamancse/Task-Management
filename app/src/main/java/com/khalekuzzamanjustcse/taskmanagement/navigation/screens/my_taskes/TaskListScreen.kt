@@ -2,8 +2,6 @@ package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.ui.tooling.preview.Preview
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.GenericListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.MyTaskCard
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.MyTask
@@ -35,40 +33,41 @@ val dummyTaskList = listOf(
     MyTask("Task 5", "Description for Task 5", "Eva Brown", true, "2023-10-27 09:30 AM")
 )
 
-@Preview
+
 @Composable
-fun MyTaskListScreen() {
-    val state = remember {
-        MyTaskViewModel()
-    }
-    val currentOpenTask=state.currentOpenTask.collectAsState().value
+fun MyTaskListScreen(
+    viewModel:MyTaskViewModel,
+) {
+
+    val currentOpenTask=viewModel.currentOpenTask.collectAsState().value
+
     if(currentOpenTask!=null){
         TaskDetails(
             title =currentOpenTask.tile,
             assigner =currentOpenTask.assigner,
             timeStamp =currentOpenTask.timestamp,
             description =currentOpenTask.description,
-            onClose = state::onTaskDescriptionClose
+            onClose = viewModel::onTaskDescriptionClose
         )
     }
     else{
         GenericListScreen(
-            items = state.tasks.collectAsState().value,
+            items = viewModel.tasks.collectAsState().value,
+            isLoading = viewModel.isLoading.collectAsState().value,
             itemContent = { myTask ->
                 MyTaskCard(
                     title = myTask.tile,
                     assigner = myTask.assigner,
                     onCheckedChanged = {
-                        state.onCheckChanged(myTask, it)
+                        viewModel.onCheckChanged(myTask, it)
                     },
                     checked = myTask.status,
                     onLongClick = {
-                        state.onLongClick(myTask)
+                        viewModel.onLongClick(myTask)
                     }
                 )
             },
             screenTitle = "My Task",
-            isLoading = true,
             onBack = { }
         )
     }

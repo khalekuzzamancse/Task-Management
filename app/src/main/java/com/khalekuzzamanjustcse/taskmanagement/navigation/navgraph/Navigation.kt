@@ -9,14 +9,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.ContactScreen
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.FetchContact
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithDrawer
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.AuthScreen
@@ -29,6 +27,7 @@ import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestScreenViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friends.FriendListScreenViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.MyTaskListScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.MyTaskViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.users.UserListScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.users.UsersScreenViewModel
 
@@ -180,7 +179,10 @@ fun NavGraph() {
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
-                MyTaskListScreen()
+                val viewModel= remember {
+                    MyTaskViewModel()
+                }
+                MyTaskListScreen(viewModel = viewModel)
             }
 
         }
