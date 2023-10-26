@@ -115,6 +115,33 @@ class FirebaseFireStore {
         }
     }
 
+    suspend fun getSingedUser(email: String?): User? {
+        if (email == null)
+            return null
+        return try {
+            val querySnapshot = withContext(Dispatchers.IO) {
+                db.collection("Users")
+                    .whereEqualTo("Email", email)
+                    .get()
+                    .await()
+            }
+
+            if (!querySnapshot.isEmpty) {
+                val document = querySnapshot.documents.first()
+                val name = document.getString("Name")
+                var user:User?=null
+                name?.let {
+                   user= User(name = it, phone = "")
+                }
+                user
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     suspend fun getDocuments(
         collectionName: String,
         whereClause: Filter,
@@ -127,7 +154,7 @@ class FirebaseFireStore {
                     .await()
             }
             if (!querySnapshot.isEmpty) {
-                val  document = querySnapshot.documents
+                val document = querySnapshot.documents
             }
         } catch (_: Exception) {
 

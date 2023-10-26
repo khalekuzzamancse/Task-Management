@@ -25,6 +25,7 @@ import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.create_task.Ta
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.DeviceContactViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestScreenViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friends.FriendListScreenViewModel
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.home.Home
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.MyTaskListScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.MyTaskViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.users.UserListScreen
@@ -47,6 +48,9 @@ fun NavGraph() {
     val onDrawerItemClick: (String) -> Unit = {
         navigationAction.navigateTo(it)
     }
+    val navigateToCreateTaskScreen:()-> Unit = {
+        navigationAction.navigateTo(Screen.Task.route)
+    }
     val context = LocalContext.current
 
 
@@ -62,7 +66,10 @@ fun NavGraph() {
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
-                HomePage()
+                Home(
+                    openDrawer=openDrawer,
+                    onCreateTask = navigateToCreateTaskScreen
+                )
             }
 
         }

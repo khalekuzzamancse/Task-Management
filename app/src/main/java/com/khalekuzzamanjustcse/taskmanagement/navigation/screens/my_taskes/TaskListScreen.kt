@@ -13,7 +13,6 @@ import com.khalekuzzamanjustcse.taskmanagement.ui.components.MyTask
 fun MyTaskListScreen(
     viewModel: MyTaskViewModel,
 ) {
-
     val currentOpenTask = viewModel.currentOpenTask.collectAsState().value
     if (currentOpenTask != null) {
         TaskDetails(
@@ -45,6 +44,5 @@ fun MyTaskListScreen(
         )
 
     }
-
 
 }
