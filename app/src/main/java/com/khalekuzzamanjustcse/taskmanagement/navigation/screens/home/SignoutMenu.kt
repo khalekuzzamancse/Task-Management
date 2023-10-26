@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -36,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.ProfileImage
 import com.khalekuzzamanjustcse.taskmanagement.ui.theme.TaskManagementTheme
 
@@ -62,15 +64,19 @@ fun HomeScreenDropDown(
             }
         )
     } else {
+
         DropdownMenu(
             modifier = Modifier
                 .padding(16.dp),
             expanded = true,
-            onDismissRequest = { showMenu = false }) {
+            onDismissRequest = { showMenu = false },
+
+
+            ) {
             Column(modifier = Modifier) {
                 ProfileSection()
                 Spacer(modifier = Modifier.height(16.dp))
-                Divider(modifier = Modifier.fillMaxWidth())
+                HorizontalDivider(modifier = Modifier.fillMaxWidth())
                 Spacer(modifier = Modifier.height(16.dp))
 
                 DropdownMenuItem(
