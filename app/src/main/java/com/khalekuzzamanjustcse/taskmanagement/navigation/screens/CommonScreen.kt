@@ -81,10 +81,7 @@ fun CommonScreen(
                         Icon(Icons.Filled.ArrowBack, null)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
+
             )
         }
     ) { scaffoldPadding ->

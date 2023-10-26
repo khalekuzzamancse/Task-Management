@@ -17,39 +17,49 @@ import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.CommonScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AuthScreen() {
+fun AuthScreen(
+    onLoginSuccess: ()->Unit={},
+) {
     val viewModel = remember {
         AuthViewModel()
     }
     val registrationMode = viewModel.openRegistrationFrom.collectAsState().value
-    if (!registrationMode) {
-        CommonScreen(
-            title = "Login ",
-            onBackArrowClick = viewModel::onRegistrationDone,
-            isLoading = false,
-            showSnackBar =viewModel.showSnackBar.collectAsState().value,
-            snackBarMessage = viewModel.snackBarMessage.collectAsState().value,
-        ) {scaffoldPadding->
-            LoginScreen(
-                scaffoldPadding = scaffoldPadding,
-                onRegisterButtonClicked = viewModel::onRegistrationRequest,
-                state = viewModel.loginState.collectAsState().value,
-                onLoginButtonClicked = viewModel::onLoginRequest
-            )
-        }
 
-    } else {
-        CommonScreen(
-            title = "Registration Form",
-            onBackArrowClick = viewModel::onRegistrationDone,
-            isLoading = false,
-            showSnackBar =viewModel.showSnackBar.collectAsState().value,
-            snackBarMessage = viewModel.snackBarMessage.collectAsState().value,
-        ) {
-            RegisterScreen(
-                scaffoldPadding = it,
-                onDone = viewModel::onRegistrationDone
-            )
+    if (viewModel.alreadyLogin.collectAsState().value){
+        onLoginSuccess ()
+    }
+    else{
+        if (!registrationMode) {
+            CommonScreen(
+                title = "Login ",
+                onBackArrowClick = viewModel::onRegistrationDone,
+                isLoading = false,
+                showSnackBar =viewModel.showSnackBar.collectAsState().value,
+                snackBarMessage = viewModel.snackBarMessage.collectAsState().value,
+            ) {scaffoldPadding->
+                LoginScreen(
+                    scaffoldPadding = scaffoldPadding,
+                    onRegisterButtonClicked = viewModel::onRegistrationRequest,
+                    state = viewModel.loginState.collectAsState().value,
+                    onLoginButtonClicked = viewModel::onLoginRequest
+                )
+            }
+
+        } else {
+            CommonScreen(
+                title = "Registration Form",
+                onBackArrowClick = viewModel::onRegistrationDone,
+                isLoading = false,
+                showSnackBar =viewModel.showSnackBar.collectAsState().value,
+                snackBarMessage = viewModel.snackBarMessage.collectAsState().value,
+            ) {
+                RegisterScreen(
+                    scaffoldPadding = it,
+                    onDone = viewModel::onRegistrationDone
+                )
+            }
         }
     }
+
+
 }

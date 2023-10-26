@@ -52,6 +52,7 @@ fun HomePreview() {
 fun Home(
     onCreateTask: () -> Unit = {},
     openDrawer: () -> Unit = {},
+    onLogOut: () -> Unit = {},
     onTaskDetailsOpen: (TaskEntity) -> Unit = {},
 ) {
 
@@ -71,10 +72,16 @@ fun Home(
         }
     }
 
+
+
     Scaffold(
         topBar = {
             HomeTopAppbar(
-                onNavigationIconClick = onNavigationIconClick
+                onNavigationIconClick = onNavigationIconClick,
+               // onLogOut = onLogOut
+                onLogOut = {
+
+                }
             )
         },
         floatingActionButton = {
@@ -84,6 +91,7 @@ fun Home(
         },
         floatingActionButtonPosition = FabPosition.Center
     ) {
+
         Column(
             modifier = Modifier
                 .padding(it)
@@ -133,19 +141,26 @@ fun UserInfo(
 @Composable
 fun HomeTopAppbar(
     navigationIcon: ImageVector = Icons.Filled.Segment,
-    onNavigationIconClick: () -> Unit = {}
+    onNavigationIconClick: () -> Unit = {},
+    onLogOut: () -> Unit = {},
 ) {
     TopAppBar(
-        title = {
-        },
+        title = { Text(text = "Home") },
         navigationIcon = {
             IconButton(onClick = onNavigationIconClick) {
                 Icon(navigationIcon, null)
             }
         },
         actions = {
-            Spacer(modifier = Modifier.weight(1f))
-            ProfileImage()
+            HomeScreenDropDown(onLogOutIconClick = {
+               // onLogOut()
+            })
+//            ProfileImage(
+//                onClick = {
+//                    AuthManager().signOut()
+//                    onLogOut()
+//                }
+//            )
         },
     )
 }

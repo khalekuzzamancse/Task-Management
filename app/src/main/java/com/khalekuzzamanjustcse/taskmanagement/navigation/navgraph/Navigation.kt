@@ -55,7 +55,6 @@ fun NavGraph() {
         TaskEntity()
     }
     val onTaskDetailsOpen: (TaskEntity) -> Unit = {
-        Log.d("AAAAAAAAAAAA", "onTaskDetailsOpen")
         task = it
         navigationAction.navigateTo(Screen.MyTaskDetails.route)
     }
@@ -70,7 +69,7 @@ fun NavGraph() {
     NavHost(
         navController = navController,
         route = "MainScreen",
-        startDestination = Screen.Home.route
+        startDestination = Screen.Login.route
     ) {
 
         composable(route = Screen.Home.route) {
@@ -83,6 +82,9 @@ fun NavGraph() {
                     openDrawer = openDrawer,
                     onCreateTask = navigateToCreateTaskScreen,
                     onTaskDetailsOpen = onTaskDetailsOpen,
+                    onLogOut = {
+                        navController.navigate(Screen.Login.route)
+                    }
                 )
             }
 
@@ -93,7 +95,10 @@ fun NavGraph() {
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
-                AuthScreen()
+                AuthScreen(onLoginSuccess = {
+//                    navController.popBackStack()
+                    navigationAction.navigateTo( Screen.Home.route)
+                })
             }
 
         }
@@ -130,17 +135,7 @@ fun NavGraph() {
             }
 
         }
-        composable(route = Screen.Logout.route) {
-            ScreenWithDrawer(
-                drawerState = drawerState,
-                closeDrawer = onCloseDrawer,
-                onDrawerItemClick = onDrawerItemClick
-            ) {
-                AuthManager().signOut()
 
-            }
-
-        }
         composable(route = Screen.FriendRequest.route) {
             ScreenWithDrawer(
                 drawerState = drawerState,

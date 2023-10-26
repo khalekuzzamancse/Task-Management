@@ -3,13 +3,16 @@ package com.khalekuzzamanjustcse.taskmanagement.data
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class AuthManager(
     private val onSuccess: () -> Unit = {},
     private val onFailed: () -> Unit = {},
+    private val onLogout: () -> Unit = {},
 ) {
     private val auth = Firebase.auth
     private val user = auth.currentUser
+
     fun createAccount(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -60,5 +63,6 @@ class AuthManager(
 
     fun signOut() {
         auth.signOut()
+        onLogout()
     }
 }

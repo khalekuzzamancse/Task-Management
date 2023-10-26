@@ -12,6 +12,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AuthViewModel : ViewModel() {
+
+    //
+    private val _alreadyLogin = MutableStateFlow(
+        AuthManager().singedInUserEmail() != null
+    )
+    val alreadyLogin = _alreadyLogin.asStateFlow()
+
     //Handling registration
     private val _openRegistrationFrom = MutableStateFlow(false)
     val openRegistrationFrom = _openRegistrationFrom.asStateFlow()
@@ -28,7 +35,6 @@ class AuthViewModel : ViewModel() {
     val loginState = _loginState.asStateFlow()
 
 
-
     //Snack bar management
     private val _snackBarMessage = MutableStateFlow("")
     val snackBarMessage = _snackBarMessage.asStateFlow()
@@ -37,28 +43,28 @@ class AuthViewModel : ViewModel() {
     //
 
     fun onLoginRequest() {
+
         AuthManager(
             onSuccess = {
-
                 _snackBarMessage.value = "Login successfully"
                 _showSnackBar.value = true
                 viewModelScope.launch {
                     delay(300)
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         _showSnackBar.value = false
+                        _alreadyLogin.value = true
                     }
 
                 }
 
 
-
             },
             onFailed = {
-                _snackBarMessage.value =  "Login failed"
+                _snackBarMessage.value = "Login failed"
                 _showSnackBar.value = true
                 viewModelScope.launch {
                     delay(300)
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         _showSnackBar.value = false
                     }
 

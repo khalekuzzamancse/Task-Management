@@ -28,11 +28,9 @@ object DrawerItemsProvider {
         name = "",
         members = listOf(
             ModalDrawerItem(Screen.Home.route, Icons.Filled.Home),
-            ModalDrawerItem(Screen.Login.route, Icons.Filled.Login),
             ModalDrawerItem(Screen.Contact.route, Icons.Filled.Contacts),
             ModalDrawerItem(Screen.Users.route, Icons.Filled.Person),
             ModalDrawerItem(Screen.FriendRequest.route, Icons.Filled.Logout),
-            ModalDrawerItem(Screen.Friends.route, Icons.Filled.Logout),
 
         )
     )
