@@ -20,8 +20,7 @@ import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithDraw
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.AuthScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friends.FriendListScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestListScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui.HomePage
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.LoginScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.home.HomePage
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.create_task.TaskScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.DeviceContactViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestScreenViewModel

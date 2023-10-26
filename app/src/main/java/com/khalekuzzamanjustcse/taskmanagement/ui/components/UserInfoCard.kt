@@ -86,18 +86,7 @@ fun UserInfoCard(
                 SelectedProfileImage()
 
             } else {
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceTint)
-                        .padding(8.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Person,
-                        contentDescription = "Contact Icon",
-                        tint = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp)
-                    )
-                }
+                ProfileImage()
 
             }
 
@@ -116,6 +105,23 @@ fun UserInfoCard(
             endExtraContent()
         }
 
+    }
+
+}
+
+@Composable
+fun ProfileImage() {
+    Box(
+        modifier = Modifier
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceTint)
+            .padding(8.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Person,
+            contentDescription = "Contact Icon",
+            tint = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp)
+        )
     }
 
 }

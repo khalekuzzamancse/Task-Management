@@ -14,10 +14,7 @@ fun MyTaskListScreen(
     viewModel: MyTaskViewModel,
 ) {
 
-
     val currentOpenTask = viewModel.currentOpenTask.collectAsState().value
-
-
     if (currentOpenTask != null) {
         TaskDetails(
             title = currentOpenTask.title,
