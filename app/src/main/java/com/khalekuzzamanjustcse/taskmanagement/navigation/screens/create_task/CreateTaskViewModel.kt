@@ -1,5 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.create_task
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khalekuzzamanjustcse.taskmanagement.data.TaskEntity
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class TaskScreenViewModel : ViewModel() {
+class CreateTaskViewModel : ViewModel() {
     //Manipulating the user selection and task
     //---------------
     private val _userSelectedMode = MutableStateFlow(false)
@@ -56,14 +57,13 @@ class TaskScreenViewModel : ViewModel() {
         _description.value = description
     }
     fun  onDone(){
-        TaskTable().addTask(
-            TaskEntity(
-                title=_title.value,
-                description=_description.value,
-                assigneePhone = "",
-                assignerName = "Mr Bean"
-            )
+        val task=TaskEntity(
+            title=_title.value,
+            description=_description.value,
+            assigneePhone = "",
+            assignerName = "Mr Bean"
         )
+        TaskTable().addTask(task)
     }
 
     //Manipulating the selected user
