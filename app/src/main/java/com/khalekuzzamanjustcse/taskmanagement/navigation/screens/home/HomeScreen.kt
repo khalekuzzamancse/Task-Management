@@ -34,8 +34,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data.FirebaseFireStore
+import com.khalekuzzamanjustcse.taskmanagement.data.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.MyTaskViewModel
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.TaskDetails
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.ProfileImage
 import com.khalekuzzamanjustcse.taskmanagement.ui.theme.TaskManagementTheme
 
@@ -51,7 +51,8 @@ fun HomePreview() {
 @Composable
 fun Home(
     onCreateTask: () -> Unit = {},
-    openDrawer: () -> Unit = {}
+    openDrawer: () -> Unit = {},
+    onTaskDetailsOpen: (TaskEntity) -> Unit = {},
 ) {
 
     var username by remember {
@@ -60,22 +61,9 @@ fun Home(
     val viewModel = remember {
         MyTaskViewModel()
     }
-    val taskDetails = viewModel.currentOpenTask.collectAsState().value != null
-    val navigationIcon = if (taskDetails) Icons.Filled.ArrowBack else Icons.Filled.Segment
-
     val onNavigationIconClick: () -> Unit = {
-        if (taskDetails) {
-            viewModel.onTaskDescriptionClose()
-        }
-        else{
-            openDrawer()
-        }
+        openDrawer()
     }
-    val currentOpenTask = viewModel.currentOpenTask.collectAsState().value
-
-
-
-
     LaunchedEffect(Unit) {
         val user = FirebaseFireStore().getSingedUser(AuthManager().singedInUserEmail())
         user?.let {
@@ -86,7 +74,6 @@ fun Home(
     Scaffold(
         topBar = {
             HomeTopAppbar(
-                navigationIcon = navigationIcon,
                 onNavigationIconClick = onNavigationIconClick
             )
         },
@@ -103,16 +90,14 @@ fun Home(
                 .padding(start = 16.dp)
                 .fillMaxSize()
         ) {
-            if (currentOpenTask != null) {
-                MyTaskDetails(task=currentOpenTask)
-            } else {
-                UserInfo(username = username)
-                Spacer(modifier = Modifier.height(16.dp))
-                MyTaskList(
-                    viewModel, onTaskClick = { myTask ->
-                        viewModel.onLongClick(myTask)
-                    })
-            }
+            UserInfo(username = username)
+            Spacer(modifier = Modifier.height(16.dp))
+            MyTaskList(
+                viewModel, onTaskClick = { myTask ->
+                    viewModel.onLongClick(myTask)
+                    onTaskDetailsOpen(myTask)
+                })
+
 
         }
 

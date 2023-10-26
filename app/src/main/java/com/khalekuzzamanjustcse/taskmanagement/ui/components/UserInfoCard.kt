@@ -2,6 +2,7 @@ package com.khalekuzzamanjustcse.taskmanagement.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -75,7 +76,7 @@ fun UserInfoCard(
 
             },
 //        shape = MaterialTheme.shapes.medium,
-        color =if(selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+        color = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
     ) {
         Row(
             modifier = Modifier,
@@ -110,12 +111,17 @@ fun UserInfoCard(
 }
 
 @Composable
-fun ProfileImage() {
+fun ProfileImage(
+    onClick: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surfaceTint)
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                onClick()
+            },
     ) {
         Icon(
             imageVector = Icons.Filled.Person,

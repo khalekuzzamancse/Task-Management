@@ -12,26 +12,18 @@ import com.khalekuzzamanjustcse.taskmanagement.ui.components.UserInfoCard
 fun AssignUser(
     modifier: Modifier = Modifier,
     users: List<TaskAssignedUser> = emptyList(),
-    isLoading:Boolean=false,
+    isLoading: Boolean = false,
     onLongClick: (Int) -> Unit = {},
     onCrossClick: () -> Unit = {},
 ) {
-    CommonScreen(
-        title = "Choose Users",
-        onBackArrowClick =onCrossClick,
-        isLoading = isLoading
-    )
-    { scaffoldPadding ->
-        Column(modifier = modifier.padding(scaffoldPadding)) {
-            users.forEachIndexed { i, it ->
-                UserInfoCard(
-                    name = it.name,
-                    phone = it.phone,
-                    selected = it.selected,
-                    onLongClick = { onLongClick(i) }
-                )
-            }
-
+    Column(modifier = modifier) {
+        users.forEachIndexed { i, it ->
+            UserInfoCard(
+                name = it.name,
+                phone = it.phone,
+                selected = it.selected,
+                onLongClick = { onLongClick(i) }
+            )
         }
     }
 

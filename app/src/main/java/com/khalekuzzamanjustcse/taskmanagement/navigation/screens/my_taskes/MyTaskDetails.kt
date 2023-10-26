@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.khalekuzzamanjustcse.taskmanagement.data.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.CommonScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui.components.MyTask
 
@@ -20,23 +21,20 @@ import com.khalekuzzamanjustcse.taskmanagement.ui.components.MyTask
 @Composable
 fun TaskDetailsPreview() {
     val task =
-        MyTask("Task 2", "Description for Task 2", "Jane Smith", false, "2023-10-24 10:30 AM")
-    TaskDetails(
-        title = task.tile,
-        assigner = task.assigner,
-        timeStamp = task.timestamp,
-        description = task.description,
+        TaskEntity(
+            title = "Task 2",
+            description = "Description for Task 2",
+        )
+    TaskDetailsScreen(
+        task = task,
         onClose = {}
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskDetails(
-    title: String,
-    assigner: String,
-    timeStamp: String,
-    description: String,
+fun TaskDetailsScreen(
+    task: TaskEntity,
     onClose: () -> Unit,
 ) {
     CommonScreen(
@@ -52,25 +50,25 @@ fun TaskDetails(
                 .fillMaxSize()
         ) {
             Text(
-                text = title,
+                text = task.title,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Assigned by : $assigner",
+                text = "Assigned by : ${task.assignerName}",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = timeStamp,
+                text = "23 OCTOBER 2023",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = description,
+                text = task.description,
             )
         }
     }

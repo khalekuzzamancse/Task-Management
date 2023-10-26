@@ -1,5 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.navigation.navgraph
 
+import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.runtime.Composable
@@ -16,18 +17,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.ContactScreen
 import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
+import com.khalekuzzamanjustcse.taskmanagement.data.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithDrawer
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.AuthScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friends.FriendListScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestListScreen
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.home.HomePage
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.create_task.TaskScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.DeviceContactViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestScreenViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friends.FriendListScreenViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.home.Home
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.MyTaskListScreen
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.MyTaskViewModel
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.TaskDetailsScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.users.UserListScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.users.UsersScreenViewModel
 
@@ -48,9 +48,22 @@ fun NavGraph() {
     val onDrawerItemClick: (String) -> Unit = {
         navigationAction.navigateTo(it)
     }
-    val navigateToCreateTaskScreen:()-> Unit = {
+    val navigateToCreateTaskScreen: () -> Unit = {
         navigationAction.navigateTo(Screen.Task.route)
     }
+    var task = remember {
+        TaskEntity()
+    }
+    val onTaskDetailsOpen: (TaskEntity) -> Unit = {
+        Log.d("AAAAAAAAAAAA", "onTaskDetailsOpen")
+        task = it
+        navigationAction.navigateTo(Screen.MyTaskDetails.route)
+    }
+    val onTaskDetailsClose: () -> Unit = {
+        navigationAction.navigateTo(Screen.Home.route)
+    }
+
+
     val context = LocalContext.current
 
 
@@ -67,8 +80,9 @@ fun NavGraph() {
                 onDrawerItemClick = onDrawerItemClick
             ) {
                 Home(
-                    openDrawer=openDrawer,
-                    onCreateTask = navigateToCreateTaskScreen
+                    openDrawer = openDrawer,
+                    onCreateTask = navigateToCreateTaskScreen,
+                    onTaskDetailsOpen = onTaskDetailsOpen,
                 )
             }
 
@@ -95,7 +109,8 @@ fun NavGraph() {
                 }
                 ContactScreen(
                     viewModel = viewModel,
-                    onNavIconClicked = openDrawer,)
+                    onNavIconClicked = openDrawer,
+                )
             }
 
         }
@@ -164,29 +179,16 @@ fun NavGraph() {
             }
 
         }
+
         composable(route = Screen.Task.route) {
-            ScreenWithDrawer(
-                drawerState = drawerState,
-                closeDrawer = onCloseDrawer,
-                onDrawerItemClick = onDrawerItemClick
-            ) {
-                TaskScreen()
-
-            }
-
+            TaskScreen(
+                onBackArrowClick = {
+                    navController.popBackStack()
+                })
         }
-        composable(route = Screen.MyTask.route) {
-            ScreenWithDrawer(
-                drawerState = drawerState,
-                closeDrawer = onCloseDrawer,
-                onDrawerItemClick = onDrawerItemClick
-            ) {
-                val viewModel= remember {
-                    MyTaskViewModel()
-                }
-                MyTaskListScreen(viewModel = viewModel)
-            }
 
+        composable(route = Screen.MyTaskDetails.route) {
+            TaskDetailsScreen(task = task, onClose = onTaskDetailsClose)
         }
 
     }
