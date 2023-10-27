@@ -33,8 +33,9 @@ private fun FormStatePreview() {
         FormTextFieldStateManager(
             fieldState = FormTextFieldState(
                 label = "User Name",
+                leadingIcon = Icons.Filled.Person,
                 containerColor = containerColor,
-                leadingIcon = Icons.Filled.Person
+                readOnly = false
             ),
         )
     }
@@ -42,9 +43,10 @@ private fun FormStatePreview() {
         FormTextFieldStateManager(
             fieldState = FormTextFieldState(
                 label = "Password",
-                containerColor = containerColor,
                 leadingIcon = Icons.Filled.Lock,
-                trailingIcon = Icons.Filled.Visibility
+                trailingIcon = Icons.Filled.Visibility,
+                containerColor = containerColor,
+                readOnly = false
             ),
             observeTrailingIconClick = { passwordState ->
                 if (passwordState.visualTransformation == VisualTransformation.None) {
@@ -82,12 +84,8 @@ private fun FormStatePreview() {
             onTrailingIconClick = password::onTrailingIconClick
         )
         Button(onClick = {
-            userName.validate {text->
-            if (text.trim().isEmpty()) "Can not be empty" else null
-            }
-            password.validate {text->
-                if (text.trim().length<6) "Length at least 6" else null
-            }
+            userName.validate()
+            password.validate()
         }) {
             Text(text = "Validate")
         }
@@ -98,6 +96,7 @@ private fun FormStatePreview() {
 class FormTextFieldStateManager(
     fieldState: FormTextFieldState,
     private val observeTrailingIconClick: ((FormTextFieldState) -> FormTextFieldState)? = null,
+    var validator: ((String) -> String?)? = null
 ) {
     private val _state = MutableStateFlow(fieldState)
     val state = _state.asStateFlow()
@@ -105,9 +104,12 @@ class FormTextFieldStateManager(
         _state.value = _state.value.copy(text = text)
     }
 
-    fun validate(isValid: (String) -> String?){
-        val errorMessage = isValid(_state.value.text)
-        _state.value=_state.value.copy(errorMessage=errorMessage)
+
+    fun validate() {
+        validator?.let {
+            val errorMessage = it(_state.value.text)
+            _state.value = _state.value.copy(errorMessage = errorMessage)
+        }
     }
 
     fun onTrailingIconClick() {

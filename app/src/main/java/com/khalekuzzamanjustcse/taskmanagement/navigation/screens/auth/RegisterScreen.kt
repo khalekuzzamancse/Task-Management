@@ -30,46 +30,61 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.PasswordVisualTransformation
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FieldValidator
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormManager
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextFieldState
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextFieldStateManager
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextInput
 
 class RegistrationFormManager(
     containerColor: Color
-) {
+) : FormManager() {
+    private val validator = FieldValidator()
+
     val email = FormTextFieldStateManager(
         fieldState = FormTextFieldState(
             label = "Email",
+            leadingIcon = Icons.Filled.Email,
+            keyboardType = KeyboardType.Email,
             containerColor = containerColor,
-            leadingIcon = Icons.Filled.Email
+            readOnly = false
         ),
+        validator = validator::validateEmail
     )
     val name = FormTextFieldStateManager(
         fieldState = FormTextFieldState(
             label = "Name",
+            leadingIcon = Icons.Filled.Person,
             containerColor = containerColor,
-            leadingIcon = Icons.Filled.Person
+            readOnly = false
         ),
+        validator = validator::validateEmpty
     )
     val phone = FormTextFieldStateManager(
         fieldState = FormTextFieldState(
             label = "Phone Number",
+            leadingIcon = Icons.Filled.Phone,
+            keyboardType = KeyboardType.Number,
             containerColor = containerColor,
-            leadingIcon = Icons.Filled.Phone
+            readOnly = false
         ),
+        validator = validator::validatePhoneNo
     )
     val password = FormTextFieldStateManager(
         fieldState = FormTextFieldState(
             label = "Password",
-            containerColor = containerColor,
             leadingIcon = Icons.Filled.Lock,
-            trailingIcon = Icons.Filled.Visibility
+            trailingIcon = Icons.Filled.Visibility,
+            keyboardType = KeyboardType.Password,
+            containerColor = containerColor,
+            readOnly = false
         ),
+        validator = validator::validatePassword,
         observeTrailingIconClick = { passwordState ->
             if (passwordState.visualTransformation == VisualTransformation.None) {
                 passwordState
@@ -89,10 +104,13 @@ class RegistrationFormManager(
     val passwordConfirm = FormTextFieldStateManager(
         fieldState = FormTextFieldState(
             label = "Confirm Password",
-            containerColor = containerColor,
             leadingIcon = Icons.Filled.Lock,
-            trailingIcon = Icons.Filled.Visibility
+            trailingIcon = Icons.Filled.Visibility,
+            keyboardType = KeyboardType.Password,
+            containerColor = containerColor,
+            readOnly = false
         ),
+        validator = validator::validatePassword,
         observeTrailingIconClick = { passwordState ->
             if (passwordState.visualTransformation == VisualTransformation.None) {
                 passwordState
@@ -109,16 +127,9 @@ class RegistrationFormManager(
             }
         }
     )
+    override val field: List<FormTextFieldStateManager> =
+        listOf(email, name, phone, password, passwordConfirm)
 
-    private val validator = FieldValidator()
-
-    fun validate() {
-        email.validate(validator::validateEmail)
-        name.validate(validator::validateEmpty)
-        phone.validate(validator::validatePhoneNo)
-        password.validate(validator::validatePassword)
-        passwordConfirm.validate(validator::validatePassword)
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,19 +158,23 @@ fun RegisterScreenInputFieldsPreview() {
         floatingActionButton = {
             Button(onClick = {
                 formManger.validate()
+                if (formManger.isValid()) {
+                    formManger.getData()
+                }
             }) {
                 Text(text = "Complete Register")
             }
 
         }
     ) {
-        Column(modifier =
-        Modifier
-            .padding(it)
-            .verticalScroll(rememberScrollState())
+        Column(
+            modifier =
+            Modifier
+                .padding(it)
+                .verticalScroll(rememberScrollState())
         ) {
             VerticalSpacer()
-            RegisterScreenInputFields(formManger=formManger)
+            RegisterScreenInputFields(formManger = formManger)
         }
     }
 
@@ -169,7 +184,7 @@ fun RegisterScreenInputFieldsPreview() {
 @Composable
 fun RegisterScreenInputFields(
     scaffoldPadding: PaddingValues = PaddingValues(0.dp),
-    formManger:RegistrationFormManager
+    formManger: RegistrationFormManager
 ) {
     val inputFieldModifier = Modifier.fillMaxWidth()
 

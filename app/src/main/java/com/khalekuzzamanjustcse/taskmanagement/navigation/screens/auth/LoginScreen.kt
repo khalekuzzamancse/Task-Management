@@ -27,12 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.PasswordVisualTransformation
 import com.khalekuzzamanjustcse.taskmanagement.R
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FieldValidator
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormManager
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextFieldState
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextFieldStateManager
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextInput
@@ -40,45 +42,46 @@ import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.Form
 
 class LoginFormManager(
     containerColor: Color
-) {
-    val userName = FormTextFieldStateManager(
-        fieldState = FormTextFieldState(
-            label = "User Name",
-            containerColor = containerColor,
-            leadingIcon = Icons.Filled.Person
-        ),
-    )
-    val password = FormTextFieldStateManager(
-        fieldState = FormTextFieldState(
-            label = "Password",
-            containerColor = containerColor,
-            leadingIcon = Icons.Filled.Lock,
-            trailingIcon = Icons.Filled.Visibility
-        ),
-        observeTrailingIconClick = { passwordState ->
-            if (passwordState.visualTransformation == VisualTransformation.None) {
-                passwordState
-                    .copy(
-                        visualTransformation = PasswordVisualTransformation,
-                        trailingIcon = Icons.Filled.Visibility
-                    )
-            } else {
-                passwordState
-                    .copy(
-                        visualTransformation = VisualTransformation.None,
-                        trailingIcon = Icons.Filled.VisibilityOff
-                    )
-            }
-        }
-    )
-
+) : FormManager() {
     private val validator = FieldValidator()
-
-    //
-    fun validate() {
-        userName.validate(validator::validateEmail)
-        password.validate(validator::validatePassword)
-    }
+    override val field: List<FormTextFieldStateManager> = listOf(
+        FormTextFieldStateManager(
+            fieldState = FormTextFieldState(
+                label = "User Name",
+                leadingIcon = Icons.Filled.Person,
+                keyboardType = KeyboardType.Email,
+                containerColor = containerColor,
+                readOnly = false
+            ),
+            validator = validator::validateEmail
+        ),
+        FormTextFieldStateManager(
+            fieldState = FormTextFieldState(
+                label = "Password",
+                leadingIcon = Icons.Filled.Lock,
+                trailingIcon = Icons.Filled.Visibility,
+                keyboardType = KeyboardType.Password,
+                containerColor = containerColor,
+                readOnly = false
+            ),
+            validator = validator::validatePassword,
+            observeTrailingIconClick = { passwordState ->
+                if (passwordState.visualTransformation == VisualTransformation.None) {
+                    passwordState
+                        .copy(
+                            visualTransformation = PasswordVisualTransformation,
+                            trailingIcon = Icons.Filled.Visibility
+                        )
+                } else {
+                    passwordState
+                        .copy(
+                            visualTransformation = VisualTransformation.None,
+                            trailingIcon = Icons.Filled.VisibilityOff
+                        )
+                }
+            }
+        )
+    )
 }
 
 
@@ -89,6 +92,7 @@ fun LoginContentPreview() {
     val formManger = remember {
         LoginFormManager(containerColor)
     }
+
     LoginScreen(
         formManger = formManger,
         onLoginButtonClicked = {
@@ -106,6 +110,9 @@ fun LoginScreen(
     onRegisterButtonClicked: () -> Unit = {},
 ) {
 
+    val userName = formManger.field[0]
+    val password = formManger.field[1]
+
     val inputFieldModifier = Modifier.fillMaxWidth()
     Column(
         modifier = Modifier
@@ -118,16 +125,15 @@ fun LoginScreen(
 
         FormTextInput(
             modifier = inputFieldModifier,
-            state = formManger.userName.state.collectAsState().value,
-            onValueChanged = formManger.userName::onTextChange
-
+            state = userName.state.collectAsState().value,
+            onValueChanged = userName::onTextChange
         )
         VerticalSpacer()
         FormTextInput(
             modifier = inputFieldModifier,
-            state = formManger.password.state.collectAsState().value,
-            onValueChanged = formManger.password::onTextChange,
-            onTrailingIconClick = formManger.password::onTrailingIconClick
+            state = password.state.collectAsState().value,
+            onValueChanged = password::onTextChange,
+            onTrailingIconClick = password::onTrailingIconClick
         )
         VerticalSpacer()
 

@@ -34,6 +34,6 @@ class FieldValidator {
     }
 
     fun validateEmpty(text: String): String? {
-        return if (text.trim().isEmpty()) "Cannot be empty" else null
+        return if (text.trim().isEmpty()) " be empty" else null
     }
 }

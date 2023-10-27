@@ -40,8 +40,9 @@ private fun FormFieldPreview() {
         mutableStateOf(
             FormTextFieldState(
                 label = "User Name",
+                leadingIcon = Icons.Filled.Person,
                 containerColor = containerColor,
-                leadingIcon = Icons.Filled.Person
+                readOnly = false
             ),
         )
     }
@@ -49,9 +50,10 @@ private fun FormFieldPreview() {
         mutableStateOf(
             FormTextFieldState(
                 label = "Password",
-                containerColor = containerColor,
                 leadingIcon = Icons.Filled.Lock,
-                trailingIcon = Icons.Filled.Visibility
+                trailingIcon = Icons.Filled.Visibility,
+                containerColor = containerColor,
+                readOnly = false
             ),
         )
     }
@@ -76,24 +78,23 @@ private fun FormFieldPreview() {
             state = passwordState,
             onValueChanged = {
                 passwordState = passwordState.copy(text = it)
-            },
-            onTrailingIconClick = {
-                passwordState =
-                    if (passwordState.visualTransformation == VisualTransformation.None) {
-                        passwordState
-                            .copy(
-                                visualTransformation = PasswordVisualTransformation,
-                                trailingIcon = Icons.Filled.Visibility
-                            )
-                    } else {
-                        passwordState
-                            .copy(
-                                visualTransformation = VisualTransformation.None,
-                                trailingIcon = Icons.Filled.VisibilityOff
-                            )
-                    }
             }
-        )
+        ) {
+            passwordState =
+                if (passwordState.visualTransformation == VisualTransformation.None) {
+                    passwordState
+                        .copy(
+                            visualTransformation = PasswordVisualTransformation,
+                            trailingIcon = Icons.Filled.Visibility
+                        )
+                } else {
+                    passwordState
+                        .copy(
+                            visualTransformation = VisualTransformation.None,
+                            trailingIcon = Icons.Filled.VisibilityOff
+                        )
+                }
+        }
 
     }
 
@@ -137,7 +138,8 @@ fun FormTextInput(
                         text = it
                     )
                 }
-            }
+            },
+            readOnly=state.readOnly
         )
     }
 }
@@ -177,5 +179,6 @@ data class FormTextFieldState(
     val trailingIcon: ImageVector? = null,
     val visualTransformation: VisualTransformation = VisualTransformation.None,
     val keyboardType: KeyboardType = KeyboardType.Text,
-    val containerColor: Color? = null
+    val containerColor: Color? = null,
+    val readOnly: Boolean=false
 )
