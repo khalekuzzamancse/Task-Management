@@ -3,60 +3,176 @@ package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.PasswordVisualTransformation
-import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
-import com.khalekuzzamanjustcse.taskmanagement.data.FirebaseFireStore
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FieldValidator
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextFieldState
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextFieldStateManager
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextInput
 
-class RegisterData {
-    var phoneNumber = ""
-        private set
-    var email = ""
-        private set
-    var password = ""
-        private set
-    var name = ""
-        private set
+class RegistrationFormManager(
+    containerColor: Color
+) {
+    val email = FormTextFieldStateManager(
+        fieldState = FormTextFieldState(
+            label = "Email",
+            containerColor = containerColor,
+            leadingIcon = Icons.Filled.Email
+        ),
+    )
+    val name = FormTextFieldStateManager(
+        fieldState = FormTextFieldState(
+            label = "Name",
+            containerColor = containerColor,
+            leadingIcon = Icons.Filled.Person
+        ),
+    )
+    val phone = FormTextFieldStateManager(
+        fieldState = FormTextFieldState(
+            label = "Phone Number",
+            containerColor = containerColor,
+            leadingIcon = Icons.Filled.Phone
+        ),
+    )
+    val password = FormTextFieldStateManager(
+        fieldState = FormTextFieldState(
+            label = "Password",
+            containerColor = containerColor,
+            leadingIcon = Icons.Filled.Lock,
+            trailingIcon = Icons.Filled.Visibility
+        ),
+        observeTrailingIconClick = { passwordState ->
+            if (passwordState.visualTransformation == VisualTransformation.None) {
+                passwordState
+                    .copy(
+                        visualTransformation = PasswordVisualTransformation,
+                        trailingIcon = Icons.Filled.Visibility
+                    )
+            } else {
+                passwordState
+                    .copy(
+                        visualTransformation = VisualTransformation.None,
+                        trailingIcon = Icons.Filled.VisibilityOff
+                    )
+            }
+        }
+    )
+    val passwordConfirm = FormTextFieldStateManager(
+        fieldState = FormTextFieldState(
+            label = "Confirm Password",
+            containerColor = containerColor,
+            leadingIcon = Icons.Filled.Lock,
+            trailingIcon = Icons.Filled.Visibility
+        ),
+        observeTrailingIconClick = { passwordState ->
+            if (passwordState.visualTransformation == VisualTransformation.None) {
+                passwordState
+                    .copy(
+                        visualTransformation = PasswordVisualTransformation,
+                        trailingIcon = Icons.Filled.Visibility
+                    )
+            } else {
+                passwordState
+                    .copy(
+                        visualTransformation = VisualTransformation.None,
+                        trailingIcon = Icons.Filled.VisibilityOff
+                    )
+            }
+        }
+    )
 
-    fun onEmailChange(email: String) {
-        this.email = email
+    private val validator = FieldValidator()
+
+    fun validate() {
+        email.validate(validator::validateEmail)
+        name.validate(validator::validateEmpty)
+        phone.validate(validator::validatePhoneNo)
+        password.validate(validator::validatePassword)
+        passwordConfirm.validate(validator::validatePassword)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun RegisterScreenInputFieldsPreview() {
+    val containerColor = MaterialTheme.colorScheme.surface
+    val formManger = remember {
+        RegistrationFormManager(containerColor)
     }
 
-    fun onPasswordChange(password: String) {
-        this.password = password
-    }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = "Registration Form")
+                },
+                navigationIcon = {
+                    IconButton(onClick = {}) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                    }
+                },
+            )
+        },
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
+            Button(onClick = {
+                formManger.validate()
+            }) {
+                Text(text = "Complete Register")
+            }
 
-    fun phoneNumberChange(phoneNumber: String) {
-        this.phoneNumber = phoneNumber
-    }
-
-    fun onNameChanged(name: String) {
-        this.name = name
+        }
+    ) {
+        Column(modifier =
+        Modifier
+            .padding(it)
+            .verticalScroll(rememberScrollState())
+        ) {
+            VerticalSpacer()
+            RegisterScreenInputFields(formManger=formManger)
+        }
     }
 
 
 }
 
-
 @Composable
-fun RegisterScreen(
-    scaffoldPadding: PaddingValues,
-    onDone:()->Unit={},
+fun RegisterScreenInputFields(
+    scaffoldPadding: PaddingValues = PaddingValues(0.dp),
+    formManger:RegistrationFormManager
 ) {
+    val inputFieldModifier = Modifier.fillMaxWidth()
+
     Column(
         modifier = Modifier
             .padding(scaffoldPadding)
@@ -65,60 +181,41 @@ fun RegisterScreen(
             .padding(start = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var showPassword by remember {
-            mutableStateOf(false)
-        }
-        val data = remember {
-            RegisterData()
-        }
 
-        LoginInputField(
-            label = "Phone Number",
-            leadingIcon = Icons.Default.Person,
-            keyboardType = KeyboardType.Number,
-            onValueChange = data::phoneNumberChange
-        )
-        LoginInputField(
-            label = "Email",
-            leadingIcon = Icons.Default.Person,
-            keyboardType = KeyboardType.Email,
-            onValueChange = data::onEmailChange
+        FormTextInput(
+            modifier = inputFieldModifier,
+            state = formManger.email.state.collectAsState().value,
+            onValueChanged = formManger.email::onTextChange
+
         )
         VerticalSpacer()
-        LoginInputField(
-            label = "Name",
-            leadingIcon = Icons.Default.Person,
-            keyboardType = KeyboardType.Text,
-            onValueChange = data::onNameChanged
+        FormTextInput(
+            modifier = inputFieldModifier,
+            state = formManger.name.state.collectAsState().value,
+            onValueChanged = formManger.name::onTextChange
+
+        )
+        FormTextInput(
+            modifier = inputFieldModifier,
+            state = formManger.phone.state.collectAsState().value,
+            onValueChanged = formManger.phone::onTextChange
+
         )
         VerticalSpacer()
-        LoginInputField(
-            label = "Password",
-            leadingIcon = Icons.Default.Lock,
-            trailingIcon = if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-            keyboardType = KeyboardType.Password,
-            onValueChange = data::onPasswordChange,
-            onTrailingIconClick = { showPassword = !showPassword },
-            visualTransformation = if (!showPassword) PasswordVisualTransformation else null
+        FormTextInput(
+            modifier = inputFieldModifier,
+            state = formManger.password.state.collectAsState().value,
+            onValueChanged = formManger.password::onTextChange,
+            onTrailingIconClick = formManger.password::onTrailingIconClick
         )
         VerticalSpacer()
-        LoginInputField(
-            label = "Confirm Password",
-            leadingIcon = Icons.Default.Lock,
-            trailingIcon = if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-            keyboardType = KeyboardType.Password,
-            onValueChange = {
-            },
-            onTrailingIconClick = { showPassword = !showPassword },
-            visualTransformation = if (!showPassword) PasswordVisualTransformation else null
+        FormTextInput(
+            modifier = inputFieldModifier,
+            state = formManger.passwordConfirm.state.collectAsState().value,
+            onValueChanged = formManger.passwordConfirm::onTextChange,
+            onTrailingIconClick = formManger.passwordConfirm::onTrailingIconClick
         )
-        LoginButton(Modifier.padding(8.dp)) {
-            val auth = AuthManager()
-            auth.createAccount(data.email, data.password)
-            FirebaseFireStore().addUser(data.email, data.phoneNumber, data.name)
-            onDone()
-        }
+
     }
-
 
 }

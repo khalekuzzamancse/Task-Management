@@ -30,9 +30,9 @@ class AuthViewModel : ViewModel() {
         _openRegistrationFrom.value = false
     }
 
-    //Login
-    private val _loginState = MutableStateFlow(LoginState())
-    val loginState = _loginState.asStateFlow()
+//    //Login
+//    private val _loginState = MutableStateFlow(LoginState())
+//    val loginState = _loginState.asStateFlow()
 
 
     //Snack bar management
@@ -71,11 +71,13 @@ class AuthViewModel : ViewModel() {
                 }
 
             }
-        ).signIn(
-            email = loginState.value.email,
-            password = loginState.value.password
         )
+        //.signIn(
+////            email = loginState.value.email,
+//            //password = loginState.value.password
+//        )
+//    }
+
+
     }
-
-
 }

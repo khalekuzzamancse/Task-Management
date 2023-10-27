@@ -37,12 +37,7 @@ fun AuthScreen(
                 showSnackBar =viewModel.showSnackBar.collectAsState().value,
                 snackBarMessage = viewModel.snackBarMessage.collectAsState().value,
             ) {scaffoldPadding->
-                LoginScreen(
-                    scaffoldPadding = scaffoldPadding,
-                    onRegisterButtonClicked = viewModel::onRegistrationRequest,
-                    state = viewModel.loginState.collectAsState().value,
-                    onLoginButtonClicked = viewModel::onLoginRequest
-                )
+
             }
 
         } else {
@@ -53,10 +48,7 @@ fun AuthScreen(
                 showSnackBar =viewModel.showSnackBar.collectAsState().value,
                 snackBarMessage = viewModel.snackBarMessage.collectAsState().value,
             ) {
-                RegisterScreen(
-                    scaffoldPadding = it,
-                    onDone = viewModel::onRegistrationDone
-                )
+
             }
         }
     }

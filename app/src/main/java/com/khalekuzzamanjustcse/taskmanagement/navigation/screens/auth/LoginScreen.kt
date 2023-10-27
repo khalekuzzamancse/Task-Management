@@ -1,6 +1,5 @@
 package com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,131 +9,148 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.PasswordVisualTransformation
 import com.khalekuzzamanjustcse.taskmanagement.R
-import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FieldValidator
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextFieldState
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextFieldStateManager
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextInput
 
 
-/*
+class LoginFormManager(
+    containerColor: Color
+) {
+    val userName = FormTextFieldStateManager(
+        fieldState = FormTextFieldState(
+            label = "User Name",
+            containerColor = containerColor,
+            leadingIcon = Icons.Filled.Person
+        ),
+    )
+    val password = FormTextFieldStateManager(
+        fieldState = FormTextFieldState(
+            label = "Password",
+            containerColor = containerColor,
+            leadingIcon = Icons.Filled.Lock,
+            trailingIcon = Icons.Filled.Visibility
+        ),
+        observeTrailingIconClick = { passwordState ->
+            if (passwordState.visualTransformation == VisualTransformation.None) {
+                passwordState
+                    .copy(
+                        visualTransformation = PasswordVisualTransformation,
+                        trailingIcon = Icons.Filled.Visibility
+                    )
+            } else {
+                passwordState
+                    .copy(
+                        visualTransformation = VisualTransformation.None,
+                        trailingIcon = Icons.Filled.VisibilityOff
+                    )
+            }
+        }
+    )
 
+    private val validator = FieldValidator()
 
-Make the Login screen as:
-https://tinyurl.com/yx39k9u5
-
- */
-class LoginState{
-    var email: String=""
-    private set
-    var password: String=""
-        private set
-    fun onEmailInput(email: String){
-        this.email = email
+    //
+    fun validate() {
+        userName.validate(validator::validateEmail)
+        password.validate(validator::validatePassword)
     }
-    fun onPasswordInput(password: String){
-        this.password = password
-    }
-
-    override fun toString(): String {
-        return "LoginState(email='$email', password='$password')"
-    }
-
-
 }
+
+
+@Preview
+@Composable
+fun LoginContentPreview() {
+    val containerColor = MaterialTheme.colorScheme.surface
+    val formManger = remember {
+        LoginFormManager(containerColor)
+    }
+    LoginScreen(
+        formManger = formManger,
+        onLoginButtonClicked = {
+            formManger.validate()
+        }
+    )
+}
+
+
 @Composable
 fun LoginScreen(
-    scaffoldPadding:PaddingValues = PaddingValues(0.dp),
-    state: LoginState,
-    onLoginButtonClicked:()->Unit,
-    onRegisterButtonClicked:()->Unit ={},
-    onNavIconClicked:()->Unit ={},
+    scaffoldPadding: PaddingValues = PaddingValues(0.dp),
+    formManger: LoginFormManager,
+    onLoginButtonClicked: () -> Unit = {},
+    onRegisterButtonClicked: () -> Unit = {},
 ) {
-    var showPassword by remember {
-        mutableStateOf(false)
-    }
 
-        Column(
-            modifier = Modifier
-                .padding(scaffoldPadding)
-                .fillMaxSize()
-                .padding(start = 16.dp, end = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    val inputFieldModifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier
+            .padding(scaffoldPadding)
+            .fillMaxSize()
+            .padding(start = 16.dp, end = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-            LoginInputField(
-                label = "Email",
-                leadingIcon = Icons.Default.Person,
-                keyboardType = KeyboardType.Email,
-                onValueChange = state::onEmailInput)
-            VerticalSpacer()
-            LoginInputField(
-                label = "Password",
-                leadingIcon = Icons.Default.Lock,
-                trailingIcon = if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                keyboardType = KeyboardType.Password,
-                onValueChange = state::onPasswordInput,
-                onTrailingIconClick = { showPassword = !showPassword },
-                visualTransformation = if (!showPassword) PasswordVisualTransformation else null
-            )
-            VerticalSpacer()
-            ForgetPassword()
-            LoginButton(Modifier.padding(8.dp)){
-                onLoginButtonClicked()
-                AuthManager().signIn(state.email,state.password)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            OtherSignInOptions()
-            Spacer(modifier = Modifier.height(16.dp))
+
+        FormTextInput(
+            modifier = inputFieldModifier,
+            state = formManger.userName.state.collectAsState().value,
+            onValueChanged = formManger.userName::onTextChange
+
+        )
+        VerticalSpacer()
+        FormTextInput(
+            modifier = inputFieldModifier,
+            state = formManger.password.state.collectAsState().value,
+            onValueChanged = formManger.password::onTextChange,
+            onTrailingIconClick = formManger.password::onTrailingIconClick
+        )
+        VerticalSpacer()
+
+        ForgetPassword()
+        LoginButton(Modifier.padding(8.dp)) {
+            onLoginButtonClicked()
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        OtherSignInOptions()
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Or Signup using"
+        )
+        TextButton(onClick = onRegisterButtonClicked) {
             Text(
-                text = "Or Signup using"
+                text = "Register"
             )
-            TextButton(onClick = onRegisterButtonClicked) {
-                Text(
-                    text = "Register"
-                )
-            }
-
         }
 
-
-
-
-
-
-
-
+    }
 
 }
+
 
 @Composable
 private fun OtherSignInOptions(modifier: Modifier = Modifier) {
@@ -189,16 +205,17 @@ private fun ForgetPassword(modifier: Modifier = Modifier) {
 }
 
 @Composable
- fun LoginButton(modifier: Modifier = Modifier,onClick: () -> Unit) {
+fun LoginButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
         modifier = modifier.fillMaxWidth(),
-        onClick =onClick) {
+        onClick = onClick
+    ) {
         Text(text = "Login".uppercase())
     }
 }
 
 @Composable
- fun VerticalSpacer() {
+fun VerticalSpacer() {
     Spacer(
         modifier = Modifier
             .height(8.dp)
@@ -206,50 +223,3 @@ private fun ForgetPassword(modifier: Modifier = Modifier) {
     )
 }
 
-@Composable
- fun LoginInputField(
-    modifier: Modifier = Modifier,
-    label: String,
-    leadingIcon: ImageVector,
-    trailingIcon: ImageVector? = null,
-    visualTransformation: VisualTransformation? = null,
-    keyboardType: KeyboardType=KeyboardType.Text,
-    onTrailingIconClick: () -> Unit = {},
-    onValueChange: (String) -> Unit
-) {
-    var text by remember {
-        mutableStateOf("")
-    }
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
-        Text(text = label)
-
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            value = text,
-            onValueChange = {
-                text = it
-                onValueChange(it)
-            },
-            leadingIcon = {
-                Icon(imageVector = leadingIcon, contentDescription = null)
-            },
-            trailingIcon = {
-                trailingIcon?.let {
-                    Icon(
-                        modifier = Modifier.clickable {
-                            onTrailingIconClick()
-                        },
-                        imageVector = trailingIcon,
-                        contentDescription = null
-                    )
-                }
-            },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType=keyboardType),
-            visualTransformation = visualTransformation ?: VisualTransformation.None,
-        )
-    }
-}
