@@ -15,9 +15,17 @@ class MainActivity : ComponentActivity() {
         setContent {
             TaskManagementTheme {
                 val context = LocalContext.current
-                LaunchedEffect(Unit){
+                LaunchedEffect(Unit) {
                     NotificationFactory(context).observeFriendRequest()
                 }
+                PermissionManage(
+                    permissions = listOf(
+                        "android.permission.READ_CONTACTS",
+                        "android.permission.ACCESS_NETWORK_STATE",
+                        "android.permission.FOREGROUND_SERVICE",
+                        "android.permission.POST_NOTIFICATIONS"
+                    )
+                )
                 NavGraph()
 
             }
