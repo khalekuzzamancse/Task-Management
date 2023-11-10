@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement
+package com.khalekuzzamanjustcse.taskmanagement.ui
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping

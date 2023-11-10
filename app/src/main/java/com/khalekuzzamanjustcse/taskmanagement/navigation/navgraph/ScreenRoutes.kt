@@ -10,8 +10,11 @@ sealed interface Screen {
         override val route = "Login"
     }
 
-    data object Logout : Screen {
-        override val route = "Logout"
+    data object Register : Screen {
+        override val route = "Register"
+    }
+    data object AuthGraph : Screen {
+        override val route = "AuthGraph"
     }
 
     data object Contact : Screen {

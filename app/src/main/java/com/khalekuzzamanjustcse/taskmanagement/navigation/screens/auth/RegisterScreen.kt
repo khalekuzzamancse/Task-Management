@@ -34,7 +34,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.khalekuzzamanjustcse.taskmanagement.PasswordVisualTransformation
+import com.khalekuzzamanjustcse.taskmanagement.ui.PasswordVisualTransformation
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FieldValidator
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormManager
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.form.FormTextFieldState
@@ -133,9 +133,11 @@ class RegistrationFormManager(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
+
 @Composable
-fun RegisterScreenInputFieldsPreview() {
+fun RegisterScreenPreview(
+    onBackArrowClicked:()->Unit ={}
+) {
     val containerColor = MaterialTheme.colorScheme.surface
     val formManger = remember {
         RegistrationFormManager(containerColor)
@@ -148,7 +150,7 @@ fun RegisterScreenInputFieldsPreview() {
                     Text(text = "Registration Form")
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick =onBackArrowClicked) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
                 },
@@ -184,7 +186,7 @@ fun RegisterScreenInputFieldsPreview() {
 @Composable
 fun RegisterScreenInputFields(
     scaffoldPadding: PaddingValues = PaddingValues(0.dp),
-    formManger: RegistrationFormManager
+    formManger: RegistrationFormManager,
 ) {
     val inputFieldModifier = Modifier.fillMaxWidth()
 

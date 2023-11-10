@@ -1,6 +1,5 @@
 package com.khalekuzzamanjustcse.taskmanagement.navigation.navgraph
 
-import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.runtime.Composable
@@ -15,16 +14,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.ContactScreen
-import com.khalekuzzamanjustcse.taskmanagement.data.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.ScreenWithDrawer
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.auth.AuthScreen
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friends.FriendListScreen
-import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestListScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.create_task.TaskScreen
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.ContactScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.device_contact.DeviceContactViewModel
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestListScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friend_requests.FriendRequestScreenViewModel
+import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friends.FriendListScreen
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.friends.FriendListScreenViewModel
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.home.Home
 import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.my_taskes.TaskDetailsScreen
@@ -33,8 +30,10 @@ import com.khalekuzzamanjustcse.taskmanagement.navigation.screens.users.UsersScr
 
 
 @Composable
-fun NavGraph() {
-    val navController = rememberNavController()
+fun NavGraph(
+
+) {
+    val navController: NavHostController = rememberNavController()
     val navigationAction = NavigationActions(navController)
     var drawerState by remember {
         mutableStateOf(DrawerState(DrawerValue.Closed))
@@ -68,10 +67,19 @@ fun NavGraph() {
 
     NavHost(
         navController = navController,
-        route = "MainScreen",
-        startDestination = Screen.Login.route
+        route = "MainGraph",
+        startDestination = Screen.AuthGraph.route
     ) {
 
+        //auth nav graph
+       authNavGraph(
+           navController = navController,
+           onLoginSuccess = {
+               navController.popBackStack()
+               navController.navigate( Screen.Home.route)
+           }
+       )
+        //
         composable(route = Screen.Home.route) {
             ScreenWithDrawer(
                 drawerState = drawerState,
@@ -86,22 +94,11 @@ fun NavGraph() {
                         navController.navigate(Screen.Login.route)
                     }
                 )
+
             }
 
         }
-        composable(route = Screen.Login.route) {
-            ScreenWithDrawer(
-                drawerState = drawerState,
-                closeDrawer = onCloseDrawer,
-                onDrawerItemClick = onDrawerItemClick
-            ) {
-                AuthScreen(onLoginSuccess = {
-//                    navController.popBackStack()
-                    navigationAction.navigateTo( Screen.Home.route)
-                })
-            }
 
-        }
         composable(route = Screen.Contact.route) {
             ScreenWithDrawer(
                 drawerState = drawerState,
