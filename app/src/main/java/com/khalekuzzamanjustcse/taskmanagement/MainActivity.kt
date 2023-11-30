@@ -5,8 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import com.khalekuzzamanjustcse.taskmanagement.navigation.navgraph.NavGraph
-import com.khalekuzzamanjustcse.taskmanagement.ui.theme.TaskManagementTheme
+import com.khalekuzzamanjustcse.taskmanagement.notification.NotificationFactory
+
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph.NavGraph
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.theme.TaskManagementTheme
 
 class MainActivity : ComponentActivity() {
 
