@@ -19,7 +19,8 @@ class BaseApplication : Application() {
                             .notify(
                                 title = "New Notification",
                                 message = "Hey task\n${task.title}\nby ${task.assignerName}",
-                                notificationId = notificationId++
+                                notificationId = notificationId++,
+                                taskId = task.id
                             )
                     }
                 }

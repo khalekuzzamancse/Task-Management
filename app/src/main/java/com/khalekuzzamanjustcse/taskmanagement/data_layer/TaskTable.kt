@@ -1,5 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.data_layer
 
+import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
@@ -11,6 +12,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.onCompletion
+import java.io.Serializable
 import java.util.UUID
 val dummyTasks = listOf(
     TaskEntity(
@@ -39,6 +41,9 @@ val dummyTasks = listOf(
     )
     // Add more tasks as needed
 )
+
+
+
 
 data class TaskEntity @JvmOverloads constructor(
     @DocumentId val id: String = "",

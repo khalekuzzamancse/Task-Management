@@ -4,9 +4,13 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
+import com.khalekuzzamanjustcse.taskmanagement.DeepLink
 import com.khalekuzzamanjustcse.taskmanagement.MainActivity
 import com.khalekuzzamanjustcse.taskmanagement.R
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendManager
@@ -24,6 +28,7 @@ class Notifier(
         title: String,
         message: String,
         notificationId: Int = 1,
+        taskId: String,
     ) {
         //creating channel
         val channelID = "channel_1}"
@@ -31,9 +36,13 @@ class Notifier(
         attachChannelToManager(channel)
         //creating notification
         val pendingIntent = createPendingIntent(message)
+        val deepLinkPendingIntent = deepLinkPendingIntent(taskId)
+
+        //
         val notification = createNotification(
             channelId = channelID, title = title,
-            message = message, pendingIntent = pendingIntent
+            message = message,
+            pendingIntent =deepLinkPendingIntent?:pendingIntent
         )
         //sending notification
         manager.notify(notificationId, notification)
@@ -86,6 +95,22 @@ class Notifier(
         return PendingIntent.getActivity(context, 100, intent, flag)
     }
 
+     private fun deepLinkPendingIntent(
+         taskId:String
+     ): PendingIntent? {
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            "${DeepLink.DEEP_LINK_URL}/$taskId".toUri(),
+            context,
+            MainActivity::class.java
+        )
+        val deepLinkPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(deepLinkIntent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+        return deepLinkPendingIntent
+    }
+
 
 }
 
@@ -99,7 +124,8 @@ class NotificationFactory(
                 Notifier(context)
                     .notify(
                         title = "New Notification",
-                        message = "Friend request"
+                        message = "Friend request",
+                        taskId = "123"
                     )
                 //  createNotification(context, "${it.user.name} send a friend request.")
             }

@@ -1,8 +1,11 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,10 +14,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import com.khalekuzzamanjustcse.taskmanagement.DeepLink
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable
+import com.khalekuzzamanjustcse.taskmanagement.notification.Notifier
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.ScreenWithDrawer
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.TaskScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.device_contact.ContactScreen
@@ -27,6 +36,7 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.home.
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskDetailsScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.UserListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.UsersScreenViewModel
+import kotlinx.coroutines.flow.toList
 
 
 @Composable
@@ -50,12 +60,9 @@ fun NavGraph(
     val navigateToCreateTaskScreen: () -> Unit = {
         navigationAction.navigateTo(Screen.Task.route)
     }
-    var task = remember {
-        TaskEntity()
-    }
-    val onTaskDetailsOpen: (TaskEntity) -> Unit = {
-        task = it
-        navigationAction.navigateTo(Screen.MyTaskDetails.route)
+
+    val onTaskDetailsOpen: (TaskEntity) -> Unit = {task->
+        navigationAction.navigateTo("MyTaskDetails/${task.id}")
     }
     val onTaskDetailsClose: () -> Unit = {
         navigationAction.navigateTo(Screen.Home.route)
@@ -72,13 +79,13 @@ fun NavGraph(
     ) {
 
         //auth nav graph
-       authNavGraph(
-           navController = navController,
-           onLoginSuccess = {
-               navController.popBackStack()
-               navController.navigate( Screen.Home.route)
-           }
-       )
+        authNavGraph(
+            navController = navController,
+            onLoginSuccess = {
+                navController.popBackStack()
+                navController.navigate(Screen.Home.route)
+            }
+        )
         //
         composable(route = Screen.Home.route) {
             ScreenWithDrawer(
@@ -179,8 +186,28 @@ fun NavGraph(
                 })
         }
 
-        composable(route = Screen.MyTaskDetails.route) {
-            TaskDetailsScreen(task = task, onClose = onTaskDetailsClose)
+        composable(
+            //  route = "Screen.MyTaskDetails.route",
+            route = "MyTaskDetails/{taskId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "${DeepLink.DEEP_LINK_URL}/{taskId}" }),
+            arguments = listOf(navArgument("taskId") { type = NavType.StringType })
+        ) { navBackStackEntry ->
+
+            var details by remember {
+                mutableStateOf<TaskEntity?>(null)
+            }
+            //finding task by id ,then passing to the details screen
+            LaunchedEffect(Unit){
+                val taskId = navBackStackEntry.arguments?.getString("taskId")
+                TaskTable().getTasks().collect { tasks ->
+                   details=tasks.find { it.id==taskId }
+                }
+
+            }
+            details?.let {task->
+                TaskDetailsScreen(task = task, onClose = onTaskDetailsClose)
+            }
+
         }
 
     }
