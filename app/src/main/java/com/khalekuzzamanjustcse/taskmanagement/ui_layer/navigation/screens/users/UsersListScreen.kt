@@ -18,6 +18,7 @@ data class User(
     val isFriend: Boolean = false,
     val isSendRequest: Boolean = false,
     val email: String = "",
+    val isAsLocalContact: Boolean = false
 )
 
 @Preview
@@ -37,31 +38,37 @@ fun UserListScreenPreview() {
 
 @Composable
 fun UserListScreen(
-    contacts: List<User> =emptyList(),
-    isLoading:Boolean,
-    onNavIconClicked: () -> Unit ={},
+    contacts: List<User> = emptyList(),
+    isLoading: Boolean,
+    onNavIconClicked: () -> Unit = {},
 ) {
 
     GenericListScreen(
         items = contacts,
         isLoading = isLoading,
-        itemContent = { contact ->
-            UserInfoCard(name = contact.name, phone = contact.phone) {
-                if (!contact.isFriend) {
-                    val icon = if (contact.isSendRequest) {
-                        Icons.Filled.PersonRemove
-                    } else {
-                        Icons.Filled.PersonAdd
+        itemContent = { user ->
+            UserInfoCard(
+                name = user.name,
+                phone = user.phone,
+                endExtraContent = {
+                    if (!user.isFriend) {
+                        val icon = if (user.isSendRequest) {
+                            Icons.Filled.PersonRemove
+                        } else {
+                            Icons.Filled.PersonAdd
+                        }
+                        IconButton(
+                            onClick = {
+                                FriendManager().addNewFriendRequest(user.phone)
+                            },
+                        ) {
+                            Icon(imageVector = icon, contentDescription = null)
+                        }
                     }
-                    IconButton(
-                        onClick = {
-                            FriendManager().addNewFriendRequest(contact.phone)
-                        },
-                    ) {
-                        Icon(imageVector = icon, contentDescription = null)
-                    }
-                }
-            }
+                },
+                savedInContact = user.isAsLocalContact,
+
+            )
         },
         screenTitle = "Contacts",
         onBack = onNavIconClicked

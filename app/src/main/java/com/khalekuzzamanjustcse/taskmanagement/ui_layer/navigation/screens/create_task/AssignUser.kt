@@ -19,7 +19,8 @@ fun AssignUser(
                 name = it.name,
                 phone = it.phone,
                 selected = it.selected,
-                onLongClick = { onLongClick(i) }
+                onLongClick = { onLongClick(i) },
+                savedInContact = false
             )
         }
     }

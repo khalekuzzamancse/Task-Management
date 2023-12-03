@@ -38,17 +38,22 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.theme.TaskManagementThem
 fun UserInfoCardPreview() {
     TaskManagementTheme {
         Column(modifier = Modifier.fillMaxSize()) {
-            UserInfoCard(name = "Mr Bean", phone = "01738813865")
-            UserInfoCard(name = "Mr Azad Ali", phone = "01738813865")
-            UserInfoCard(name = "Mr Bean Karim", phone = "01738813865")
-            UserInfoCard(name = "Mr Bean Karim", phone = "01738813865", selected = true)
-            UserInfoCard(name = "Mr Bean Karim", phone = "01738813865") {
+            UserInfoCard(name = "Mr Bean", phone = "01738813865", savedInContact = false)
+            UserInfoCard(name = "Mr Azad Ali", phone = "01738813865", savedInContact = false)
+            UserInfoCard(name = "Mr Bean Karim", phone = "01738813865", savedInContact = false)
+            UserInfoCard(
+                name = "Mr Bean Karim",
+                phone = "01738813865",
+                selected = true,
+                savedInContact = false
+            )
+            UserInfoCard(name = "Mr Bean Karim", phone = "01738813865", endExtraContent = {
                 IconButton(
                     onClick = { },
                 ) {
                     Icon(imageVector = Icons.Filled.PersonAdd, contentDescription = null)
                 }
-            }
+            }, savedInContact = false)
         }
 
     }
@@ -62,8 +67,9 @@ fun UserInfoCard(
     name: String,
     phone: String,
     selected: Boolean = false,
+    savedInContact: Boolean,
     onLongClick: () -> Unit = { },
-    endExtraContent: @Composable RowScope.() -> Unit = {},
+    endExtraContent: @Composable() (RowScope.() -> Unit) = {},
 ) {
     Surface(
         modifier = modifier
@@ -97,9 +103,10 @@ fun UserInfoCard(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = phone,
+                    text = if(savedInContact)"$phone(saved)" else phone,
                     style = MaterialTheme.typography.labelSmall
                 )
+
             }
             Spacer(modifier = Modifier.weight(1f)) // U
             endExtraContent()

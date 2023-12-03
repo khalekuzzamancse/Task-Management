@@ -130,8 +130,9 @@ fun NavGraph(
                 onDrawerItemClick = onDrawerItemClick
             ) {
                 val viewModel = remember {
-                    UsersScreenViewModel()
+                    UsersScreenViewModel(context.contentResolver)
                 }
+
                 UserListScreen(
                     contacts = viewModel.users.collectAsState().value,
                     isLoading = viewModel.isLoading.collectAsState().value,

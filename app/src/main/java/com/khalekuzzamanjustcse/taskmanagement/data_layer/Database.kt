@@ -12,6 +12,9 @@ import kotlinx.coroutines.withContext
 class UserCollections {
     private val db = Firebase.firestore
     private val collectionReference = Firebase.firestore.collection("Users")
+    companion object{
+        private const val TAG = "UserCollectionsLog: "
+    }
 
     suspend fun allUsers(): List<User> {
         val users = mutableListOf<User>()
@@ -25,9 +28,12 @@ class UserCollections {
                     users.add(User(name = name, phone = phoneNumber, email = email))
                 }
             }
+
         } catch (_: Exception) {
         }
-        return users.filter { it.email == AuthManager().singedInUserEmail().toString() }
+        Log.d(TAG, "$users")
+
+        return users.filter { it.email != AuthManager().singedInUserEmail().toString() }
     }
 
     suspend fun user(phone: String): User? {

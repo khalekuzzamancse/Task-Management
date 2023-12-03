@@ -39,7 +39,7 @@ fun GenericListScreenPreview() {
     GenericListScreen(
         items = contactList,
         itemContent = { contact ->
-            UserInfoCard(name = contact.name, phone = contact.phone)
+            UserInfoCard(name = contact.name, phone = contact.phone, savedInContact = false)
         },
         screenTitle = "Contacts",
         onNavIconClicked = { }
