@@ -20,13 +20,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +37,7 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FormTextFieldState
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FormTextFieldStateManager
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FormTextInput
+
 
 class RegistrationFormManager(
     containerColor: Color
@@ -128,19 +127,24 @@ class RegistrationFormManager(
     )
     override val field: List<FormTextFieldStateManager> =
         listOf(email, name, phone, password, passwordConfirm)
-
+    val userEmail
+        get() = field[0].state.value.text
+    val userName
+        get()=field[1].state.value.text
+    val userPhone
+        get()=field[2].state.value.text
+    val userPassword
+        get()=field[3].state.value.text
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun RegisterScreenPreview(
-    onBackArrowClicked:()->Unit ={}
+fun RegisterScreen(
+    formManger: RegistrationFormManager,
+    onBackArrowClicked: () -> Unit = {},
+    onRegisterCompleteRequest: () -> Unit = {}
 ) {
-    val containerColor = MaterialTheme.colorScheme.surface
-    val formManger = remember {
-        RegistrationFormManager(containerColor)
-    }
 
     Scaffold(
         topBar = {
@@ -149,7 +153,7 @@ fun RegisterScreenPreview(
                     Text(text = "Registration Form")
                 },
                 navigationIcon = {
-                    IconButton(onClick =onBackArrowClicked) {
+                    IconButton(onClick = onBackArrowClicked) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
                 },
@@ -161,6 +165,8 @@ fun RegisterScreenPreview(
                 formManger.validate()
                 if (formManger.isValid()) {
                     formManger.getData()
+                    onRegisterCompleteRequest()
+
                 }
             }) {
                 Text(text = "Complete Register")

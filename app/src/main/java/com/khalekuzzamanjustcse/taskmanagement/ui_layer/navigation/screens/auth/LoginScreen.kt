@@ -1,5 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,12 +20,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,14 +37,64 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import com.khalekuzzamanjustcse.taskmanagement.R
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.FirebaseFireStore
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.PasswordVisualTransformation
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FieldValidator
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FormManager
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FormTextFieldState
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FormTextFieldStateManager
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FormTextInput
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
+class LoginViewModel(
+
+) : ViewModel() {
+    lateinit var formManager: LoginFormManager
+    lateinit var registrationManager: RegistrationFormManager
+
+    companion object {
+        private const val TAG = "LoginViewModelLog : "
+        private fun log(message: String) {
+            Log.d(TAG, message)
+        }
+    }
+
+    val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage = _snackbarMessage.asStateFlow()
+
+    fun clearSnackBarMessage() {
+        _snackbarMessage.value = null
+    }
+
+    suspend fun tryLogin(): Boolean {
+        val userName = formManager.userName
+        val password = formManager.password
+        val res = AuthManager().signIn(userName, password)
+        if (res) {
+            _snackbarMessage.value = "Login Successful"
+        } else {
+            _snackbarMessage.value = "Login Failed"
+        }
+        return res
+    }
+
+    suspend fun tryRegister(): Boolean {
+        val email = registrationManager.userEmail
+        val password = registrationManager.userPassword
+        val phone = registrationManager.userPhone
+        val name = registrationManager.userName
+        val isDone = AuthManager().createAccount(email, password)
+        FirebaseFireStore().addUser(email, phone, name)
+        if (isDone) {
+            log("User registration successful")
+        }
+        return isDone
+    }
+}
 
 class LoginFormManager(
     containerColor: Color
@@ -85,41 +138,61 @@ class LoginFormManager(
             }
         )
     )
+    val userName
+        get() = field[0].state.value.text
+    val password
+        get() = field[1].state.value.text
+
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun LoginContentPreview(
+fun LoginFormScreen(
+    viewModel: LoginViewModel,
     onRegisterButtonClicked: () -> Unit,
-    onLoginSuccess: () -> Unit={}
+    onLoginRequest: () -> Unit = {}
 ) {
-    val containerColor = MaterialTheme.colorScheme.surface
-    val formManger = remember {
-        LoginFormManager(containerColor)
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel._snackbarMessage.collect { message ->
+            if (message != null) {
+                snackbarHostState.showSnackbar(message)
+            }
+            viewModel.clearSnackBarMessage()
+        }
+
     }
+
+
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = "Login") },
                 navigationIcon = {
-                    IconButton(onClick ={}) {
+                    IconButton(onClick = {}) {
                         Icon(Icons.Filled.ArrowBack, null)
                     }
                 },
 
                 )
-        }
+
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
     ) {
-        LoginScreen(
+        LoginForm(
             scaffoldPadding = it,
-            formManger = formManger,
+            formManger = viewModel.formManager,
             onLoginButtonClicked = {
-                formManger.validate()
-                onLoginSuccess()
+                viewModel.formManager.validate()
+                onLoginRequest()
             },
-            onRegisterButtonClicked=onRegisterButtonClicked
+            onRegisterButtonClicked = onRegisterButtonClicked
         )
     }
 
@@ -128,7 +201,7 @@ fun LoginContentPreview(
 
 
 @Composable
-fun LoginScreen(
+fun LoginForm(
     scaffoldPadding: PaddingValues = PaddingValues(0.dp),
     formManger: LoginFormManager,
     onLoginButtonClicked: () -> Unit = {},
