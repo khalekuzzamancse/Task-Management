@@ -18,12 +18,8 @@ class FriendListScreenViewModel : ViewModel(){
     val isLoading = _isLoading.asStateFlow()
 
     init {
-        val startTime = System.currentTimeMillis()
         viewModelScope.launch {
             val newUsers = FriendManager().getFriends()
-            val endTime = System.currentTimeMillis()
-            val elapsedTime = endTime - startTime
-            if (elapsedTime < 2000)
                 delay(1500)
             withContext(Dispatchers.Main) {
                 _users.value = newUsers

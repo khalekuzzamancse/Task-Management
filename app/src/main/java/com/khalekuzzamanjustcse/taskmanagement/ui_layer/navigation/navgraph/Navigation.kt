@@ -1,5 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph
 
+import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.runtime.Composable
@@ -8,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -19,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.khalekuzzamanjustcse.taskmanagement.DeepLink
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.ScreenWithDrawer
@@ -33,6 +36,8 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.home.
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskDetailsScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.UserListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.UsersScreenViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -57,7 +62,7 @@ fun NavGraph(
         navigationAction.navigateTo(Screen.Task.route)
     }
 
-    val onTaskDetailsOpen: (TaskEntity) -> Unit = {task->
+    val onTaskDetailsOpen: (TaskEntity) -> Unit = { task ->
         navigationAction.navigateTo("MyTaskDetails/${task.id}")
     }
     val onTaskDetailsClose: () -> Unit = {
@@ -82,6 +87,7 @@ fun NavGraph(
                 navController.navigate(Screen.Home.route)
             }
         )
+
         //
         composable(route = Screen.Home.route) {
             ScreenWithDrawer(
@@ -103,6 +109,7 @@ fun NavGraph(
         }
 
         composable(route = Screen.Contact.route) {
+
             ScreenWithDrawer(
                 drawerState = drawerState,
                 closeDrawer = onCloseDrawer,
@@ -120,6 +127,7 @@ fun NavGraph(
 
         }
         composable(route = Screen.Users.route) {
+            val scope = rememberCoroutineScope()
             ScreenWithDrawer(
                 drawerState = drawerState,
                 closeDrawer = onCloseDrawer,
@@ -130,8 +138,9 @@ fun NavGraph(
                 }
 
                 UserListScreen(
-                    contacts = viewModel.users.collectAsState().value,
+                    users = viewModel.users.collectAsState().value,
                     isLoading = viewModel.isLoading.collectAsState().value,
+                    onFriendRequestSent = viewModel::onFriendRequestSent
                 )
             }
 
@@ -194,14 +203,14 @@ fun NavGraph(
                 mutableStateOf<TaskEntity?>(null)
             }
             //finding task by id ,then passing to the details screen
-            LaunchedEffect(Unit){
+            LaunchedEffect(Unit) {
                 val taskId = navBackStackEntry.arguments?.getString("taskId")
                 TaskTable().getTasks().collect { tasks ->
-                   details=tasks.find { it.id==taskId }
+                    details = tasks.find { it.id == taskId }
                 }
 
             }
-            details?.let {task->
+            details?.let { task ->
                 TaskDetailsScreen(task = task, onClose = onTaskDetailsClose)
             }
 

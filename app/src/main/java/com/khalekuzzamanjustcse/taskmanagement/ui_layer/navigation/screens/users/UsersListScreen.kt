@@ -38,13 +38,13 @@ fun UserListScreenPreview() {
 
 @Composable
 fun UserListScreen(
-    contacts: List<User> = emptyList(),
+    users: List<User> = emptyList(),
     isLoading: Boolean,
+    onFriendRequestSent :(User) -> Unit = {},
     onNavIconClicked: () -> Unit = {},
 ) {
-
     GenericListScreen(
-        items = contacts,
+        items = users,
         isLoading = isLoading,
         itemContent = { user ->
             UserInfoCard(
@@ -59,7 +59,7 @@ fun UserListScreen(
                         }
                         IconButton(
                             onClick = {
-                                FriendManager().addNewFriendRequest(user.phone)
+                             onFriendRequestSent(user)
                             },
                         ) {
                             Icon(imageVector = icon, contentDescription = null)
@@ -70,7 +70,7 @@ fun UserListScreen(
 
             )
         },
-        screenTitle = "Contacts",
+        screenTitle = "Users",
         onBack = onNavIconClicked
     )
 

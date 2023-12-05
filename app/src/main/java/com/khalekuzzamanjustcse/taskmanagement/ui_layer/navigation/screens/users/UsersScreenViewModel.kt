@@ -1,8 +1,10 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users
 
 import android.content.ContentResolver
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserCollections
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.device_contact.Contact
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.device_contact.LocalContactsProvider
@@ -24,6 +26,9 @@ class UsersScreenViewModel(
     companion object {
         private const val TAG = "UsersScreenViewModelLog: "
     }
+    fun log(message: String){
+        Log.d(TAG,message)
+    }
 
     init {
         viewModelScope.launch {
@@ -34,13 +39,46 @@ class UsersScreenViewModel(
 
     }
 
+    fun onFriendRequestSent(user: User) {
+        viewModelScope.launch {
+            FriendManager().addNewFriendRequest(user.phone)
+        }
+    }
+
+
     private suspend fun updateUser() {
-        contentResolver?.let {contentResolver->
-            _users.value =getUserWithLocalSavedIf(contentResolver)
+        contentResolver?.let { contentResolver ->
+            var user = getUserWithLocalSavedIf(contentResolver)
+            user = mergeWithAlreadyFriends(user)
+            _users.value = mergeWithSentFriendRequest(user)
         }
         contentResolver = null//do not hold unnecessary reference to save memory performance
 
     }
+
+    private suspend fun mergeWithAlreadyFriends(
+        users: List<User>
+    ): List<User> {
+        val alreadyFriends = FriendManager().getFriends()
+        return users.map { user ->
+            val isFriend = alreadyFriends.find { friend -> friend.phone == user.phone } != null
+            if (isFriend) user.copy(isFriend = true) else user
+        }
+    }
+
+    private suspend fun mergeWithSentFriendRequest(
+        users: List<User>
+    ): List<User> {
+        val friendRequests = FriendManager().getSentFriendRequest()
+        log("Request: $friendRequests")
+        return users.map { user ->
+            val requestPending = friendRequests.find { request ->
+                request.user.phone == user.phone
+            } != null
+            if (requestPending) user.copy(isSendRequest = true) else user
+        }
+    }
+
 
     private suspend fun getUserWithLocalSavedIf(contentResolver: ContentResolver): List<User> {
         val updatedLocalContacts = LocalContactsProvider(contentResolver).getContact()

@@ -19,10 +19,12 @@ fun FriendRequestListScreen(
     GenericListScreen<User>(
         items = viewModel.users.collectAsState().value,
         isLoading = viewModel.isLoading.collectAsState().value,
-        itemContent = { contact  ->
-            UserInfoCard(name =contact.name, phone = contact.phone, endExtraContent = {
+        itemContent = { user  ->
+            UserInfoCard(name =user.name, phone = user.phone, endExtraContent = {
                 IconButton(
-                    onClick = {},
+                    onClick = {
+                        viewModel.acceptFriendRequest(user.phone)
+                    },
                 ) {
                     Icon(imageVector = Icons.Filled.AddCircleOutline, contentDescription = null)
                 }

@@ -54,7 +54,7 @@ fun ContactScreenNavGraph() {
                     UsersScreenViewModel()
                 }
                 UserListScreen(
-                    contacts = viewModel.users.collectAsState().value,
+                    users = viewModel.users.collectAsState().value,
                     isLoading = viewModel.isLoading.collectAsState().value,
                 )
             }

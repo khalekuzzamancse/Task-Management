@@ -2,6 +2,7 @@ package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Contacts
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
@@ -27,7 +28,7 @@ object DrawerItemsProvider {
             ModalDrawerItem(Screen.Contact.route, Icons.Filled.Contacts),
             ModalDrawerItem(Screen.Users.route, Icons.Filled.Person),
             ModalDrawerItem(Screen.FriendRequest.route, Icons.Filled.Logout),
-
+            ModalDrawerItem(Screen.Friends.route, Icons.Filled.Group),
         )
     )
     val drawerGroups = listOf(group)

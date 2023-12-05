@@ -11,7 +11,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FriendRequestScreenViewModel : ViewModel(){
+class FriendRequestScreenViewModel : ViewModel() {
+    fun acceptFriendRequest(senderPhoneNo: String) {
+        viewModelScope.launch {
+            FriendManager().acceptFriendRequest(senderPhoneNo)
+        }
+    }
+
     private val _users = MutableStateFlow<List<User>>(emptyList())
     val users = _users.asStateFlow()
     private val _isLoading = MutableStateFlow(true)
@@ -20,8 +26,8 @@ class FriendRequestScreenViewModel : ViewModel(){
     init {
         val startTime = System.currentTimeMillis()
         viewModelScope.launch {
-            val request = FriendManager().getFriendRequest()
-            val newUsers =request.map { it.user }
+            val request = FriendManager().getReceivedFriendRequest()
+            val newUsers = request.map { it.user }
             val endTime = System.currentTimeMillis()
             val elapsedTime = endTime - startTime
             if (elapsedTime < 2000)

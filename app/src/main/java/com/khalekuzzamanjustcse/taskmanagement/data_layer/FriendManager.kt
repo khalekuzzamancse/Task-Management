@@ -16,7 +16,17 @@ data class FriendRequest(
     val hasNotified: Boolean
 )
 
+
 class FriendManager {
+    companion object {
+        private const val TAG = "FriendManagerLog: "
+
+    }
+
+    private fun log(message: String) {
+        Log.d(TAG, message)
+    }
+
     private val db = Firebase.firestore
     fun addNewFriendRequest(phoneNoTo: String) {
         val scope = CoroutineScope(Dispatchers.Default)
@@ -29,28 +39,53 @@ class FriendManager {
         }
     }
 
-    fun addNewFriend(otherPhoneNo: String) {
+    fun acceptFriendRequest(requestSenderPhone: String) {
         val scope = CoroutineScope(Dispatchers.Default)
         scope.launch {
-            val email = AuthManager().singedInUserEmail()
-            val singedUserPhoneNo = FirebaseFireStore().getUserPhoneNumber(email)
-            if (singedUserPhoneNo != null) {
-                val friend = hashMapOf(
-                    "user1Id" to singedUserPhoneNo,
-                    "user2Id" to otherPhoneNo,
-                    "notified" to false,
+            getSingedUserPhone()?.let { singedUserPhoneNo ->
+                addToFriendTable(
+                    singedUserPhoneNo = singedUserPhoneNo,
+                    senderPhoneNo = requestSenderPhone
                 )
-                db.collection("Friends").document("$otherPhoneNo-$singedUserPhoneNo")
-                    .set(friend)
-                    .addOnSuccessListener {
-                        Log.i("FriendAdded: ", "Successfully")
-                    }
-                    .addOnFailureListener { }
+                removeFriendRequest(
+                    senderPhone = requestSenderPhone,
+                    receiverPhone = singedUserPhoneNo
+                )
             }
+
         }
     }
 
-    suspend fun getFriendRequest(): List<FriendRequest> {
+    private fun removeFriendRequest(senderPhone: String, receiverPhone: String) {
+        db.collection("FriendRequest").document("$senderPhone$receiverPhone")
+            .delete()
+            .addOnSuccessListener { }
+            .addOnFailureListener { }
+    }
+
+    private fun addToFriendTable(
+        singedUserPhoneNo: String,
+        senderPhoneNo: String
+    ) {
+        val friend = hashMapOf(
+            "user1Id" to singedUserPhoneNo,
+            "user2Id" to senderPhoneNo,
+            "notified" to false,
+        )
+        db.collection("Friends").document("$senderPhoneNo-$singedUserPhoneNo")
+            .set(friend)
+            .addOnSuccessListener {
+                Log.i("FriendAdded: ", "Successfully")
+            }
+            .addOnFailureListener { }
+    }
+
+    private suspend fun getSingedUserPhone(): String? {
+        val email = AuthManager().singedInUserEmail()
+        return FirebaseFireStore().getUserPhoneNumber(email)
+    }
+
+    suspend fun getReceivedFriendRequest(): List<FriendRequest> {
         val email = AuthManager().singedInUserEmail()
         val signInUserPhoneNo = FirebaseFireStore().getUserPhoneNumber(email)
         val requests = mutableListOf<FriendRequest>()
@@ -65,10 +100,10 @@ class FriendManager {
                 for (document in querySnapshot.documents) {
                     val requestFrom = document.getString("sender")
                     val hasNotified = document.getBoolean("hasBeenNotified")
-                    if (requestFrom != null&&hasNotified!=null) {
+                    if (requestFrom != null && hasNotified != null) {
                         val user = UserCollections().user(requestFrom)
-                        user?.let {it->
-                            requests.add(FriendRequest(it,hasNotified))
+                        user?.let { it ->
+                            requests.add(FriendRequest(it, hasNotified))
                         }
                     }
                 }
@@ -78,6 +113,92 @@ class FriendManager {
         } catch (_: Exception) {
             requests
         }
+    }
+
+    suspend fun getSentFriendRequest(): List<FriendRequest> {
+        val email = AuthManager().singedInUserEmail()
+        val signInUserPhoneNo = FirebaseFireStore().getUserPhoneNumber(email)
+        val requests = mutableListOf<FriendRequest>()
+        return try {
+            val querySnapshot = withContext(Dispatchers.IO) {
+                db.collection("FriendRequest")
+                    .whereEqualTo("sender", signInUserPhoneNo)
+                    .get()
+                    .await()
+            }
+            if (!querySnapshot.isEmpty) {
+                for (document in querySnapshot.documents) {
+                    val requestedTo = document.getString("receiver")
+                    val hasNotified = document.getBoolean("hasBeenNotified")
+                    if (requestedTo != null && hasNotified != null) {
+                        val user = UserCollections().user(requestedTo)
+                        user?.let { it ->
+                            requests.add(FriendRequest(it, hasNotified))
+                        }
+                    }
+                }
+
+            }
+            requests
+        } catch (_: Exception) {
+            requests
+        }
+    }
+
+    suspend fun friendRequestAcceptNotified(
+        friendPhoneNo: String
+    ) {
+
+
+    }
+
+    suspend fun getNewFriends(): List<User> {
+        val email = AuthManager().singedInUserEmail()
+        val signInUserPhoneNo = FirebaseFireStore().getUserPhoneNumber(email)
+        val users = mutableListOf<User>()
+        return try {
+            val querySnapshot = withContext(Dispatchers.IO) {
+                db.collection("Friends")
+                    .where(
+                        Filter.or(
+                            Filter.equalTo("user1Id", signInUserPhoneNo),
+                            Filter.equalTo("user2Id", signInUserPhoneNo)
+                        )
+                    ).whereEqualTo("notified", false)
+                    .get()
+                    .await()
+            }
+            if (!querySnapshot.isEmpty) {
+                for (document in querySnapshot.documents) {
+                    val user1Id = document.getString("user1Id")
+                    val user2Id = document.getString("user2Id")
+                    if (user1Id != null && user2Id != null) {
+                        val friendIdOfCurrentUser =
+                            if (user1Id != signInUserPhoneNo) user2Id else user1Id
+                        log("friendPhone:$friendIdOfCurrentUser")
+                        val user = UserCollections().user(friendIdOfCurrentUser)
+                        user?.let {
+                            users.add(it)
+                                //prevent to get multiple notifications for the same friendship
+                            notified(document.id)
+                        }
+                    }
+                }
+
+            }
+            log("friends:$users")
+            users
+        } catch (_: Exception) {
+            users
+        }
+
+    }
+
+    private fun notified(documentId: String) {
+        db
+            .collection("Friends")
+            .document(documentId)
+            .update("notified", true)
     }
 
     suspend fun getFriends(): List<User> {

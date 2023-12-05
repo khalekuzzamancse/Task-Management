@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import com.khalekuzzamanjustcse.taskmanagement.DeepLink
@@ -47,6 +46,27 @@ class Notifier(
         //sending notification
         manager.notify(notificationId, notification)
     }
+    fun notify(
+        title: String,
+        message: String,
+        notificationId: Int = 1,
+    ) {
+        //creating channel
+        val channelID = "channel_1}"
+        val channel = crateChannel(channelId = channelID, channelName = "Channel_01")
+        attachChannelToManager(channel)
+        //creating notification
+        val pendingIntent = createPendingIntent(message)
+        //
+        val notification = createNotification(
+            channelId = channelID, title = title,
+            message = message,
+            pendingIntent =pendingIntent
+        )
+        //sending notification
+        manager.notify(notificationId, notification)
+    }
+
 
     private fun crateChannel(
         channelId: String, channelName: String,
@@ -118,7 +138,7 @@ class NotificationFactory(
     private val context: Context
 ) {
     suspend fun observeFriendRequest() {
-        val request = FriendManager().getFriendRequest()
+        val request = FriendManager().getReceivedFriendRequest()
         request.forEach {
             if (!it.hasNotified) {
                 Notifier(context)
