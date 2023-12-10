@@ -1,6 +1,5 @@
 package com.khalekuzzamanjustcse.taskmanagement.data_layer
 
-import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
@@ -12,8 +11,10 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.onCompletion
-import java.io.Serializable
 import java.util.UUID
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+
 val dummyTasks = listOf(
     TaskEntity(
         title = "Task 1",
@@ -41,7 +42,6 @@ val dummyTasks = listOf(
     )
     // Add more tasks as needed
 )
-
 
 
 
@@ -97,6 +97,23 @@ class TaskTable {
                 // Handle the failure
             }
     }
+    suspend fun addTask(task: TaskEntity2): Boolean = suspendCoroutine { continuation ->
+        var id = UUID.randomUUID().toString()
+        val taskHasId = task.primaryKey.isNotEmpty()
+        if (taskHasId) {
+            id = task.primaryKey
+        }
+
+        val taskDoc = tasksCollection.document(id)
+        taskDoc.set(task)
+            .addOnSuccessListener {
+                continuation.resume(true)
+            }
+            .addOnFailureListener {
+                continuation.resume(false)
+            }
+    }
+
 
     fun updateTask(task: TaskEntity) {
         val taskId = task.id
