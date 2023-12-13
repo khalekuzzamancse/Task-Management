@@ -178,7 +178,9 @@ fun NavGraph(
 
                 FriendListScreen(
                     viewModel = viewModel,
-                    onNavIconClicked = {},
+                    onNavIconClicked = {
+                        navController.popBackStack()
+                    },
                 )
 
             }

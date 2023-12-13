@@ -41,6 +41,8 @@ import androidx.lifecycle.ViewModel
 import com.khalekuzzamanjustcse.taskmanagement.R
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FirebaseFireStore
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserCollection
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserEntity
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.PasswordVisualTransformation
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FieldValidator
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FormManager
@@ -88,7 +90,8 @@ class LoginViewModel(
         val phone = registrationManager.userPhone
         val name = registrationManager.userName
         val isDone = AuthManager().createAccount(email, password)
-        FirebaseFireStore().addUser(email, phone, name)
+
+        UserCollection().createUser(UserEntity(name=name, phone=phone,email=email))
         if (isDone) {
             log("User registration successful")
         }

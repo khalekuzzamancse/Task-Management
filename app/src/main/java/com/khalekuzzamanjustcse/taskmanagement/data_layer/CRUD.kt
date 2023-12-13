@@ -48,15 +48,15 @@ class DatabaseCRUD {
 
     suspend inline fun <reified T> read(
         collectionName: String,
-        predicate: Filter
+        predicate: Filter? = null
     ): List<T> {
         val collectionRef = Firebase.firestore.collection(collectionName)
         return try {
             val querySnapshot = withContext(Dispatchers.IO) {
-                collectionRef
-                    .where(predicate)
-                    .get()
-                    .await()
+                val query = if (predicate != null)
+                    collectionRef.where(predicate).get()
+                else collectionRef.get()
+                query.await()
             }
             asList(querySnapshot)
         } catch (_: Exception) {

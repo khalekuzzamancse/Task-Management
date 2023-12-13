@@ -5,12 +5,13 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.firebase.firestore.Filter
 
 @OptIn(ExperimentalLayoutApi::class)
 @Preview
 @Composable
 fun UserCollectionPreview() {
-    val dummyUser=UserEntity(
+    val dummyUser = UserEntity(
         name = "Nada",
         phone = "2",
         email = "baka@gmail.com",
@@ -24,6 +25,10 @@ fun UserCollectionPreview() {
             val user = UserCollection().getUser("2")
             Log.d("UserCollection:read", "$user")
         }, label = "Read")
+        MyButton(onClick = {
+            val user = UserCollection().getUsers("2")
+            Log.d("UserCollection:allUser", "$user")
+        }, label = "All users")
     }
 }
 
@@ -46,9 +51,20 @@ class UserCollection {
             docId = userPhone
         )
     }
+    suspend fun getUserByEmail(email: String): UserEntity? {
+        return databaseCRUD.read<UserEntity>(
+            COLLECTION_NAME,
+            Filter.equalTo("email", email)
+        ).firstOrNull()
+    }
+
+    suspend fun getUsers(myUserId: String): List<UserEntity> {
+        return databaseCRUD.read<UserEntity>(COLLECTION_NAME).filter { it.phone!=myUserId }
+    }
 
     suspend fun createUser(userEntity: UserEntity): Boolean {
         return databaseCRUD.create(COLLECTION_NAME, userEntity, docID = userEntity.phone)
     }
+
 
 }

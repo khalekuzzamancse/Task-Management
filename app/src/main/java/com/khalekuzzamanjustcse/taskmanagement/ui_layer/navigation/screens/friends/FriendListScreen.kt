@@ -12,11 +12,12 @@ fun FriendListScreen(
     viewModel: FriendListScreenViewModel,
     onNavIconClicked: () -> Unit,
 ) {
+
     GenericListScreen<User>(
         items = viewModel.users.collectAsState().value,
         isLoading = viewModel.isLoading.collectAsState().value,
         itemContent = { contact ->
-            UserInfoCard(name = contact.name, phone = contact.phone, savedInContact = false)
+            UserInfoCard(name = contact.name, phone = contact.phone, savedInContact = contact.isAsLocalContact)
         },
         screenTitle = "My Friends",
         onBack =onNavIconClicked,

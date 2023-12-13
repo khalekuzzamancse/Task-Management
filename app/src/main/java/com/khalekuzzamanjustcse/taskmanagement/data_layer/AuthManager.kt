@@ -19,25 +19,16 @@ class AuthManager(
         }
     }
 
-//    fun createAccount(email: String, password: String) {
-//        auth.createUserWithEmailAndPassword(email, password)
-//            .addOnCompleteListener { task ->
-//                if (task.isSuccessful) {
-//                } else {
-//                }
-//            }
-//
-//    }
     suspend fun createAccount(email: String, password: String): Boolean {
         return suspendCoroutine { continuation ->
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        log("createUserWithEmailAndPassword():success")
-                        log("createUserWithEmailAndPassword():CurrentUser:${auth.currentUser}")
+//                        log("createUserWithEmailAndPassword():success")
+//                        log("createUserWithEmailAndPassword():CurrentUser:${auth.currentUser}")
                         continuation.resume(true)
                     } else {
-                        log("createUserWithEmailAndPassword():failure")
+                       // log("createUserWithEmailAndPassword():failure")
                         continuation.resume(false)
                     }
                 }
@@ -49,11 +40,11 @@ class AuthManager(
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        log("signInWithEmailAndPassword():success")
-                        log("signInWithEmailAndPassword():CurrentUser:${auth.currentUser}")
+//                        log("signInWithEmailAndPassword():success")
+//                        log("signInWithEmailAndPassword():CurrentUser:${auth.currentUser}")
                         continuation.resume(true) // Call the continuation with success
                     } else {
-                        log("signInWithEmailAndPassword():failure")
+                        //log("signInWithEmailAndPassword():failure")
                         continuation.resume(false) // Call the continuation with failure
                     }
                 }
@@ -72,8 +63,10 @@ class AuthManager(
         return try {
             user?.let {
                 val email = it.email
-                val phone = FirebaseFireStore().getUserPhoneNumber(email)
-                phone // Return the phone number
+                if (email!=null) {
+                    UserCollection().getUserByEmail(email)?.phone
+                }
+                else null
             }
         } catch (e: Exception) {
             null

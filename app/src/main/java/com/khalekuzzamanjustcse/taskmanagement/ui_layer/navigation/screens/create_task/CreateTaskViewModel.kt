@@ -2,8 +2,11 @@ package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.crea
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendShipManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserCollection
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserCollections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +27,9 @@ class CreateTaskViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-                val newUser=UserCollections()
-                    .allUsers()
+            val myUserId=AuthManager().signedInUserPhone()
+            if (myUserId!=null){
+                val newUser= FriendShipManager().myFriendList(myUserId)
                     .map {
                         TaskAssignedUser(
                             name = it.name,
@@ -33,10 +37,12 @@ class CreateTaskViewModel : ViewModel() {
                             selected = false
                         )
                     }
-            withContext(Dispatchers.Main){
-                _users.value=newUser
-                _isLoading.value=false
+                withContext(Dispatchers.Main){
+                    _users.value=newUser
+                    _isLoading.value=false
+                }
             }
+
         }
     }
 

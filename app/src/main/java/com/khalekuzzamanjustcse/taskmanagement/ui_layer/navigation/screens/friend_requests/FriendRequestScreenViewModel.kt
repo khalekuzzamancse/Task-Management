@@ -2,7 +2,9 @@ package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.frie
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendManager
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendShipManager
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -12,9 +14,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class FriendRequestScreenViewModel : ViewModel() {
+  private val manager=  FriendShipManager()
     fun acceptFriendRequest(senderPhoneNo: String) {
         viewModelScope.launch {
-            FriendManager().acceptFriendRequest(senderPhoneNo)
+            manager.acceptRequest(senderPhoneNo,"2")
         }
     }
 
@@ -24,18 +27,21 @@ class FriendRequestScreenViewModel : ViewModel() {
     val isLoading = _isLoading.asStateFlow()
 
     init {
-        val startTime = System.currentTimeMillis()
         viewModelScope.launch {
-            val request = FriendManager().getReceivedFriendRequest()
-            val newUsers = request.map { it.user }
-            val endTime = System.currentTimeMillis()
-            val elapsedTime = endTime - startTime
-            if (elapsedTime < 2000)
-                delay(1500)
-            withContext(Dispatchers.Main) {
-                _users.value = newUsers
-                _isLoading.value = false
+            val singedUserPhone=AuthManager().signedInUserPhone()
+            if(singedUserPhone!=null) {
+                val request = FriendShipManager().getFriendRequest(singedUserPhone)
+                val newUsers = request.map {User(
+                    name = it.name,
+                    phone = it.phone
+                ) }
+                withContext(Dispatchers.Main) {
+                    _users.value = newUsers
+                    _isLoading.value = false
+                }
             }
+
+
         }
     }
 }

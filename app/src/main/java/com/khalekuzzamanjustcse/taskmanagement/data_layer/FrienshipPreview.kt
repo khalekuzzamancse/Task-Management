@@ -31,7 +31,7 @@ fun FriendshipDemo() {
         }, label = "Add FriendShip")
 
         MyButton(onClick = {
-            val requests = FriendShipManager().newFriendRequest("2")
+            val requests = FriendShipManager().getFriendRequest("2")
             Log.d("FriendShipDemo:MyReq", "$requests")
         }, label = "My Request")
 
@@ -43,8 +43,8 @@ fun FriendshipDemo() {
         )
         MyButton(
             onClick = {
-                val isSuccess = FriendShipManager().acceptRequest(docID)
-                Log.d("FriendShipDemo:acceptRequest", "$isSuccess")
+               // val isSuccess = FriendShipManager().acceptRequest(docID)
+               // Log.d("FriendShipDemo:acceptRequest", "$isSuccess")
             }, label = "Accept request"
         )
         MyButton(
