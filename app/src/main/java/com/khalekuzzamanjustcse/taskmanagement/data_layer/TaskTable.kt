@@ -99,9 +99,9 @@ class TaskTable {
     }
     suspend fun addTask(task: TaskEntity2): Boolean = suspendCoroutine { continuation ->
         var id = UUID.randomUUID().toString()
-        val taskHasId = task.primaryKey.isNotEmpty()
+        val taskHasId = task.taskId.isNotEmpty()
         if (taskHasId) {
-            id = task.primaryKey
+            id = task.taskId
         }
 
         val taskDoc = tasksCollection.document(id)

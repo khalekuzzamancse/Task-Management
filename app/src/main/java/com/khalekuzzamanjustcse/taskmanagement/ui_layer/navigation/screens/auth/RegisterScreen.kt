@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.PasswordVisualTransformation
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph.ProgressBar
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FieldValidator
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FormManager
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FormTextFieldState
@@ -180,8 +181,10 @@ fun RegisterScreen(
                 .padding(it)
                 .verticalScroll(rememberScrollState())
         ) {
+
             VerticalSpacer()
             RegisterScreenInputFields(formManger = formManger)
+
         }
     }
 

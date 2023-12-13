@@ -28,18 +28,11 @@ import kotlin.coroutines.suspendCoroutine
 @Preview
 @Composable
 fun TaskDemo() {
-    val dummyTask = TaskEntity2(
-        primaryKey = "123",
-        title = "Dummy Task",
-        description = "This is a dummy task for testing",
-        assignerPrimaryKey = "017388",
-        dueDate = "2023-01-01",
-    )
     val taskToAdd = TaskToAdd(
         title = "02 Dummy Task",
         description = "02 This is a dummy task for testing",
-        assignerPrimaryKey = "017388",
-        dueDate = "2023-01-01",
+        assignerIdentifier = "017388",
+        dueDate = 12344,
         assignee = listOf("0123", "0134")
     )
     val scope = rememberCoroutineScope()
@@ -57,7 +50,7 @@ fun TaskDemo() {
         Button(onClick = {
             scope.launch {
                 val tasks = TaskTable2().getAssignedTasks("0134")
-                Log.d("TaskDemoCom:\n", "$tasks")
+                Log.d("TaskDemoCom:", "$tasks")
 
             }
 
@@ -67,27 +60,20 @@ fun TaskDemo() {
         Button(onClick = {
             scope.launch {
                 TaskTable2().updateTaskStage(
-                    taskAssignee = TaskAssignee(
-                        documentId = "Odtav6tnVTFmsfYtOZaz",
-                        assigneePrimaryKey = "0123",
-                        stage = "2",
-                        taskPrimaryKey = "Dummy Task-017388"
+                    assignedTask = AssignedTask(
+                        assignmentId = "YF4XE6LKI5GJy0ufNtzx",
+                        assigneeId = "0123",
+                        taskStateId = "2",
+                        taskId = "Dummy Task-017388"
                     ),
-                    stage = "4"
+                    newState = "4"
                 )
             }
 
         }) {
             Text(text = "Update Tasks Stage")
         }
-        Button(onClick = {
-            scope.launch {
 
-            }
-
-        }) {
-            Text(text = "Fetch Where")
-        }
 
     }
 
@@ -96,78 +82,82 @@ fun TaskDemo() {
 data class TaskToAdd(
     val title: String,
     val description: String,
-    val dueDate: String,
-    val assignerPrimaryKey: String,
+    val dueDate: Long,
+    val assignerIdentifier: String,
     val assignee: List<String>
 ) {
-    private val taskPrimaryKey = "$title-$assignerPrimaryKey"
+    private val taskPrimaryKey = "$title-$assignerIdentifier"
     fun getEntity(): TaskEntity2 {
         return TaskEntity2(
-            primaryKey = taskPrimaryKey,
+            taskId = taskPrimaryKey,
             title = title,
             description = description,
-            dueDate = dueDate,
-            assignerPrimaryKey = assignerPrimaryKey
+            dueTime = dueDate,
+            assignerId = assignerIdentifier
         )
     }
 
     fun getTaskAssignee() = assignee.map { assignerPrimaryKey ->
-        TaskAssignee(
-            taskPrimaryKey = taskPrimaryKey,
-            assigneePrimaryKey = assignerPrimaryKey,
-            stage = "1"
+        AssignedTask(
+            taskId = taskPrimaryKey,
+            assigneeId = assignerPrimaryKey,
+            taskStateId = "1"
         )
     }
 }
 
+data class TaskEntity2 @JvmOverloads constructor(
+    @DocumentId val taskId: String = "",
+    val title: String = "",
+    val description: String = "",
+    val dueTime: Long = 0,
+    val assignerId: String = "",
+)
 
-data class TaskAssignee @JvmOverloads constructor(
-    @DocumentId val documentId: String = "",
-    val taskPrimaryKey: String = "",
-    val assigneePrimaryKey: String = "",
-    val stage: String = ""
+data class AssignedTask @JvmOverloads constructor(
+    @DocumentId val assignmentId: String = "",
+    val taskId: String = "",
+    val taskStateId: String = "",
+    val assigneeId: String = "",
+    val assignedTime: Long = 0,
+    val completionTime: Long = 0,
 )
 
 
-data class AssignedTask(
+data class MyAssignedTask(
     val title: String,
     val description: String,
     val assignerName: String,
     val assignerPhone: String,
-    val dueDate: String,
+    val dueDate: Long,
     val taskAssignedId: String,
 ) {
     companion object {
-        fun toAssignedTask(taskAssignee: TaskAssignee, task: TaskEntity2): AssignedTask {
-            return AssignedTask(
+        fun toAssignedTask(assignedTask: AssignedTask, task: TaskEntity2): MyAssignedTask {
+            return MyAssignedTask(
                 title = task.title,
                 description = task.description,
                 assignerName = "--",
-                assignerPhone = task.assignerPrimaryKey,
-                dueDate = task.dueDate,
-                taskAssignedId = taskAssignee.documentId
+                assignerPhone = task.assignerId,
+                dueDate = task.dueTime,
+                taskAssignedId = assignedTask.assignmentId
             )
         }
     }
 }
 
-data class TaskEntity2 @JvmOverloads constructor(
-    @DocumentId val primaryKey: String = "",
-    val title: String = "",
-    val description: String = "",
-    val assignerPrimaryKey: String = "",
-    val dueDate: String = "",
-)
 
 class TaskTable2 {
     companion object {
         private const val TASKS_COLLECTION = "Tasks"
-        private const val TASK_ASSIGNEE_COLLECTION = "TaskAssignees"
+        private const val TASK_ASSIGNEE_COLLECTION = "AssignedTask"
+        private const val ASSIGN_ID_FIELD = "assigneeId"
+
     }
 
     private val db = FirebaseFirestore.getInstance()
     private val taskCollection = db.collection(TASKS_COLLECTION)
-    private val taskAssigneesCollection = db.collection(TASK_ASSIGNEE_COLLECTION)
+    private val assignedTaskCollection = db.collection(TASK_ASSIGNEE_COLLECTION)
 
 
     suspend fun addTask(task: TaskToAdd) {
@@ -182,9 +172,9 @@ class TaskTable2 {
     private suspend fun addToTaskCollection(task: TaskEntity2): Boolean =
         suspendCoroutine { continuation ->
             var id = UUID.randomUUID().toString()
-            val taskHasNotId = task.primaryKey.isNotEmpty()
+            val taskHasNotId = task.taskId.isNotEmpty()
             if (taskHasNotId) {
-                id = task.primaryKey
+                id = task.taskId
             }
             val documentReference = taskCollection.document(id)
             documentReference.set(task)
@@ -192,9 +182,9 @@ class TaskTable2 {
                 .addOnFailureListener { continuation.resume(false) }
         }
 
-    private suspend fun addAssignee(assignee: TaskAssignee): Boolean =
+    private suspend fun addAssignee(assignee: AssignedTask): Boolean =
         suspendCoroutine { continuation ->
-            val documentReference = taskAssigneesCollection.document()
+            val documentReference = assignedTaskCollection.document()
             documentReference.set(assignee)
                 .addOnSuccessListener { continuation.resume(true) }
                 .addOnFailureListener { continuation.resume(false) }
@@ -202,7 +192,7 @@ class TaskTable2 {
 
 
     suspend fun updateTask(task: TaskEntity2): Boolean = suspendCoroutine { continuation ->
-        val taskId = task.primaryKey
+        val taskId = task.taskId
         val taskHasId = taskId.isNotBlank()
         if (taskHasId) {
             val taskDoc = taskCollection.document(taskId)
@@ -219,12 +209,12 @@ class TaskTable2 {
         }
     }
 
-    suspend fun updateTaskStage(taskAssignee: TaskAssignee, stage: String): Boolean =
+    suspend fun updateTaskStage(assignedTask: AssignedTask, newState: String): Boolean =
         suspendCoroutine { continuation ->
-            if (taskAssignee.documentId.isNotBlank()) {
-                val taskDoc = taskAssigneesCollection.document(taskAssignee.documentId)
+            if (assignedTask.assignmentId.isNotBlank()) {
+                val taskDoc = assignedTaskCollection.document(assignedTask.assignmentId)
                 taskDoc
-                    .set(taskAssignee.copy(stage = stage))
+                    .set(assignedTask.copy(taskStateId = newState))
                     .addOnSuccessListener {
                         continuation.resume(true)
                     }
@@ -236,12 +226,13 @@ class TaskTable2 {
             }
         }
 
-    suspend fun getAssignedTasks(signedUserPhone: String): List<AssignedTask> {
-        val tasks = mutableListOf<AssignedTask>()
+    suspend fun getAssignedTasks(signedUserPhone: String): List<MyAssignedTask> {
+        val tasks = mutableListOf<MyAssignedTask>()
         val refs = getAssignedTaskReferences(signedUserPhone)
+      //  Log.d("TaskDemoCom:Ref", "$refs")
         refs.forEach { taskAssignee ->
-            val task = getTasks(taskAssignee.taskPrimaryKey)
-            if (task != null) tasks.add(AssignedTask.toAssignedTask(taskAssignee, task))
+            val task = getTasks(taskAssignee.taskId)
+            if (task != null) tasks.add(MyAssignedTask.toAssignedTask(taskAssignee, task))
         }
         return tasks
     }
@@ -260,7 +251,7 @@ class TaskTable2 {
     }
 
 
-    private suspend fun getAssignedTaskReferences(signedUserPhone: String): List<TaskAssignee> {
+    private suspend fun getAssignedTaskReferences(signedUserPhone: String): List<AssignedTask> {
         return suspendCancellableCoroutine { continuation ->
             val callback = EventListener<QuerySnapshot> { value, error ->
                 if (error != null) {
@@ -270,17 +261,17 @@ class TaskTable2 {
                 }
 
                 value?.let { querySnapshot ->
-                    val assignedTasksRef = mutableListOf<TaskAssignee>()
+                    val assignedTasksRef = mutableListOf<AssignedTask>()
                     for (document in querySnapshot) {
-                        val taskEntity = document.toObject(TaskAssignee::class.java)
+                        val taskEntity = document.toObject(AssignedTask::class.java)
                         assignedTasksRef.add(taskEntity)
                     }
                     continuation.resume(assignedTasksRef)
                 }
             }
 
-            val query = taskAssigneesCollection
-                .whereEqualTo("assigneePrimaryKey", signedUserPhone)
+            val query = assignedTaskCollection
+                .whereEqualTo(ASSIGN_ID_FIELD, signedUserPhone)
 
             val registration = query.addSnapshotListener(callback)
 
@@ -291,7 +282,30 @@ class TaskTable2 {
         }
     }
 
-    fun getTasks(): Flow<List<TaskEntity2>> = callbackFlow {
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+
+   fun getTasks(): Flow<List<TaskEntity2>> = callbackFlow {
         val callback = EventListener<QuerySnapshot> { value, _ ->
             value?.let { querySnapshot ->
                 val taskList = mutableListOf<TaskEntity2>()
@@ -300,10 +314,9 @@ class TaskTable2 {
                     var isNotEmpty: Boolean
                     taskEntity.apply {
                         isNotEmpty = !(title.isBlank() &&
-                                primaryKey.isBlank() &&
+                                taskId.isBlank() &&
                                 description.isBlank() &&
-                                assignerPrimaryKey.isBlank() &&
-                                dueDate.isBlank())
+                                assignerId.isBlank())
                     }
                     if (isNotEmpty) {
                         taskList.add(taskEntity)
@@ -315,6 +328,4 @@ class TaskTable2 {
         val registration = taskCollection.addSnapshotListener(callback)
         awaitClose { registration.remove() }
     }.onCompletion {}
-
-}
-
+ */
