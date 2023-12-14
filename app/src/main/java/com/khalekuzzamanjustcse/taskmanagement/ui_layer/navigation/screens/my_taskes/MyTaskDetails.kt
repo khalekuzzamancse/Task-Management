@@ -1,5 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +38,7 @@ fun TaskDetailsScreen(
     task: TaskEntity,
     onClose: () -> Unit,
 ) {
+
     CommonScreen(
         title = "Task Details",
         onBackArrowClick = onClose,
@@ -63,7 +65,7 @@ fun TaskDetailsScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "23 OCTOBER 2023",
+                text = task.dueDate,
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )

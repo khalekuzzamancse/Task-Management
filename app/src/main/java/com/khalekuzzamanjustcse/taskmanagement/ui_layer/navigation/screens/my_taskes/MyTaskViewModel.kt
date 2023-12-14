@@ -58,11 +58,13 @@ class MyTaskViewModel : ViewModel() {
                 val taskCollection = TaskTable2(myUserId)
                 withContext(Dispatchers.Main) {
                     _tasks.value+= taskCollection.getAssignedTasks(myUserId).map {
+                        Log.d("TaskDetailsScreen", "$it")
                         TaskEntity(
                             title = it.title,
                             description = it.description,
                             assignerName = it.assignerName,
                             assigneePhone = it.assignerPhone,
+                            dueDate = it.dueDate,
                             complete = it.assignerPhone==myUserId
                         )
                     }

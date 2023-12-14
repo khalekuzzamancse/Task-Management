@@ -51,9 +51,12 @@ data class TaskEntity @JvmOverloads constructor(
     val description: String = "",
     val assignerName: String = "",
     val assigneePhone: String = "",
+    val dueDate: String = "",
     val notified: Boolean = false,
     val complete: Boolean = false
 ) {
+
+
 
     fun isEmpty(): Boolean {
         return title.isBlank() &&

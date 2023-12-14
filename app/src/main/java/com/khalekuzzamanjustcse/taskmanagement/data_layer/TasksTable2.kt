@@ -167,7 +167,7 @@ data class MyAssignedTask(
             return MyAssignedTask(
                 title = task.title,
                 description = task.description,
-                assignerName = "--",
+                assignerName = "",
                 assignerPhone = task.assignerId,
                 dueDate = task.dueTime,
                 taskAssignedId = assignedTaskRelation.assignmentId
@@ -388,7 +388,17 @@ class TaskTable2(
                 collectionName = TASKS_COLLECTION,
                 docId = taskAssignee.taskId
             )
-            if (task != null) tasks.add(MyAssignedTask.toAssignedTask(taskAssignee, task))
+            if (task != null){
+                val assigner=UserCollection().getUser(task.assignerId)
+                if (assigner != null){
+                    tasks.add(
+                        MyAssignedTask
+                            .toAssignedTask(taskAssignee, task)
+                            .copy(assignerName = assigner.name+"(${assigner.phone})")
+                    )
+                }
+
+            }
         }
         return tasks
     }
