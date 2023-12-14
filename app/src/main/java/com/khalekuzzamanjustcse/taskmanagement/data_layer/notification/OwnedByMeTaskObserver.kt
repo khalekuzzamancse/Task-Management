@@ -7,6 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Filter
 import com.khalekuzzamanjustcse.taskmanagement.BaseApplication
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseCollectionReader
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserCollection
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskDoer
@@ -49,19 +50,6 @@ fun createDummyTask(): Task {
     )
 }
 
-@Preview
-@Composable
-fun Pre() {
-    LaunchedEffect(Unit) {
-        AssignedByMeTasksObserver.observe("01571378537")
-
-//        val res = DatabaseCRUD().read<Task>(
-//            collection = "NewTaks",
-//        )
-//        Log.d("Resultdlkfalkflak", "$res")
-
-    }
-}
 
 object AssignedByMeTasksObserver {
     private const val TASKS_COLLECTION = "NewTaks"
@@ -72,24 +60,33 @@ object AssignedByMeTasksObserver {
     private const val STATE_COMPLETED_NOTIFIED = 4
 
     private val _taskEntities = MutableStateFlow(emptyList<Task>())
-     val _taskOwnedByMe= MutableStateFlow(emptyList<TaskOwnedByMe>())
+    val _taskOwnedByMe = MutableStateFlow(emptyList<TaskOwnedByMe>())
 
 
     init {
         val scope = CoroutineScope(Dispatchers.Main)
         scope.launch {
+            AuthManager.signedInUserPhone()?.let {
+                observe(it)
+            }
+        }
+    }
+
+    init {
+        val scope = CoroutineScope(Dispatchers.Main)
+        scope.launch {
             _taskEntities.collect { tasks ->
-             _taskOwnedByMe.value=  tasks.map{ task ->
-                    val doers= taskDoers(task)
-                    val ts= TaskOwnedByMe(
-                        taskId=task.taskId,
+                _taskOwnedByMe.value = tasks.map { task ->
+                    val doers = taskDoers(task)
+                    val ts = TaskOwnedByMe(
+                        taskId = task.taskId,
                         title = task.title,
                         description = task.description,
                         dueDate = task.dueTime,
                         doers = doers
                     )
 
-                  ts
+                    ts
                 }
 
             }
@@ -97,25 +94,26 @@ object AssignedByMeTasksObserver {
 
 
     }
-    private suspend fun  taskDoers(task: Task):List<TaskDoer>{
-       return task.assignedUsers.mapNotNull{
+
+    private suspend fun taskDoers(task: Task): List<TaskDoer> {
+        return task.assignedUsers.mapNotNull {
             taskDoer(it)
         }
     }
 
 
-    private suspend fun taskDoer(assignee:AssignedUser):TaskDoer?{
-        val state=assignee.state
-        val user=UserCollection().getUser(assignee.userId)
-       return if(user!=null){
+    private suspend fun taskDoer(assignee: AssignedUser): TaskDoer? {
+        val state = assignee.state
+        val user = UserCollection().getUser(assignee.userId)
+        return if (user != null) {
             TaskDoer(
                 name = user.name,
                 phone = user.phone,
                 status = decodeTaskState(state)
             )
-        }
-        else null
+        } else null
     }
+
     private fun decodeTaskState(state: Int): String {
         return when (state) {
             1 -> "Unseen"
@@ -136,6 +134,7 @@ object AssignedByMeTasksObserver {
         )
 
     }
+
     private suspend fun observerTaskEntityAssignedByMe(signedInUserId: String) {
         val predicate = Filter.equalTo(FIELD_ASSIGNER_ID, signedInUserId)
         DatabaseCollectionReader(collection = TASKS_COLLECTION)

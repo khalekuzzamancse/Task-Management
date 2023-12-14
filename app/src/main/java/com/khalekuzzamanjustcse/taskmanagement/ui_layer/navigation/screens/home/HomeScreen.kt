@@ -1,5 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FirebaseFireStore
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.AssignedByMeTasksObserver
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.AssignedToMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.MyTaskViewModel
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskOwnedByMe
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TasksOwnedByMe
@@ -56,6 +59,7 @@ fun Home(
     onMyOwnedTaskOpenDetail: (TaskOwnedByMe) -> Unit,
     onTaskDetailsOpen: (TaskEntity) -> Unit = {},
 ) {
+
 
     var username by remember {
         mutableStateOf("NULL")
@@ -99,15 +103,17 @@ fun Home(
             UserInfo(username = username)
             Spacer(modifier = Modifier.height(16.dp))
             TasksOwnedByMe(
-                tasks = viewModel.taskOwnedByMe.collectAsState().value,
+                tasks =AssignedByMeTasksObserver._taskOwnedByMe.collectAsState().value,
                 onOpenDetails =onMyOwnedTaskOpenDetail
             )
             TasksAssignedToMeScreen(
                 viewModel,
+                items = AssignedToMeTasksObserver.taskToMe.collectAsState().value,
                 onTaskClick = { myTask ->
                     viewModel.onLongClick(myTask)
                     onTaskDetailsOpen(myTask)
-                })
+                }
+            )
 
 
         }

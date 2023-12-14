@@ -11,9 +11,10 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_ta
 @Composable
 fun TasksAssignedToMeScreen(
     viewModel: MyTaskViewModel,
+     items:List<TaskEntity>,
     onTaskClick: (TaskEntity)->Unit={}
 ) {
-    val items= viewModel.tasks.collectAsState().value
+
 
         LazyColumn {
             items(items) { myTask ->

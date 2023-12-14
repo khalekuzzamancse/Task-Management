@@ -38,26 +38,6 @@ class MyTaskViewModel : ViewModel() {
 
     }
 
-
-    private var _taskOwnedByMe = MutableStateFlow(emptyList<TaskOwnedByMe>())
-    var taskOwnedByMe=_taskOwnedByMe.asStateFlow()
-        private set
-
-    init {
-        viewModelScope.launch {
-            val myUserId = AuthManager.signedInUserPhone()
-            if (myUserId != null) {
-              val a=AssignedByMeTasksObserver
-                  a.observe(myUserId)
-                a._taskOwnedByMe.collect{
-                  Log.d("MyAssignedTask:ByMe", "$it")
-                  _taskOwnedByMe.value=it
-              }
-
-            }
-
-        }
-    }
     init {
 
         viewModelScope.launch {

@@ -17,7 +17,7 @@ object AuthManager {
     var loggedIn = _loggedIn.asStateFlow()
         private set
 init {
-    var onLogout: () -> Unit = {}
+
     auth = Firebase.auth
      user = auth.currentUser
     _loggedIn.value =user!=null
