@@ -21,16 +21,16 @@ fun TaskDemo() {
     val taskToAdd = TaskToAdd(
         title = "02 Dummy Task",
         description = "02 This is a dummy task for testing",
-        assignerIdentifier = "017388",
+        assignerIdentifier = "01571378537",
         dueDate = 12344,
-        assignee = listOf("0123", "0134")
+        assignee = listOf("01571207787", "01625337883")
     )
     val scope = rememberCoroutineScope()
 
     FlowRow {
         Button(onClick = {
             scope.launch {
-                TaskTable2("").createTask(taskToAdd)
+                TaskTable2("01571378537").createTask(taskToAdd)
 
             }
 
@@ -39,7 +39,7 @@ fun TaskDemo() {
         }
         Button(onClick = {
             scope.launch {
-                val tasks = TaskTable2("").getAssignedTasks("0134")
+                val tasks = TaskTable2("01571378537").getAssignedTasks("0134")
                 Log.d("TaskDemoCom:", "$tasks")
 
             }
@@ -49,7 +49,7 @@ fun TaskDemo() {
         }
         Button(onClick = {
             scope.launch {
-                TaskTable2("").makeAssignedTaskNotified("RQO1v9HC9pk7JPxM5Khm")
+                TaskTable2("01571378537").makeAssignedTaskNotified("RQO1v9HC9pk7JPxM5Khm")
             }
 
         }) {
@@ -57,12 +57,12 @@ fun TaskDemo() {
         }
         Button(onClick = {
             scope.launch {
-                val taskTable = TaskTable2("0123")
+                val taskTable = TaskTable2("01571378537")
                 val tasks = taskTable.getAssignedNotNotifiedTask()
                 tasks.forEach {
                     taskTable.makeAssignedTaskNotified(it.taskAssignedId)
                 }
-                Log.d("NewlyAssingnedTask","$tasks")
+                Log.d("NewlyAssingnedTask", "$tasks")
 
             }
 
@@ -71,7 +71,7 @@ fun TaskDemo() {
         }
         Button(onClick = {
             scope.launch {
-                val taskTable = TaskTable2("0123")
+                val taskTable = TaskTable2("01571378537")
                 val tasks = taskTable.getCompletedNotNotifiedTask()
                 tasks.forEach {
                     taskTable.makeTaskCompletedTaskNotified(it.taskAssignedId)
@@ -81,6 +81,23 @@ fun TaskDemo() {
 
         }) {
             Text(text = "Complete  not notified  task")
+        }
+        Button(onClick = {
+            scope.launch {
+                val taskTable = TaskTable2("01571378537")
+                val tasks = taskTable.myAssignedCompletedUnNotifiedTask()
+                tasks.forEach {
+                    Log.d(
+                        "MyAssignedTask:ComputedBY",
+                        "${it.task.title} completed by ${it.completer.name}"
+                    )
+                    taskTable.makeTaskCompletedTaskNotified(it.taskAssignedId)
+                }
+
+            }
+
+        }) {
+            Text(text = "MY ASSIGNED COMPLETED TASK")
         }
 
 
@@ -107,7 +124,7 @@ data class TaskToAdd(
     }
 
     fun getTaskAssignee() = assignee.map { assignerPrimaryKey ->
-        AssignedTask(
+        AssignedTaskRelation(
             taskId = taskPrimaryKey,
             assigneeId = assignerPrimaryKey,
             taskStateId = 1
@@ -123,7 +140,7 @@ data class TaskEntity2 @JvmOverloads constructor(
     val assignerId: String = "",
 )
 
-data class AssignedTask @JvmOverloads constructor(
+data class AssignedTaskRelation @JvmOverloads constructor(
     @DocumentId val assignmentId: String = "",
     val taskId: String = "",
     val taskStateId: Int = 1,
@@ -142,18 +159,27 @@ data class MyAssignedTask(
     val taskAssignedId: String,
 ) {
     companion object {
-        fun toAssignedTask(assignedTask: AssignedTask, task: TaskEntity2): MyAssignedTask {
+        fun toAssignedTask(
+            assignedTaskRelation: AssignedTaskRelation,
+            task: TaskEntity2
+        ): MyAssignedTask {
             return MyAssignedTask(
                 title = task.title,
                 description = task.description,
                 assignerName = "--",
                 assignerPhone = task.assignerId,
                 dueDate = task.dueTime,
-                taskAssignedId = assignedTask.assignmentId
+                taskAssignedId = assignedTaskRelation.assignmentId
             )
         }
     }
 }
+
+data class CompletedTaskUnNotified(
+    val task: TaskEntity2,
+    val completer: UserEntity,
+    val taskAssignedId: String
+)
 
 
 class TaskTable2(
@@ -164,6 +190,8 @@ class TaskTable2(
         private const val COLLECTION_ASSIGNED_TASK = "AssignedTask"
         private const val ASSIGN_ID_FIELD = "assigneeId"
         private const val FIELD_STATE_ID = "taskStateId"
+        private const val FIELD_ASSIGNER_ID = "assignerId"
+        private const val FIELD_TASK_ID = "taskId"
         private const val STATE_CREATED_NOT_NOTIFIED = 1
         private const val STATE_CREATED_NOTIFIED = 2
         private const val STATE_COMPLETED_NOT_NOTIFIED = 3
@@ -171,9 +199,6 @@ class TaskTable2(
 
     }
 
-    private val db = FirebaseFirestore.getInstance()
-    private val taskCollection = db.collection(TASKS_COLLECTION)
-    private val assignedTaskCollection = db.collection(COLLECTION_ASSIGNED_TASK)
 
     private val databaseCRUD = DatabaseCRUD()
 
@@ -194,12 +219,12 @@ class TaskTable2(
 
     suspend fun getAssignedNotNotifiedTask(): List<MyAssignedTask> {
         val ref = getAssignTaskRef().filter { it.taskStateId == STATE_CREATED_NOT_NOTIFIED }
-        return getAssignTask(ref)
+        return getAssignTasks(ref)
     }
 
     suspend fun getCompletedNotNotifiedTask(): List<MyAssignedTask> {
         val ref = getAssignTaskRef().filter { it.taskStateId == STATE_COMPLETED_NOT_NOTIFIED }
-        return getAssignTask(ref)
+        return getAssignTasks(ref)
     }
 
     suspend fun makeAssignedTaskNotified(assignedTaskId: String): Boolean {
@@ -236,12 +261,13 @@ class TaskTable2(
     }
 
 
-    private suspend fun addAssignee(assignee: AssignedTask): Boolean {
+    private suspend fun addAssignee(assignee: AssignedTaskRelation): Boolean {
         return databaseCRUD.create(
             COLLECTION_ASSIGNED_TASK, assignee
         )
 
     }
+
     /*
     Find the taskId that I assigned.
     then got to the AssignedTask collection,
@@ -250,14 +276,47 @@ class TaskTable2(
     then fetch those tasks again by id
      */
 
-    suspend fun getAssignTaskRef(): List<AssignedTask> {
+    suspend fun myAssignedCompletedUnNotifiedTask():List<CompletedTaskUnNotified> {
+        val tasks = readMyAssignedTaskEntity()
+        val assignedTask = readMyAssigneeRef(tasks.map { it.taskId })
+        val userCollection = UserCollection()
+        val responses= mutableListOf<CompletedTaskUnNotified>()
+        assignedTask.forEach { assignedTaskRelation ->
+            val user = userCollection.getUser(assignedTaskRelation.assigneeId)
+            val task = tasks.find { it.taskId == assignedTaskRelation.taskId }
+            if (task != null && user != null) {
+             responses+=CompletedTaskUnNotified(task,user,assignedTaskRelation.assignmentId)
+            }
+        }
+        return responses
+    }
+
+
+    suspend fun readMyAssignedTaskEntity() = databaseCRUD.read<TaskEntity2>(
+        collection = TASKS_COLLECTION,
+        where = Filter.equalTo(FIELD_ASSIGNER_ID, myUserId)
+    )
+
+    suspend fun readMyAssigneeRef(myAssignedTaskIds: List<String>): List<AssignedTaskRelation> {
+        val refs = mutableListOf<AssignedTaskRelation>()
+        myAssignedTaskIds.forEach { taskId ->
+            refs += databaseCRUD.read(
+                collection = COLLECTION_ASSIGNED_TASK,
+                where = Filter.equalTo(FIELD_TASK_ID, taskId)
+            )
+        }
+        return refs.filter { it.taskStateId == STATE_COMPLETED_NOT_NOTIFIED }
+    }
+
+
+    suspend fun getAssignTaskRef(): List<AssignedTaskRelation> {
         return databaseCRUD.read(
-            collectionName = COLLECTION_ASSIGNED_TASK,
-            predicate = Filter.equalTo(ASSIGN_ID_FIELD, myUserId)
+            collection = COLLECTION_ASSIGNED_TASK,
+            where = Filter.equalTo(ASSIGN_ID_FIELD, myUserId)
         )
     }
 
-    suspend fun getAssignTask(refs: List<AssignedTask>): List<MyAssignedTask> {
+    suspend fun getAssignTasks(refs: List<AssignedTaskRelation>): List<MyAssignedTask> {
         val tasks = mutableListOf<MyAssignedTask>()
         refs.forEach { taskAssignee ->
             val task = databaseCRUD.read<TaskEntity2>(
@@ -271,9 +330,9 @@ class TaskTable2(
 
     suspend fun getAssignedTasks(signedUserPhone: String): List<MyAssignedTask> {
         val tasks = mutableListOf<MyAssignedTask>()
-        val refs = databaseCRUD.read<AssignedTask>(
-            collectionName = COLLECTION_ASSIGNED_TASK,
-            predicate = Filter.equalTo(ASSIGN_ID_FIELD, signedUserPhone)
+        val refs = databaseCRUD.read<AssignedTaskRelation>(
+            collection = COLLECTION_ASSIGNED_TASK,
+            where = Filter.equalTo(ASSIGN_ID_FIELD, signedUserPhone)
         )
         refs.forEach { taskAssignee ->
             val task = databaseCRUD.read<TaskEntity2>(

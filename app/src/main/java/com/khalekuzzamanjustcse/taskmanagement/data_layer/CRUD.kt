@@ -1,7 +1,6 @@
 package com.khalekuzzamanjustcse.taskmanagement.data_layer
 
 import com.google.firebase.Firebase
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
@@ -47,14 +46,14 @@ class DatabaseCRUD {
     }
 
     suspend inline fun <reified T> read(
-        collectionName: String,
-        predicate: Filter? = null
+        collection: String,
+        where: Filter? = null
     ): List<T> {
-        val collectionRef = Firebase.firestore.collection(collectionName)
+        val collectionRef = Firebase.firestore.collection(collection)
         return try {
             val querySnapshot = withContext(Dispatchers.IO) {
-                val query = if (predicate != null)
-                    collectionRef.where(predicate).get()
+                val query = if (where != null)
+                    collectionRef.where(where).get()
                 else collectionRef.get()
                 query.await()
             }

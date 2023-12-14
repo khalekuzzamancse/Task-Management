@@ -76,8 +76,8 @@ class FriendShipManager {
 
     suspend fun getFriendRequest(userId: String): List<MyFriend> {
         val friendShips = databaseCRUD.read<FriendShipEntity>(
-            collectionName = COLLECTION,
-            predicate = Filter.and(
+            collection = COLLECTION,
+            where = Filter.and(
                 Filter.equalTo(FIELD_RECEIVER_ID, userId),
                 // Filter.lessThan(FIELD_FRIENDSHIP_STATE, 3), has bug,find why this query not work
             )
@@ -87,8 +87,8 @@ class FriendShipManager {
     }
     suspend fun getUnNotifiedFriendRequest(userId: String): List<MyFriend> {
         val friendShips = databaseCRUD.read<FriendShipEntity>(
-            collectionName = COLLECTION,
-            predicate = Filter.and(
+            collection = COLLECTION,
+            where = Filter.and(
                 Filter.equalTo(FIELD_RECEIVER_ID, userId),
                 // Filter.lessThan(FIELD_FRIENDSHIP_STATE, 3), has bug,find why this query not work
             )
@@ -98,8 +98,8 @@ class FriendShipManager {
     }
     suspend fun getAcceptNotNotifiedRequest(userId: String): List<MyFriend> {
         val friendShips = databaseCRUD.read<FriendShipEntity>(
-            collectionName = COLLECTION,
-            predicate = Filter.and(
+            collection = COLLECTION,
+            where = Filter.and(
                 Filter.equalTo(FIELD_SENDER_ID, userId),
                 // Filter.lessThan(FIELD_FRIENDSHIP_STATE, 3), has bug,find why this query not work
             )
@@ -115,8 +115,8 @@ class FriendShipManager {
 
     private suspend fun getFriendShipId(senderId: String, receiverId: String): String? {
         return databaseCRUD.read<FriendShipEntity>(
-            collectionName = COLLECTION,
-            predicate = Filter.or(
+            collection = COLLECTION,
+            where = Filter.or(
                 Filter.equalTo(FIELD_RECEIVER_ID, receiverId),
                 Filter.equalTo(FIELD_SENDER_ID, senderId)
             )
@@ -144,8 +144,8 @@ class FriendShipManager {
             Filter.equalTo(FIELD_SENDER_ID, userId)
         )
         return databaseCRUD.read<FriendShipEntity>(
-            collectionName = COLLECTION,
-            predicate = eitherRequestSenderOrReceiver
+            collection = COLLECTION,
+            where = eitherRequestSenderOrReceiver
         )
             .filter { it.friendShipState == ACCEPTED_NOT_NOTIFIED || it.friendShipState == ACCEPTED_NOTIFIED }
     }

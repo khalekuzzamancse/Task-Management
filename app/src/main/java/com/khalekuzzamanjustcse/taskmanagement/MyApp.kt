@@ -26,17 +26,21 @@ class BaseApplication : Application() {
     private fun notifyTasksCompleted() {
         var notificationId = 1
         CoroutineScope(Dispatchers.IO).launch {
-            val taskTable = TaskTable2("017388")
-            taskTable.getCompletedNotNotifiedTask().forEach { task ->
-                Notifier(this@BaseApplication)
-                    .notify(
-                        title = "Task Completeded",
-                        message = "${task.title}\nby ${task.assignerPhone}",
-                        notificationId = notificationId++,
-                        taskId = task.taskAssignedId
-                    )
-                taskTable.makeTaskCompletedTaskNotified(task.taskAssignedId)
+            val userId=AuthManager().signedInUserPhone()
+            if(userId!=null){
+                val taskTable = TaskTable2(userId)
+                taskTable.myAssignedCompletedUnNotifiedTask().forEach { response ->
+                    Notifier(this@BaseApplication)
+                        .notify(
+                            title = "Task Completed",
+                            message = "${response.task.title}\nby ${response.completer.name}",
+                            notificationId = notificationId++,
+                            taskId = response.taskAssignedId
+                        )
+                    taskTable.makeTaskCompletedTaskNotified(response.taskAssignedId)
+                }
             }
+
         }
 
     }
@@ -110,6 +114,7 @@ class BaseApplication : Application() {
         notifyTasksAssigned()
         notifyAcceptFriendRequest()
         notifyIncomingFriendRequest()
+        notifyTasksCompleted()
 
     }
 
