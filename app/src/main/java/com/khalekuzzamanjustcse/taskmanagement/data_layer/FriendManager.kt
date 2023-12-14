@@ -32,7 +32,7 @@ class FriendManager {
     fun addNewFriendRequest(phoneNoTo: String) {
         val scope = CoroutineScope(Dispatchers.Default)
         scope.launch {
-            val email = AuthManager().singedInUserEmail()
+            val email = AuthManager.singedInUserEmail()
             val phone = FirebaseFireStore().getUserPhoneNumber(email)
             if (phone != null) {
                 FirebaseFireStore().addFriendRequest(phone, phoneNoTo)
@@ -82,12 +82,12 @@ class FriendManager {
     }
 
     private suspend fun getSingedUserPhone(): String? {
-        val email = AuthManager().singedInUserEmail()
+        val email = AuthManager.singedInUserEmail()
         return FirebaseFireStore().getUserPhoneNumber(email)
     }
 
     suspend fun getReceivedFriendRequest(): List<FriendRequest> {
-        val email = AuthManager().singedInUserEmail()
+        val email = AuthManager.singedInUserEmail()
         val signInUserPhoneNo = FirebaseFireStore().getUserPhoneNumber(email)
         val requests = mutableListOf<FriendRequest>()
         return try {
@@ -117,7 +117,7 @@ class FriendManager {
     }
 
     suspend fun getSentFriendRequest(): List<FriendRequest> {
-        val email = AuthManager().singedInUserEmail()
+        val email = AuthManager.singedInUserEmail()
         val signInUserPhoneNo = FirebaseFireStore().getUserPhoneNumber(email)
         val requests = mutableListOf<FriendRequest>()
         return try {
@@ -154,7 +154,7 @@ class FriendManager {
     }
 
     suspend fun getNewFriends(): List<User> {
-        val email = AuthManager().singedInUserEmail()
+        val email = AuthManager.singedInUserEmail()
         val signInUserPhoneNo = FirebaseFireStore().getUserPhoneNumber(email)
         val users = mutableListOf<User>()
         return try {
@@ -203,7 +203,7 @@ class FriendManager {
     }
 
     suspend fun getFriends(): List<User> {
-        val email = AuthManager().singedInUserEmail()
+        val email = AuthManager.singedInUserEmail()
         val signInUserPhoneNo = FirebaseFireStore().getUserPhoneNumber(email)
         val users = mutableListOf<User>()
         return try {

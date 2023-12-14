@@ -3,9 +3,13 @@ package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.crea
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseCRUD
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendShipManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable2
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskToAdd
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.AssignedUser
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.Task
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.createDummyTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,7 +37,7 @@ class CreateTaskViewModel(
 
     init {
         viewModelScope.launch {
-            val myUserId = AuthManager().signedInUserPhone()
+            val myUserId = AuthManager.signedInUserPhone()
             if (myUserId != null) {
                 val newUser = FriendShipManager().myFriendList(myUserId)
                     .map {
@@ -56,30 +60,31 @@ class CreateTaskViewModel(
         _showProgressbar.value=true
         viewModelScope.launch {
 
-            val myUserId=AuthManager().signedInUserPhone()
+            val myUserId=AuthManager.signedInUserPhone()
             val title = formManager.titleText
             val description = formManager.descriptionText
             val dueDate = formManager.dueDateText
-            val assigneesdIds = mutableListOf<String>()
+            val assignedUsers = mutableListOf<AssignedUser>()
             users.value.forEach {
                 if (it.selected) {
-                    assigneesdIds += it.phone
+                    assignedUsers +=AssignedUser(
+                        userId =it.phone,
+                        state = 1
+                    )
                 }
             }
-            if(myUserId!=null &&assigneesdIds.isNotEmpty()){
-               val isSuccess= TaskTable2(myUserId).createTask(
-                    TaskToAdd(
-                        title=title,
-                        description=description,
-                        dueDate=dueDate,
-                        assignerIdentifier = myUserId,
-                        assignee = assigneesdIds
-                    )
-                )
+            if(myUserId!=null &&assignedUsers.isNotEmpty()){
+               val task= Task(
+                   title=title,
+                   description=description,
+                   dueTime =dueDate,
+                   assignerId = myUserId,
+                   assignedUsers = assignedUsers
+               )
+               val isSuccess= DatabaseCRUD().create(collectionName = "NewTaks", task)
                 onShowToast(
                     if(isSuccess)"Created successfully " else "Failed to create"
                 )
-
             }
             withContext(Dispatchers.Main){
                 _showProgressbar.value=false

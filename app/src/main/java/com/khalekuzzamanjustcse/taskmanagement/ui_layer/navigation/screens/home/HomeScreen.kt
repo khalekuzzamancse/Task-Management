@@ -67,7 +67,7 @@ fun Home(
         openDrawer()
     }
     LaunchedEffect(Unit) {
-        val user = FirebaseFireStore().getSingedUser(AuthManager().singedInUserEmail())
+        val user = FirebaseFireStore().getSingedUser(AuthManager.singedInUserEmail())
         user?.let {
             username = it.name
         }
@@ -79,10 +79,7 @@ fun Home(
         topBar = {
             HomeTopAppbar(
                 onNavigationIconClick = onNavigationIconClick,
-                // onLogOut = onLogOut
-                onLogOut = {
-
-                }
+                onLogOut = onLogOut
             )
         },
         floatingActionButton = {
@@ -148,7 +145,7 @@ fun UserInfo(
 fun HomeTopAppbar(
     navigationIcon: ImageVector = Icons.Filled.Segment,
     onNavigationIconClick: () -> Unit = {},
-    onLogOut: () -> Unit = {},
+    onLogOut: () -> Unit,
 ) {
     TopAppBar(
         title = { Text(text = "Home") },
@@ -158,33 +155,11 @@ fun HomeTopAppbar(
             }
         },
         actions = {
-            HomeScreenDropDown(onLogOutIconClick = {
-                // onLogOut()
-            })
-//            ProfileImage(
-//                onClick = {
-//                    AuthManager().signOut()
-//                    onLogOut()
-//                }
-//            )
+            HomeScreenDropDown(
+                onLogOutIconClick = onLogOut
+            )
+
         },
     )
 }
 
-@Composable
-fun HomePage() {
-    var phone by remember {
-        mutableStateOf("NULL")
-    }
-    LaunchedEffect(Unit) {
-        phone = AuthManager().signedInUserPhone().toString()
-    }
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-
-    }
-}

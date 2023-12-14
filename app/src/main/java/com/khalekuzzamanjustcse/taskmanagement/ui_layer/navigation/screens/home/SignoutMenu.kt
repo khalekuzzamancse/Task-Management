@@ -38,13 +38,13 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.theme.TaskManagementThem
 @Composable
 fun HomeScreenDropDownPreview() {
     TaskManagementTheme {
-        HomeScreenDropDown()
+        HomeScreenDropDown({})
     }
 }
 
 @Composable
 fun HomeScreenDropDown(
-    onLogOutIconClick: () -> Unit = {}
+    onLogOutIconClick: () -> Unit
 ) {
     var showMenu by remember {
         mutableStateOf(false)

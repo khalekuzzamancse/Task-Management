@@ -1,13 +1,11 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,16 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
-import com.khalekuzzamanjustcse.taskmanagement.DeepLink
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendManager
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.ScreenWithDrawer
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskFormManager
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskViewModel
@@ -45,8 +38,6 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_ta
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskOwnedByMe
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.UserListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.UsersScreenViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -91,12 +82,14 @@ fun NavGraph(
 
 
     val context = LocalContext.current
+    val scope= rememberCoroutineScope()
 
+    val isLogin=AuthManager.loggedIn.collectAsState().value
 
     NavHost(
         navController = navController,
         route = "MainGraph",
-        startDestination = Screen.AuthGraph.route
+        startDestination = if(isLogin) Screen.Home.route else Screen.AuthGraph.route
     ) {
 
         //auth nav graph
@@ -120,6 +113,7 @@ fun NavGraph(
                     onCreateTask = navigateToCreateTaskScreen,
                     onTaskDetailsOpen = onTaskDetailsOpen,
                     onLogOut = {
+                        AuthManager.signOut()
                         navController.navigate(Screen.Login.route)
                     },
                     onMyOwnedTaskOpenDetail = onMyOwnedTaskOpenDetail

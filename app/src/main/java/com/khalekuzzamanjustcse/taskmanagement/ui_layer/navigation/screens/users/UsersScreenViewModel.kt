@@ -48,7 +48,7 @@ class UsersScreenViewModel(
 
     fun onFriendRequestSent(user: User) {
         viewModelScope.launch {
-            val myUserId=AuthManager().signedInUserPhone()
+            val myUserId=AuthManager.signedInUserPhone()
             Log.d( "OnFriendRequestSent", myUserId.toString())
             if(myUserId!=null){
                 manager.sentFriendRequests(myUserId,user.phone)
@@ -59,7 +59,7 @@ class UsersScreenViewModel(
     }
 
     private suspend fun updateUser() {
-        val singedUserPhone= AuthManager().signedInUserPhone()
+        val singedUserPhone= AuthManager.signedInUserPhone()
         if(singedUserPhone!=null) {
             contentResolver?.let { contentResolver ->
                 _users.value = UserUtil(singedUserPhone)

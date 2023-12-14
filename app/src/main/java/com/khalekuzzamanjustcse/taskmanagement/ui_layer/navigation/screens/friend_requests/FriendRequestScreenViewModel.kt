@@ -28,7 +28,7 @@ class FriendRequestScreenViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            val singedUserPhone=AuthManager().signedInUserPhone()
+            val singedUserPhone=AuthManager.signedInUserPhone()
             if(singedUserPhone!=null) {
                 val request = FriendShipManager().getFriendRequest(singedUserPhone)
                 val newUsers = request.map {User(

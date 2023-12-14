@@ -369,7 +369,7 @@ class TaskTable2(
         val tasks = mutableListOf<MyAssignedTask>()
         refs.forEach { taskAssignee ->
             val task = databaseCRUD.read<TaskEntity2>(
-                collectionName = TASKS_COLLECTION,
+                collection = TASKS_COLLECTION,
                 docId = taskAssignee.taskId
             )
             if (task != null) tasks.add(MyAssignedTask.toAssignedTask(taskAssignee, task))
@@ -385,7 +385,7 @@ class TaskTable2(
         )
         refs.forEach { taskAssignee ->
             val task = databaseCRUD.read<TaskEntity2>(
-                collectionName = TASKS_COLLECTION,
+                collection = TASKS_COLLECTION,
                 docId = taskAssignee.taskId
             )
             if (task != null){

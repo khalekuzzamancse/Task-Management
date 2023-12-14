@@ -4,45 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.firestore.DocumentId
-import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.onCompletion
-import java.util.UUID
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
-
-val dummyTasks = listOf(
-    TaskEntity(
-        title = "Task 1",
-        description = "Description for Task 1",
-        assignerName = "Assigner 1",
-        assigneePhone = "Assignee Phone 1",
-        notified = false,
-        complete = false
-    ),
-    TaskEntity(
-        title = "Task 2",
-        description = "Description for Task 2",
-        assignerName = "Assigner 2",
-        assigneePhone = "Assignee Phone 2",
-        notified = false,
-        complete = false
-    ),
-    TaskEntity(
-        title = "Task 3",
-        description = "Description for Task 3",
-        assignerName = "Assigner 3",
-        assigneePhone = "Assignee Phone 3",
-        notified = false,
-        complete = true
-    )
-    // Add more tasks as needed
-)
-
+import com.google.firebase.firestore.Filter
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskDoer
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskOwnedByMe
 
 
 data class TaskEntity @JvmOverloads constructor(
@@ -54,20 +18,7 @@ data class TaskEntity @JvmOverloads constructor(
     val dueDate: String = "",
     val notified: Boolean = false,
     val complete: Boolean = false
-) {
-
-
-
-    fun isEmpty(): Boolean {
-        return title.isBlank() &&
-                id.isBlank() &&
-                description.isBlank() &&
-                assignerName.isBlank() &&
-                assigneePhone.isBlank() &&
-                !notified &&
-                !complete
-    }
-}
+)
 
 @Preview
 @Composable
@@ -82,76 +33,171 @@ fun Preview() {
 
 }
 
+class TaskTable(private val signedInUserId: String,
+) {
+    companion object {
+        private const val TASKS_COLLECTION = "Tasks"
+        private const val COLLECTION_ASSIGNED_TASK = "AssignedTask"
+        private const val ASSIGN_ID_FIELD = "assigneeId"
+        private const val FIELD_STATE_ID = "taskStateId"
+        private const val FIELD_ASSIGNER_ID = "assignerId"
+        private const val FIELD_TASK_ID = "taskId"
+        private const val STATE_CREATED_NOT_NOTIFIED = 1
+        private const val STATE_CREATED_NOTIFIED = 2
+        private const val STATE_COMPLETED_NOT_NOTIFIED = 3
+        private const val STATE_COMPLETED_NOTIFIED = 4
 
-class TaskTable {
-    private val db = FirebaseFirestore.getInstance()
-    private val tasksCollection = db.collection("Tasks")
-    fun addTask(task: TaskEntity) {
-        var id=UUID.randomUUID().toString()
-        if(task.id.isNotEmpty()){
-            id=task.id
-        }
-        val taskDoc = tasksCollection.document(id)
-        taskDoc.set(task)
-            .addOnSuccessListener {
-                // Task added successfully
-            }
-            .addOnFailureListener {
-                // Handle the failure
-            }
-    }
-    suspend fun addTask(task: TaskEntity2): Boolean = suspendCoroutine { continuation ->
-        var id = UUID.randomUUID().toString()
-        val taskHasId = task.taskId.isNotEmpty()
-        if (taskHasId) {
-            id = task.taskId
-        }
-
-        val taskDoc = tasksCollection.document(id)
-        taskDoc.set(task)
-            .addOnSuccessListener {
-                continuation.resume(true)
-            }
-            .addOnFailureListener {
-                continuation.resume(false)
-            }
     }
 
 
-    fun updateTask(task: TaskEntity) {
-        val taskId = task.id
-        if (taskId.isNotBlank()) {
-            val taskDoc = tasksCollection.document(taskId)
-            taskDoc.set(task)
-                .addOnSuccessListener {
-                    // Task updated successfully
-                }
-                .addOnFailureListener {
-                    // Handle the failure
-                }
-        }
+    private val databaseCRUD = DatabaseCRUD()
+
+
+    suspend fun getAssignedNotNotifiedTask(): List<MyAssignedTask> {
+        val ref = getAssignTaskRef().filter { it.taskStateId == STATE_CREATED_NOT_NOTIFIED }
+        return getAssignTasks(ref)
+    }
+
+    suspend fun getCompletedNotNotifiedTask(): List<MyAssignedTask> {
+        val ref = getAssignTaskRef().filter { it.taskStateId == STATE_COMPLETED_NOT_NOTIFIED }
+        return getAssignTasks(ref)
     }
 
 
 
-    fun getTasks(): Flow<List<TaskEntity>> = callbackFlow {
-        val callback = EventListener<QuerySnapshot> { value, _ ->
-            value?.let { querySnapshot ->
-                val taskList = mutableListOf<TaskEntity>()
+    /*
+    Find the taskId that I assigned.
+    then got to the AssignedTask collection,
+    find the task ref that is my assigned list
+    then filter the ref that state==3
+    then fetch those tasks again by id
+     */
 
-                for (document in querySnapshot) {
-                    val taskEntity = document.toObject(TaskEntity::class.java)
-                    if (!taskEntity.isEmpty()) {
-                        taskList.add(taskEntity)
-                    }
-                }
-                trySend(taskList)
+    suspend fun myAssignedCompletedUnNotifiedTask(): List<CompletedTaskUnNotified> {
+        val tasks = readMyAssignedTaskEntity()
+        val assignedTask = readMyAssigneeRef(tasks.map { it.taskId })
+        val userCollection = UserCollection()
+        val responses = mutableListOf<CompletedTaskUnNotified>()
+        assignedTask.forEach { assignedTaskRelation ->
+            val user = userCollection.getUser(assignedTaskRelation.assigneeId)
+            val task = tasks.find { it.taskId == assignedTaskRelation.taskId }
+            if (task != null && user != null) {
+                responses += CompletedTaskUnNotified(task, user, assignedTaskRelation.assignmentId)
             }
         }
-        val registration = tasksCollection.addSnapshotListener(callback)
-        awaitClose { registration.remove() }
-    }.onCompletion {
+        return responses
+    }
+
+
+    suspend fun taskOwnedByMe():List<TaskOwnedByMe> {
+        val userCollection = UserCollection()
+        val tasksByMe = readMyAssignedTaskEntity()
+        val result = mutableListOf<TaskOwnedByMe>()
+        tasksByMe.forEach { task ->
+            val relations = readAssignedTaskRelation(task.taskId)
+            val doers = mutableListOf<TaskDoer>()
+            relations.forEach { relation ->
+                val doer = userCollection.getUser(relation.assigneeId)
+                if (doer != null) {
+                    doers += TaskDoer(
+                        name = doer.name,
+                        phone = doer.phone,
+                        status = decodeTaskState(relation.taskStateId)
+                    )
+                }
+            }
+            result+= TaskOwnedByMe(
+                taskId = task.taskId,
+                title = task.title,
+                description = task.description,
+                dueDate = task.dueTime,
+                doers=doers
+            )
+        }
+        return result
+    }
+
+    private fun decodeTaskState(state: Int): String {
+        return when (state) {
+            1 -> "Unseen"
+            2 -> "Seen"
+            else -> "Completed"
+        }
+    }
+
+    private suspend fun readMyAssignedTaskEntity() = databaseCRUD.read<TaskEntity2>(
+        collection = TASKS_COLLECTION,
+        where = Filter.equalTo(FIELD_ASSIGNER_ID, signedInUserId)
+    )
+
+    private suspend fun readAssignedTaskRelation(taskId: String): List<AssignedTaskRelation> {
+        val relations = mutableListOf<AssignedTaskRelation>()
+        relations += databaseCRUD.read(
+            collection = COLLECTION_ASSIGNED_TASK,
+            where = Filter.equalTo(FIELD_TASK_ID, taskId)
+        )
+        return relations
+    }
+
+    private suspend fun readMyAssigneeRef(
+        myAssignedTaskIds: List<String>
+    ): List<AssignedTaskRelation> {
+        val refs = mutableListOf<AssignedTaskRelation>()
+        myAssignedTaskIds.forEach { taskId ->
+            refs += databaseCRUD.read(
+                collection = COLLECTION_ASSIGNED_TASK,
+                where = Filter.equalTo(FIELD_TASK_ID, taskId)
+            )
+        }
+        return refs.filter { it.taskStateId == STATE_COMPLETED_NOT_NOTIFIED }
+    }
+
+
+    private suspend fun getAssignTaskRef(): List<AssignedTaskRelation> {
+        return databaseCRUD.read(
+            collection = COLLECTION_ASSIGNED_TASK,
+            where = Filter.equalTo(ASSIGN_ID_FIELD, signedInUserId)
+        )
+    }
+
+    private suspend fun getAssignTasks(refs: List<AssignedTaskRelation>): List<MyAssignedTask> {
+        val tasks = mutableListOf<MyAssignedTask>()
+        refs.forEach { taskAssignee ->
+            val task = databaseCRUD.read<TaskEntity2>(
+                collection = TASKS_COLLECTION,
+                docId = taskAssignee.taskId
+            )
+            if (task != null) tasks.add(MyAssignedTask.toAssignedTask(taskAssignee, task))
+        }
+        return tasks
+    }
+
+    suspend fun getAssignedTasks(signedUserPhone: String): List<MyAssignedTask> {
+        val tasks = mutableListOf<MyAssignedTask>()
+        val refs = databaseCRUD.read<AssignedTaskRelation>(
+            collection = COLLECTION_ASSIGNED_TASK,
+            where = Filter.equalTo(ASSIGN_ID_FIELD, signedUserPhone)
+        )
+        refs.forEach { taskAssignee ->
+            val task = databaseCRUD.read<TaskEntity2>(
+                collection = TASKS_COLLECTION,
+                docId = taskAssignee.taskId
+            )
+            if (task != null){
+                val assigner=UserCollection().getUser(task.assignerId)
+                if (assigner != null){
+                    tasks.add(
+                        MyAssignedTask
+                            .toAssignedTask(taskAssignee, task)
+                            .copy(assignerName = assigner.name+"(${assigner.phone})")
+                    )
+                }
+
+            }
+        }
+        return tasks
     }
 
 }
+
 

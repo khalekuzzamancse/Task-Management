@@ -3,21 +3,30 @@ package com.khalekuzzamanjustcse.taskmanagement.data_layer
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class AuthManager(
-    private val onLogout: () -> Unit = {},
-) {
-    private val auth = Firebase.auth
-    private val user = auth.currentUser
-
-    companion object {
-        private const val TAG = "AuthManagerLog: "
-        private fun log(message: String){
-            Log.d(TAG, message)
-        }
+object AuthManager {
+    var onLogout: () -> Unit = {}
+    private var auth = Firebase.auth
+    private var user = auth.currentUser
+    private const val TAG = "AuthManagerLog: "
+    private val _loggedIn = MutableStateFlow(user!=null)
+    var loggedIn = _loggedIn.asStateFlow()
+        private set
+init {
+    var onLogout: () -> Unit = {}
+    auth = Firebase.auth
+     user = auth.currentUser
+    _loggedIn.value =user!=null
+    loggedIn = _loggedIn.asStateFlow()
+}
+    private fun log(message: String) {
+        Log.d(TAG, message)
     }
+
 
     suspend fun createAccount(email: String, password: String): Boolean {
         return suspendCoroutine { continuation ->
@@ -28,7 +37,7 @@ class AuthManager(
 //                        log("createUserWithEmailAndPassword():CurrentUser:${auth.currentUser}")
                         continuation.resume(true)
                     } else {
-                       // log("createUserWithEmailAndPassword():failure")
+                        // log("createUserWithEmailAndPassword():failure")
                         continuation.resume(false)
                     }
                 }
@@ -43,9 +52,11 @@ class AuthManager(
 //                        log("signInWithEmailAndPassword():success")
 //                        log("signInWithEmailAndPassword():CurrentUser:${auth.currentUser}")
                         continuation.resume(true) // Call the continuation with success
+                        _loggedIn.value=true
                     } else {
                         //log("signInWithEmailAndPassword():failure")
-                        continuation.resume(false) // Call the continuation with failure
+                        continuation.resume(false)
+                        _loggedIn.value=false
                     }
                 }
         }
@@ -63,10 +74,9 @@ class AuthManager(
         return try {
             user?.let {
                 val email = it.email
-                if (email!=null) {
+                if (email != null) {
                     UserCollection().getUserByEmail(email)?.phone
-                }
-                else null
+                } else null
             }
         } catch (e: Exception) {
             null
@@ -77,5 +87,6 @@ class AuthManager(
     fun signOut() {
         auth.signOut()
         onLogout()
+        _loggedIn.value=false
     }
 }

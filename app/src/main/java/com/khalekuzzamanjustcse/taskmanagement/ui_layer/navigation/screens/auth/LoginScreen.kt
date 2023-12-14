@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.khalekuzzamanjustcse.taskmanagement.R
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.FirebaseFireStore
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserCollection
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserEntity
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.PasswordVisualTransformation
@@ -75,7 +74,7 @@ class LoginViewModel(
     suspend fun tryLogin(): Boolean {
         val userName = formManager.userName
         val password = formManager.password
-        val res = AuthManager().signIn(userName, password)
+        val res = AuthManager.signIn(userName, password)
         if (res) {
             _snackbarMessage.value = "Login Successful"
         } else {
@@ -89,7 +88,7 @@ class LoginViewModel(
         val password = registrationManager.userPassword
         val phone = registrationManager.userPhone
         val name = registrationManager.userName
-        val isDone = AuthManager().createAccount(email, password)
+        val isDone = AuthManager.createAccount(email, password)
 
         UserCollection().createUser(UserEntity(name=name, phone=phone,email=email))
         if (isDone) {

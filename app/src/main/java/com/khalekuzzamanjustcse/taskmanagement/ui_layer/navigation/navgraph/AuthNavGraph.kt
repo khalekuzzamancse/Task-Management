@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +21,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.LoginFormManager
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.LoginFormScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.LoginViewModel
@@ -40,6 +42,7 @@ fun NavGraphBuilder.authNavGraph(
     val viewModel = LoginViewModel()
     val scope = CoroutineScope(Dispatchers.IO)
 
+
     val onRegisterSuccess: () -> Unit = {
         navController.navigate(Screen.Login.route)
         Log.d("onRegisterSuccess", "")
@@ -50,6 +53,7 @@ fun NavGraphBuilder.authNavGraph(
         route = Screen.AuthGraph.route,
         startDestination = Screen.Login.route
     ) {
+
 
         composable(route = Screen.Login.route) {
             val context= LocalContext.current

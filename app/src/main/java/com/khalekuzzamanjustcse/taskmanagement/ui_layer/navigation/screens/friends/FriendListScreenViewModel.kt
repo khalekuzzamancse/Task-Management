@@ -19,7 +19,7 @@ class FriendListScreenViewModel : ViewModel(){
 
     init {
         viewModelScope.launch {
-            val singedUserPhone= AuthManager().signedInUserPhone()
+            val singedUserPhone= AuthManager.signedInUserPhone()
             if(singedUserPhone!=null) {
                 val newUsers =FriendShipManager().myFriendList(singedUserPhone)
                 withContext(Dispatchers.Main) {

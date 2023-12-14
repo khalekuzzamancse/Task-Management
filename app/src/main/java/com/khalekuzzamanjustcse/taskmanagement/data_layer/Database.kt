@@ -33,7 +33,7 @@ class UserCollections {
         }
         Log.d(TAG, "$users")
 
-        return users.filter { it.email != AuthManager().singedInUserEmail().toString() }
+        return users.filter { it.email != AuthManager.singedInUserEmail().toString() }
     }
 
     suspend fun user(phone: String): User? {

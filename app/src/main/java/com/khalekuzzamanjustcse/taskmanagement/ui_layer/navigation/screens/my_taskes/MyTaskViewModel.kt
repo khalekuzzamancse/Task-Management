@@ -5,11 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable2
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.AssignedByMeTasksObserver
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,20 +32,28 @@ class MyTaskViewModel : ViewModel() {
 
     fun onCheckChanged(task: TaskEntity, checked: Boolean) {
         viewModelScope.launch {
-            Log.d("taskAsignee:", "${task.assigneePhone}")
+            Log.d("taskAsignee:", task.assigneePhone)
 //            TaskTable().updateTask(task.copy(complete = checked))
         }
 
     }
 
+
     private var _taskOwnedByMe = MutableStateFlow(emptyList<TaskOwnedByMe>())
-    val taskOwnedByMe = _taskOwnedByMe.asStateFlow()
+    var taskOwnedByMe=_taskOwnedByMe.asStateFlow()
+        private set
 
     init {
         viewModelScope.launch {
-            val myUserId = AuthManager().signedInUserPhone()
+            val myUserId = AuthManager.signedInUserPhone()
             if (myUserId != null) {
-                _taskOwnedByMe.value = TaskTable2(myUserId).taskOwnedByMe()
+              val a=AssignedByMeTasksObserver
+                  a.observe(myUserId)
+                a._taskOwnedByMe.collect{
+                  Log.d("MyAssignedTask:ByMe", "$it")
+                  _taskOwnedByMe.value=it
+              }
+
             }
 
         }
@@ -53,7 +61,7 @@ class MyTaskViewModel : ViewModel() {
     init {
 
         viewModelScope.launch {
-            val myUserId = AuthManager().signedInUserPhone()
+            val myUserId = AuthManager.signedInUserPhone()
             if (myUserId != null) {
                 val taskCollection = TaskTable2(myUserId)
                 withContext(Dispatchers.Main) {
