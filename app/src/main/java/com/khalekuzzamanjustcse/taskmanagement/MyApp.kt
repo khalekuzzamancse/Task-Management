@@ -5,6 +5,7 @@ import android.util.Log
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendShipManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable2
 import com.khalekuzzamanjustcse.taskmanagement.notification.Notifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,36 +23,50 @@ class BaseApplication : Application() {
         Log.d(TAG, message)
     }
 
+    private fun notifyTasksCompleted() {
+        var notificationId = 1
+        CoroutineScope(Dispatchers.IO).launch {
+            val taskTable = TaskTable2("017388")
+            taskTable.getCompletedNotNotifiedTask().forEach { task ->
+                Notifier(this@BaseApplication)
+                    .notify(
+                        title = "Task Completeded",
+                        message = "${task.title}\nby ${task.assignerPhone}",
+                        notificationId = notificationId++,
+                        taskId = task.taskAssignedId
+                    )
+                taskTable.makeTaskCompletedTaskNotified(task.taskAssignedId)
+            }
+        }
+
+    }
     private fun notifyTasksAssigned() {
         var notificationId = 1
         CoroutineScope(Dispatchers.IO).launch {
-            TaskTable().getTasks().collect { tasks ->
-                tasks.forEach { task ->
-                    val notNotified = !task.notified
-                    if (notNotified) {
-                        Notifier(this@BaseApplication)
-                            .notify(
-                                title = "New Notification",
-                                message = "Hey task\n${task.title}\nby ${task.assignerName}",
-                                notificationId = notificationId++,
-                                taskId = task.id
-                            )
-                    }
-                }
+            val taskTable = TaskTable2("0123")
+                taskTable.getAssignedNotNotifiedTask().forEach { task ->
+                Notifier(this@BaseApplication)
+                    .notify(
+                        title = "New Task",
+                        message = "${task.title}\nby ${task.assignerPhone}",
+                        notificationId = notificationId++,
+                        taskId = task.taskAssignedId
+                    )
+                    taskTable.makeAssignedTaskNotified(task.taskAssignedId)
             }
         }
 
     }
 
     private fun notifyAcceptFriendRequest() {
-        val friendShipManager=FriendShipManager()
+        val friendShipManager = FriendShipManager()
         var notificationId = 1
         CoroutineScope(Dispatchers.IO).launch {
-            val signedUserPhone=AuthManager().signedInUserPhone()
-            if(signedUserPhone!=null){
-                val accepted=friendShipManager.getAcceptNotNotifiedRequest(signedUserPhone)
+            val signedUserPhone = AuthManager().signedInUserPhone()
+            if (signedUserPhone != null) {
+                val accepted = friendShipManager.getAcceptNotNotifiedRequest(signedUserPhone)
                 log("$accepted")
-                accepted.forEach {friend ->
+                accepted.forEach { friend ->
                     Notifier(this@BaseApplication)
                         .notify(
                             title = "Friend Request Accepted",
@@ -64,12 +79,13 @@ class BaseApplication : Application() {
 
         }
     }
+
     private fun notifyIncomingFriendRequest() {
-        val friendShipManager=FriendShipManager()
+        val friendShipManager = FriendShipManager()
         var notificationId = 1
         CoroutineScope(Dispatchers.IO).launch {
-            val signedUserPhone=AuthManager().signedInUserPhone()
-            if(signedUserPhone!=null){
+            val signedUserPhone = AuthManager().signedInUserPhone()
+            if (signedUserPhone != null) {
                 val request = friendShipManager.getUnNotifiedFriendRequest(signedUserPhone)
                 log("$request")
                 request.forEach { friend ->
@@ -89,10 +105,9 @@ class BaseApplication : Application() {
     }
 
 
-
     override fun onCreate() {
         super.onCreate()
-      //  notifyTasksAssigned()
+        notifyTasksAssigned()
         notifyAcceptFriendRequest()
         notifyIncomingFriendRequest()
 

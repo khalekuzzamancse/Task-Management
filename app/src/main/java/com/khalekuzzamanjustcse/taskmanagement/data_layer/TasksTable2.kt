@@ -242,6 +242,13 @@ class TaskTable2(
         )
 
     }
+    /*
+    Find the taskId that I assigned.
+    then got to the AssignedTask collection,
+    find the task ref that is my assigned list
+    then filter the ref that state==3
+    then fetch those tasks again by id
+     */
 
     suspend fun getAssignTaskRef(): List<AssignedTask> {
         return databaseCRUD.read(
