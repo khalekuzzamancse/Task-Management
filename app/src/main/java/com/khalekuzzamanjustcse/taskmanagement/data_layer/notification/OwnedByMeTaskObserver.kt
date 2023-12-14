@@ -1,9 +1,5 @@
 package com.khalekuzzamanjustcse.taskmanagement.data_layer.notification
 
-import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Filter
 import com.khalekuzzamanjustcse.taskmanagement.BaseApplication
@@ -15,8 +11,6 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_ta
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class Task @JvmOverloads constructor(
@@ -97,7 +91,22 @@ object AssignedByMeTasksObserver {
 
     private suspend fun taskDoers(task: Task): List<TaskDoer> {
         return task.assignedUsers.mapNotNull {
-            taskDoer(it)
+           val doer= taskDoer(it)
+            if (doer != null){
+                notifyTaskComplete(doer,task)
+            }
+
+            doer
+        }
+    }
+    private fun notifyTaskComplete(doer: TaskDoer,task: Task) {
+        task.assignedUsers.map {
+            if (it.state == 3) {
+                BaseApplication.notify(
+                    title = "Task Complete",
+                    message = "${task.title} by ${doer.name}"
+                )
+            }
         }
     }
 

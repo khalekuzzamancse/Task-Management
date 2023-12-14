@@ -6,7 +6,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.khalekuzzamanjustcse.taskmanagement.BaseApplication
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseCollectionReader
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.MyAssignedTask
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserCollection
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskDoer
@@ -40,24 +39,26 @@ object AssignedToMeTasksObserver {
     init {
         val scope = CoroutineScope(Dispatchers.Main)
         scope.launch {
-
             AuthManager.signedInUserPhone()?.let {
                 observe(it)
             }
         }
     }
+
     init {
         val scope = CoroutineScope(Dispatchers.Main)
         scope.launch {
             _taskEntities.collect { tasks ->
                 _taskToMe.value = tasks.map { task ->
-                    TaskEntity(
+                    val res = TaskEntity(
                         title = task.title,
                         description = task.description,
                         dueDate = task.dueTime,
                         assignerName = task.assignerId,
                         assigneePhone = "11"
                     )
+                    notifyNewTasks(task)
+                    res
                     //  Log.d("MyAssignedTask:ToMe", "$task")
 
                 }
@@ -68,9 +69,14 @@ object AssignedToMeTasksObserver {
 
     }
 
-    private suspend fun taskDoers(task: Task): List<TaskDoer> {
-        return task.assignedUsers.mapNotNull {
-            taskDoer(it)
+    private fun notifyNewTasks(task: Task) {
+        task.assignedUsers.map {
+            if (it.state == 1) {
+                BaseApplication.notify(
+                    title = "New Task",
+                    message = task.title
+                )
+            }
         }
     }
 
@@ -100,13 +106,6 @@ object AssignedToMeTasksObserver {
         observe(signedInUserId)
     }
 
-    fun notifyTasksAssigned() {
-        BaseApplication.notify(
-            title = "Notification Test",
-            message = "Notifications From Test"
-        )
-
-    }
 
     private suspend fun observe(signedInUserId: String) {
         DatabaseCollectionReader(collection = TASKS_COLLECTION)
