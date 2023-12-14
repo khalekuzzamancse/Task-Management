@@ -25,9 +25,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.ProfileImage
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph.ProgressBar
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph.showToast
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.VerticalSpacer
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.DatePickerNoOutlined
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.form.FieldValidator
@@ -39,7 +42,18 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.auth.
 @Preview
 @Composable
 fun TaskScreenPreview() {
-    TaskScreen()
+    val containerColor = MaterialTheme.colorScheme.surface
+    val context= LocalContext.current
+    val viewModel = remember {
+        CreateTaskViewModel(CreateTaskFormManager(containerColor)){msg->
+            showToast(context,msg)
+        }
+    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        TaskScreen(viewModel)
+        ProgressBar()
+    }
+
 }
 
 class CreateTaskFormManager(
@@ -54,7 +68,7 @@ class CreateTaskFormManager(
         ),
         validator = validator::validateEmpty
     )
-    val dateState = FormTextFieldStateManager(
+    val dueDate = FormTextFieldStateManager(
         fieldState = FormTextFieldState(
             label = "Due Date",
             leadingIcon = Icons.Filled.DateRange,
@@ -73,30 +87,35 @@ class CreateTaskFormManager(
         validator = validator::validateEmpty
     )
     override val field: List<FormTextFieldStateManager> =
-        listOf(title, dateState, description)
+        listOf(title, dueDate, description)
+    val titleText: String
+        get() = title.state.value.text
+    val dueDateText: String
+        get() = dueDate.state.value.text
+    val descriptionText: String
+        get() = description.state.value.text
+
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskScreen(
-    onBackArrowClick: () -> Unit = {}
+    viewModel: CreateTaskViewModel,
+    onBackArrowClick: () -> Unit = {},
 ) {
-    val screenState = remember {
-        CreateTaskViewModel()
-    }
-    val containerColor = MaterialTheme.colorScheme.surface
+
+
     val formManager = remember {
-        CreateTaskFormManager(containerColor)
+        viewModel.formManager
     }
     val inputFieldModifier = Modifier.fillMaxWidth()
 
-
-    val showUser = screenState.userSelectedMode.collectAsState().value
+    val showUser = viewModel.userSelectedMode.collectAsState().value
     val title = if (showUser) "Choose Users" else "New Task"
     val onNavigationIconClick: () -> Unit = {
         if (showUser) {
-            screenState.onUserSelectedModeChanged(false)
+            viewModel.onUserSelectedModeChanged(false)
         } else {
             onBackArrowClick()
         }
@@ -116,7 +135,7 @@ fun TaskScreen(
                 actions = {
                     if (!showUser) {
                         ProfileImage(onClick = {
-                            screenState.onUserSelectedModeChanged(true)
+                            viewModel.onUserSelectedModeChanged(true)
                         })
                     }
                 },
@@ -126,11 +145,11 @@ fun TaskScreen(
         floatingActionButton = {
             if (!showUser) {
                 Button(onClick = {
-                    // screenState.onDone()
                     formManager.validate()
                     if (formManager.isValid()) {
-                       val data= formManager.getData()
-                        Log.d("FormDataComplete",data.toString())
+                        viewModel.onDone()
+                        val data = formManager.getData()
+                        Log.d("FormDataComplete", data.toString())
                     }
                 }) {
                     Text(text = "Create New  Task")
@@ -147,8 +166,8 @@ fun TaskScreen(
             if (showUser) {
                 AssignUser(
                     modifier = Modifier.matchParentSize(),
-                    onLongClick = screenState::onLongClick,
-                    users = screenState.users.collectAsState().value,
+                    onLongClick = viewModel::onLongClick,
+                    users = viewModel.users.collectAsState().value,
                 )
             } else {
                 Column(
@@ -165,8 +184,8 @@ fun TaskScreen(
                     VerticalSpacer()
                     DatePickerNoOutlined(
                         modifier = inputFieldModifier,
-                        state = formManager.dateState.state.collectAsState().value,
-                        onDateSelected = formManager.dateState::onTextChange
+                        state = formManager.dueDate.state.collectAsState().value,
+                        onDateSelected = formManager.dueDate::onTextChange
                     )
                     VerticalSpacer()
                     FormTextInput(

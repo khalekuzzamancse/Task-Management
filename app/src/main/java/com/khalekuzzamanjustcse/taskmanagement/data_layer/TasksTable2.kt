@@ -22,7 +22,7 @@ fun TaskDemo() {
         title = "02 Dummy Task",
         description = "02 This is a dummy task for testing",
         assignerIdentifier = "01571378537",
-        dueDate = 12344,
+        dueDate = "12344",
         assignee = listOf("01571207787", "01625337883")
     )
     val scope = rememberCoroutineScope()
@@ -108,7 +108,7 @@ fun TaskDemo() {
 data class TaskToAdd(
     val title: String,
     val description: String,
-    val dueDate: Long,
+    val dueDate: String,
     val assignerIdentifier: String,
     val assignee: List<String>
 ) {
@@ -136,7 +136,7 @@ data class TaskEntity2 @JvmOverloads constructor(
     @DocumentId val taskId: String = "",
     val title: String = "",
     val description: String = "",
-    val dueTime: Long = 0,
+    val dueTime: String = "0",
     val assignerId: String = "",
 )
 
@@ -155,7 +155,7 @@ data class MyAssignedTask(
     val description: String,
     val assignerName: String,
     val assignerPhone: String,
-    val dueDate: Long,
+    val dueDate: String,
     val taskAssignedId: String,
 ) {
     companion object {
@@ -203,7 +203,7 @@ class TaskTable2(
     private val databaseCRUD = DatabaseCRUD()
 
 
-    suspend fun createTask(task: TaskToAdd) {
+    suspend fun createTask(task: TaskToAdd):Boolean {
         val entity = task.getEntity()
         val isSuccess = databaseCRUD.create(
             collectionName = TASKS_COLLECTION,
@@ -215,6 +215,7 @@ class TaskTable2(
                 addAssignee(taskAssignee)
             }
         }
+        return isSuccess
     }
 
     suspend fun getAssignedNotNotifiedTask(): List<MyAssignedTask> {
