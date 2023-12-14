@@ -3,8 +3,10 @@ package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_t
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,28 +32,47 @@ class MyTaskViewModel : ViewModel() {
 
     fun onCheckChanged(task: TaskEntity, checked: Boolean) {
         viewModelScope.launch {
-            TaskTable().updateTask(task.copy(complete = checked))
+            Log.d("taskAsignee:", "${task.assigneePhone}")
+//            TaskTable().updateTask(task.copy(complete = checked))
         }
 
     }
 
+    private var _taskOwnedByMe = MutableStateFlow(emptyList<TaskOwnedByMe>())
+    val taskOwnedByMe = _taskOwnedByMe.asStateFlow()
 
     init {
-        val startTime = System.currentTimeMillis()
         viewModelScope.launch {
-            TaskTable().getTasks().collect { newTaskes ->
-                val endTime = System.currentTimeMillis()
-                val elapsedTime = endTime - startTime
-                if (elapsedTime < 2000)
-                    delay(1000)
+            val myUserId = AuthManager().signedInUserPhone()
+            if (myUserId != null) {
+                _taskOwnedByMe.value = TaskTable2(myUserId).taskOwnedByMe()
+            }
+
+        }
+    }
+    init {
+
+        viewModelScope.launch {
+            val myUserId = AuthManager().signedInUserPhone()
+            if (myUserId != null) {
+                val taskCollection = TaskTable2(myUserId)
                 withContext(Dispatchers.Main) {
-                    Log.i("TaskTable: ", newTaskes.toString())
-                    _tasks.value = newTaskes
+                    _tasks.value+= taskCollection.getAssignedTasks(myUserId).map {
+                        TaskEntity(
+                            title = it.title,
+                            description = it.description,
+                            assignerName = it.assignerName,
+                            assigneePhone = it.assignerPhone,
+                            complete = it.assignerPhone==myUserId
+                        )
+                    }
+
                     _isLoading.value = false
 
-
                 }
+
             }
+
 
 
         }

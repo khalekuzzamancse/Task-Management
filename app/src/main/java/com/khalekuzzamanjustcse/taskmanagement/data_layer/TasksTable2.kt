@@ -10,7 +10,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Filter
-import com.google.firebase.firestore.FirebaseFirestore
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskDoer
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskOwnedByMe
 import kotlinx.coroutines.launch
 
 
@@ -203,7 +204,7 @@ class TaskTable2(
     private val databaseCRUD = DatabaseCRUD()
 
 
-    suspend fun createTask(task: TaskToAdd):Boolean {
+    suspend fun createTask(task: TaskToAdd): Boolean {
         val entity = task.getEntity()
         val isSuccess = databaseCRUD.create(
             collectionName = TASKS_COLLECTION,
@@ -277,28 +278,75 @@ class TaskTable2(
     then fetch those tasks again by id
      */
 
-    suspend fun myAssignedCompletedUnNotifiedTask():List<CompletedTaskUnNotified> {
+    suspend fun myAssignedCompletedUnNotifiedTask(): List<CompletedTaskUnNotified> {
         val tasks = readMyAssignedTaskEntity()
         val assignedTask = readMyAssigneeRef(tasks.map { it.taskId })
         val userCollection = UserCollection()
-        val responses= mutableListOf<CompletedTaskUnNotified>()
+        val responses = mutableListOf<CompletedTaskUnNotified>()
         assignedTask.forEach { assignedTaskRelation ->
             val user = userCollection.getUser(assignedTaskRelation.assigneeId)
             val task = tasks.find { it.taskId == assignedTaskRelation.taskId }
             if (task != null && user != null) {
-             responses+=CompletedTaskUnNotified(task,user,assignedTaskRelation.assignmentId)
+                responses += CompletedTaskUnNotified(task, user, assignedTaskRelation.assignmentId)
             }
         }
         return responses
     }
 
 
-    suspend fun readMyAssignedTaskEntity() = databaseCRUD.read<TaskEntity2>(
+    suspend fun taskOwnedByMe():List<TaskOwnedByMe> {
+        val userCollection = UserCollection()
+        val tasksByMe = readMyAssignedTaskEntity()
+        val result = mutableListOf<TaskOwnedByMe>()
+        tasksByMe.forEach { task ->
+            val relations = readAssignedTaskRelation(task.taskId)
+            val doers = mutableListOf<TaskDoer>()
+            relations.forEach { relation ->
+                val doer = userCollection.getUser(relation.assigneeId)
+                if (doer != null) {
+                    doers += TaskDoer(
+                        name = doer.name,
+                        phone = doer.phone,
+                        status = decodeTaskState(relation.taskStateId)
+                    )
+                }
+            }
+            result+=TaskOwnedByMe(
+                taskId = task.taskId,
+                title = task.title,
+                description = task.description,
+                dueDate = task.dueTime,
+                doers=doers
+            )
+        }
+        return result
+    }
+
+    private fun decodeTaskState(state: Int): String {
+        return when (state) {
+            1 -> "Unseen"
+            2 -> "Seen"
+            else -> "Completed"
+        }
+    }
+
+    private suspend fun readMyAssignedTaskEntity() = databaseCRUD.read<TaskEntity2>(
         collection = TASKS_COLLECTION,
         where = Filter.equalTo(FIELD_ASSIGNER_ID, myUserId)
     )
 
-    suspend fun readMyAssigneeRef(myAssignedTaskIds: List<String>): List<AssignedTaskRelation> {
+    private suspend fun readAssignedTaskRelation(taskId: String): List<AssignedTaskRelation> {
+        val relations = mutableListOf<AssignedTaskRelation>()
+        relations += databaseCRUD.read(
+            collection = COLLECTION_ASSIGNED_TASK,
+            where = Filter.equalTo(FIELD_TASK_ID, taskId)
+        )
+        return relations
+    }
+
+    private suspend fun readMyAssigneeRef(
+        myAssignedTaskIds: List<String>
+    ): List<AssignedTaskRelation> {
         val refs = mutableListOf<AssignedTaskRelation>()
         myAssignedTaskIds.forEach { taskId ->
             refs += databaseCRUD.read(
@@ -310,14 +358,14 @@ class TaskTable2(
     }
 
 
-    suspend fun getAssignTaskRef(): List<AssignedTaskRelation> {
+    private suspend fun getAssignTaskRef(): List<AssignedTaskRelation> {
         return databaseCRUD.read(
             collection = COLLECTION_ASSIGNED_TASK,
             where = Filter.equalTo(ASSIGN_ID_FIELD, myUserId)
         )
     }
 
-    suspend fun getAssignTasks(refs: List<AssignedTaskRelation>): List<MyAssignedTask> {
+    private suspend fun getAssignTasks(refs: List<AssignedTaskRelation>): List<MyAssignedTask> {
         val tasks = mutableListOf<MyAssignedTask>()
         refs.forEach { taskAssignee ->
             val task = databaseCRUD.read<TaskEntity2>(

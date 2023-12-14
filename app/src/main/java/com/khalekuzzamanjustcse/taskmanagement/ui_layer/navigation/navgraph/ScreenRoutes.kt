@@ -44,4 +44,7 @@ sealed  class Screen {
     data object MyTaskDetails : Screen() {
         override val route = "MyTaskDetails"
     }
+    data object MyOwnedTaskDetails : Screen() {
+        override val route = "MyOwnedTaskDetails"
+    }
 }

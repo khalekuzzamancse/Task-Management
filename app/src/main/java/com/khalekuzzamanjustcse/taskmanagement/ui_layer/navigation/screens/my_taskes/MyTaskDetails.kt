@@ -32,7 +32,6 @@ fun TaskDetailsPreview() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskDetailsScreen(
     task: TaskEntity,

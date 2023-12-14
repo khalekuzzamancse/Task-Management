@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,8 @@ import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FirebaseFireStore
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.MyTaskViewModel
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskOwnedByMe
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TasksOwnedByMe
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.theme.TaskManagementTheme
 
 
@@ -41,7 +44,7 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.theme.TaskManagementThem
 @Composable
 fun HomePreview() {
     TaskManagementTheme {
-        Home(onCreateTask = {})
+        Home(onCreateTask = {}, onMyOwnedTaskOpenDetail = {})
     }
 }
 
@@ -50,6 +53,7 @@ fun Home(
     onCreateTask: () -> Unit = {},
     openDrawer: () -> Unit = {},
     onLogOut: () -> Unit = {},
+    onMyOwnedTaskOpenDetail: (TaskOwnedByMe) -> Unit,
     onTaskDetailsOpen: (TaskEntity) -> Unit = {},
 ) {
 
@@ -75,7 +79,7 @@ fun Home(
         topBar = {
             HomeTopAppbar(
                 onNavigationIconClick = onNavigationIconClick,
-               // onLogOut = onLogOut
+                // onLogOut = onLogOut
                 onLogOut = {
 
                 }
@@ -97,8 +101,13 @@ fun Home(
         ) {
             UserInfo(username = username)
             Spacer(modifier = Modifier.height(16.dp))
-            MyTaskList(
-                viewModel, onTaskClick = { myTask ->
+            TasksOwnedByMe(
+                tasks = viewModel.taskOwnedByMe.collectAsState().value,
+                onOpenDetails =onMyOwnedTaskOpenDetail
+            )
+            TasksAssignedToMeScreen(
+                viewModel,
+                onTaskClick = { myTask ->
                     viewModel.onLongClick(myTask)
                     onTaskDetailsOpen(myTask)
                 })
@@ -150,7 +159,7 @@ fun HomeTopAppbar(
         },
         actions = {
             HomeScreenDropDown(onLogOutIconClick = {
-               // onLogOut()
+                // onLogOut()
             })
 //            ProfileImage(
 //                onClick = {
