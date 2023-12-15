@@ -21,7 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.ScreenWithDrawer
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskFormManager
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskViewModel
@@ -142,7 +142,7 @@ fun NavGraph(
 
         }
         composable(route = Screen.Users.route) {
-            val scope = rememberCoroutineScope()
+            rememberCoroutineScope()
             ScreenWithDrawer(
                 drawerState = drawerState,
                 closeDrawer = onCloseDrawer,

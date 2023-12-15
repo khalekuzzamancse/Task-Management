@@ -8,27 +8,30 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.khalekuzzamanjustcse.taskmanagement.BaseApplication
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendShipManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.MyFriend
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserCollection
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserEntity
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.user_managment.User2
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.user_managment.UsersObserver
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.device_contact.Contact
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.device_contact.LocalContactsProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-//after fetching the contact make eligible for garbage collect that is why
-//content resolver declared as nullable
 class UsersScreenViewModel(
     private var contentResolver: ContentResolver? = null
 ) : ViewModel() {
     private val _users = MutableStateFlow<List<User>>(emptyList())
-    val users = _users.asStateFlow()
+
+    //    val users = _users.asStateFlow()
+    val users = UsersObserver.users
     private val _isLoading = MutableStateFlow(true)
     val isLoading = _isLoading.asStateFlow()
-    val manager=FriendShipManager()
+
+    private val manager = FriendShipManager()
 
     companion object {
         private const val TAG = "UsersScreenViewModelLog: "
@@ -46,12 +49,12 @@ class UsersScreenViewModel(
 
     }
 
-    fun onFriendRequestSent(user: User) {
+    fun onFriendRequestSent(user: User2) {
         viewModelScope.launch {
-            val myUserId=AuthManager.signedInUserPhone()
-            Log.d( "OnFriendRequestSent", myUserId.toString())
-            if(myUserId!=null){
-                manager.sentFriendRequests(myUserId,user.phone)
+            val myUserId = AuthManager.signedInUserPhone()
+            Log.d("OnFriendRequestSent", myUserId.toString())
+            if (myUserId != null) {
+                manager.sentFriendRequests(myUserId, user.phone)
             }
 
 
@@ -59,19 +62,17 @@ class UsersScreenViewModel(
     }
 
     private suspend fun updateUser() {
-        val singedUserPhone= AuthManager.signedInUserPhone()
-        if(singedUserPhone!=null) {
-            contentResolver?.let { contentResolver ->
-                _users.value = UserUtil(singedUserPhone)
-                    .readLocalContacts(contentResolver)
-                    .fetchRemoteEntity()
-                    .matchLocalWithRemoteContacts()
-                    .fetchMyFriends()
-                    .mergeWithAlreadyFriends()
-                    .fetchFriendRequest()
-                    .mergeWithReceivedFriendRequest()
-                    .users
-            }
+        val singedUserPhone = AuthManager.signedInUserPhone()
+        if (singedUserPhone != null) {
+            _users.value = UserUtil(singedUserPhone)
+                .readLocalContacts()
+                .fetchRemoteEntity()
+                .matchLocalWithRemoteContacts()
+                .fetchMyFriends()
+                .mergeWithAlreadyFriends()
+                .fetchFriendRequest()
+                .mergeWithReceivedFriendRequest()
+                .users
         }
 
         contentResolver = null
@@ -87,7 +88,7 @@ fun Preview() {
     val resolver = LocalContext.current.contentResolver
     LaunchedEffect(Unit) {
         val util = UserUtil("2")
-            .readLocalContacts(resolver)
+            .readLocalContacts()
             .fetchRemoteEntity()
             .matchLocalWithRemoteContacts()
             .fetchMyFriends()
@@ -110,8 +111,8 @@ data class UserUtil(
     private var friends = emptyList<MyFriend>()
     private var friendRequests = emptyList<MyFriend>()
 
-    fun readLocalContacts(contentResolver: ContentResolver): UserUtil {
-        savedContacts = LocalContactsProvider(contentResolver).getContact()
+    fun readLocalContacts(): UserUtil {
+        savedContacts = BaseApplication.getLocalContact()
         return this
     }
 
@@ -132,7 +133,7 @@ data class UserUtil(
     }
 
     suspend fun fetchMyFriends(): UserUtil {
-        friends = FriendShipManager().myFriendList(myUserId)
+        // friends = FriendShipManager().myFriendList(myUserId)
         return this
 
     }
@@ -146,7 +147,7 @@ data class UserUtil(
     }
 
     suspend fun fetchFriendRequest(): UserUtil {
-        friendRequests = FriendShipManager().getFriendRequest(myUserId)
+        // friendRequests = FriendShipManager().getFriendRequest(myUserId)
         return this
     }
 

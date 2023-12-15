@@ -1,5 +1,6 @@
-package com.khalekuzzamanjustcse.taskmanagement.data_layer.notification
+package com.khalekuzzamanjustcse.taskmanagement.data_layer.friend_management
 
+import android.util.Log
 import com.google.firebase.firestore.Filter
 import com.khalekuzzamanjustcse.taskmanagement.BaseApplication
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseCollectionReader
@@ -50,7 +51,11 @@ data class FriendRequest(
 //}
 
 
-object ObservableFriendShip {
+enum class FriendShipStatus {
+    Pending, Friend, NoFriendShip
+}
+
+object FriendShipObserver {
 
     private const val TAG = "FriendShipManagerLog: "
     private const val COLLECTION = "FriendShips"
@@ -60,7 +65,8 @@ object ObservableFriendShip {
     private const val ACCEPTED_NOT_NOTIFIED = 3
 
 
-    private val friendShipWithMe = MutableStateFlow(emptyList<FriendShipInfo>())
+    private val _friendShipWithMe = MutableStateFlow(emptyList<FriendShipInfo>())
+    val friendShipWithMe= _friendShipWithMe.asStateFlow()
     private val _myFriends = MutableStateFlow(emptyList<FriendShipInfo>())
     val myFriends = _myFriends.asStateFlow()
     private val _requests = MutableStateFlow(emptyList<FriendRequest>())
@@ -83,7 +89,7 @@ object ObservableFriendShip {
         shipInfo.forEach { friendShipInfo ->
             if (friendShipInfo.friendStatus == PENDING_NOT_NOTIFIED) {
                 notifyNewFriendRequest(friendShipInfo)
-            } else if (friendShipInfo.iAmSender&&friendShipInfo.friendStatus == ACCEPTED_NOT_NOTIFIED) {
+            } else if (friendShipInfo.iAmSender && friendShipInfo.friendStatus == ACCEPTED_NOT_NOTIFIED) {
                 notifyRequestAccept(friendShipInfo)
             }
 
@@ -94,7 +100,7 @@ object ObservableFriendShip {
         val title = "New Friend Request"
         val message = "By ${info.friendName} (${info.friendPhone})"
         BaseApplication.notify(title, message)
-       FriendShipManager().makeRequestNotified(info.friendShipId)
+        FriendShipManager().makeRequestNotified(info.friendShipId)
     }
 
     private suspend fun notifyRequestAccept(info: FriendShipInfo) {
@@ -106,7 +112,7 @@ object ObservableFriendShip {
     }
 
     private fun updateFriendshipInfo(shipInfo: List<FriendShipInfo>) {
-        friendShipWithMe.value = shipInfo
+        _friendShipWithMe.value = shipInfo
     }
 
     private fun updateRequestInfo(shipInfo: List<FriendShipInfo>) {

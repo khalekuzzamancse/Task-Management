@@ -18,14 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable2
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.CommonScreen
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 data class TaskDoer(
     val name: String,

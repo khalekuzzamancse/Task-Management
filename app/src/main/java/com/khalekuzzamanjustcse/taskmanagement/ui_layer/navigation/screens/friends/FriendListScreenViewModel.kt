@@ -3,7 +3,7 @@ package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.frie
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.MyFriend
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.ObservableFriendShip
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.friend_management.FriendShipObserver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -16,7 +16,7 @@ class FriendListScreenViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            ObservableFriendShip.myFriends.collect { friendships ->
+            FriendShipObserver.myFriends.collect { friendships ->
                 friends.value = friendships.map { friendship ->
                     MyFriend(
                         name = friendship.friendName,

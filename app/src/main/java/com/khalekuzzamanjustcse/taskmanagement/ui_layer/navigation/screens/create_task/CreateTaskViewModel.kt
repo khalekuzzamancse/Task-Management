@@ -4,12 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseCRUD
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendShipManager
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable2
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskToAdd
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.AssignedUser
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.Task
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.createDummyTask
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.friend_management.FriendShipObserver
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedUser
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.Task
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,11 +36,11 @@ class CreateTaskViewModel(
         viewModelScope.launch {
             val myUserId = AuthManager.signedInUserPhone()
             if (myUserId != null) {
-                val newUser = FriendShipManager().myFriendList(myUserId)
+                val newUser = FriendShipObserver.myFriends.value
                     .map {
                         TaskAssignedUser(
-                            name = it.name,
-                            phone = it.phone,
+                            name = it.friendName,
+                            phone = it.friendPhone,
                             selected = false
                         )
                     }
@@ -67,7 +64,7 @@ class CreateTaskViewModel(
             val assignedUsers = mutableListOf<AssignedUser>()
             users.value.forEach {
                 if (it.selected) {
-                    assignedUsers +=AssignedUser(
+                    assignedUsers += AssignedUser(
                         userId =it.phone,
                         state = 1
                     )

@@ -1,8 +1,7 @@
-package com.khalekuzzamanjustcse.taskmanagement.data_layer.notification
+package com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment
 
 import com.khalekuzzamanjustcse.taskmanagement.BaseApplication
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseCollectionReader
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

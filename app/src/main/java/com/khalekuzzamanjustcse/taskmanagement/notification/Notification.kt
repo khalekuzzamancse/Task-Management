@@ -12,7 +12,6 @@ import androidx.core.net.toUri
 import com.khalekuzzamanjustcse.taskmanagement.DeepLink
 import com.khalekuzzamanjustcse.taskmanagement.MainActivity
 import com.khalekuzzamanjustcse.taskmanagement.R
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendManager
 
 //taking context as instance variable so after using class instance make it eligible for garbage collection
 //by assigning null to it  instance or use other technique so that it references is not hold unnecessary
@@ -138,18 +137,18 @@ class NotificationFactory(
     private val context: Context
 ) {
     suspend fun observeFriendRequest() {
-        val request = FriendManager().getReceivedFriendRequest()
-        request.forEach {
-            if (!it.hasNotified) {
-                Notifier(context)
-                    .notify(
-                        title = "New Notification",
-                        message = "Friend request",
-                        taskId = "123"
-                    )
-                //  createNotification(context, "${it.user.name} send a friend request.")
-            }
-        }
+//        val request = FriendManager().getReceivedFriendRequest()
+//        request.forEach {
+//            if (!it.hasNotified) {
+//                Notifier(context)
+//                    .notify(
+//                        title = "New Notification",
+//                        message = "Friend request",
+//                        taskId = "123"
+//                    )
+//                //  createNotification(context, "${it.user.name} send a friend request.")
+//            }
+//        }
     }
 
 }

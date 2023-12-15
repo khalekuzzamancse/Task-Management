@@ -3,9 +3,14 @@ package com.khalekuzzamanjustcse.taskmanagement.data_layer
 import android.util.Log
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.firestore.Filter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Preview
@@ -67,4 +72,19 @@ class UserCollection {
     }
 
 
+}
+@Composable
+fun MyButton(
+    scope: CoroutineScope = rememberCoroutineScope(),
+    onClick: suspend () -> Unit,
+    label: String
+) {
+    Button(onClick = {
+        scope.launch {
+            onClick()
+        }
+
+    }) {
+        Text(text = label)
+    }
 }

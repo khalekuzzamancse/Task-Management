@@ -72,68 +72,8 @@ class FriendShipManager {
     }
 
 
-    suspend fun getFriendRequest(userId: String): List<MyFriend> {
-        val friendShips = databaseCRUD.read<FriendShipEntity>(
-            collection = COLLECTION,
-            where = Filter.and(
-                Filter.equalTo(FIELD_RECEIVER_ID, userId),
-                // Filter.lessThan(FIELD_FRIENDSHIP_STATE, 3), has bug,find why this query not work
-            )
-        )
-            .filter { it.friendShipState != ACCEPTED_NOTIFIED && it.friendShipState != ACCEPTED_NOT_NOTIFIED }
-        return toMyFriend(userId, friendShips)
-    }
-    suspend fun getUnNotifiedFriendRequest(userId: String): List<MyFriend> {
-        val friendShips = databaseCRUD.read<FriendShipEntity>(
-            collection = COLLECTION,
-            where = Filter.and(
-                Filter.equalTo(FIELD_RECEIVER_ID, userId),
-                // Filter.lessThan(FIELD_FRIENDSHIP_STATE, 3), has bug,find why this query not work
-            )
-        )
-            .filter { it.friendShipState== PENDING_NOT_NOTIFIED}
-        return toMyFriend(userId, friendShips)
-    }
-    suspend fun getAcceptNotNotifiedRequest(userId: String): List<MyFriend> {
-        val friendShips = databaseCRUD.read<FriendShipEntity>(
-            collection = COLLECTION,
-            where = Filter.and(
-                Filter.equalTo(FIELD_SENDER_ID, userId),
-                // Filter.lessThan(FIELD_FRIENDSHIP_STATE, 3), has bug,find why this query not work
-            )
-        )
-            .filter { it.friendShipState== ACCEPTED_NOT_NOTIFIED}
-        return toMyFriend(userId, friendShips)
-    }
-
-    suspend fun myFriendList(myUserId: String): List<MyFriend> {
-        val friendShip = fetchFriends(myUserId)
-        return toMyFriend(myUserId, friendShip)
-    }
-
-    private suspend fun getFriendShipId(senderId: String, receiverId: String): String? {
-        return databaseCRUD.read<FriendShipEntity>(
-            collection = COLLECTION,
-            where = Filter.or(
-                Filter.equalTo(FIELD_RECEIVER_ID, receiverId),
-                Filter.equalTo(FIELD_SENDER_ID, senderId)
-            )
-        ).firstOrNull()?.id
-    }
 
 
-    private suspend fun toMyFriend(
-        myUserId: String,
-        friends: List<FriendShipEntity>
-    ): List<MyFriend> {
-        val userCollection = UserCollection()
-        return friends.mapNotNull { friendShip ->
-            val iAmSender = friendShip.senderId == myUserId
-            val friendUserId = if (iAmSender) friendShip.receiverId else friendShip.senderId
-            val user = userCollection.getUser(friendUserId)
-            if (user != null) MyFriend(user.name, user.phone, friendShip.id) else null
-        }
-    }
 
 
     suspend fun fetchFriends(userId: String): List<FriendShipEntity> {

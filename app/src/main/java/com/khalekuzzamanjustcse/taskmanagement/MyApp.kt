@@ -3,9 +3,11 @@ package com.khalekuzzamanjustcse.taskmanagement
 import android.app.Application
 import android.util.Log
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.AssignedToMeTasksObserver
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.ObservableFriendShip
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedToMeTasksObserver
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.friend_management.FriendShipObserver
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.user_managment.UsersObserver
 import com.khalekuzzamanjustcse.taskmanagement.notification.Notifier
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.device_contact.LocalContactsProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,6 +29,9 @@ class BaseApplication : Application() {
                 notificationId = notificationId++,
             )
         }
+        fun getLocalContact()=
+            LocalContactsProvider(instance.applicationContext.contentResolver)
+                .getContact()
 
     }
 
@@ -40,25 +45,22 @@ class BaseApplication : Application() {
         instance = this
         AuthManager//initialize
         val scope = CoroutineScope(Dispatchers.IO)
-//        scope.launch {
-//           ObservableFriendShip._friendShipWithMe.collect {
-//                Log.d("friendShipStatus:App", "${it}")
-//            }
-//
-//        }
         scope.launch {
             AuthManager.signedInUserPhone()?.let {
-                ObservableFriendShip.subscribe(it)
-
+                FriendShipObserver.subscribe(it)
             }
 
         }
         scope.launch {
             AuthManager.signedInUserPhone()?.let {
-                Log.d("MyAssignedTask:App", "$it")
                 AssignedToMeTasksObserver.subscribe(it)
             }
 
+        }
+        scope.launch {
+            AuthManager.signedInUserPhone()?.let {
+                UsersObserver.subscribe(it)
+            }
         }
 
     }

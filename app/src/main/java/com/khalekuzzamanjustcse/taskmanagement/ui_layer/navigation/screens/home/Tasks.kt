@@ -3,15 +3,14 @@ package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.home
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskEntity
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.MyTaskCard
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.MyTaskViewModel
 
 @Composable
 fun TasksAssignedToMeScreen(
     viewModel: MyTaskViewModel,
-     items:List<TaskEntity>,
+    items:List<TaskEntity>,
     onTaskClick: (TaskEntity)->Unit={}
 ) {
 
