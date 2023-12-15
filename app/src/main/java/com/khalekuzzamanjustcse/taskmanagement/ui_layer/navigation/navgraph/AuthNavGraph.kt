@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
+
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController,
     onLoginSuccess: () -> Unit = {},
@@ -53,7 +54,6 @@ fun NavGraphBuilder.authNavGraph(
         route = Screen.AuthGraph.route,
         startDestination = Screen.Login.route
     ) {
-
 
         composable(route = Screen.Login.route) {
             val context= LocalContext.current
