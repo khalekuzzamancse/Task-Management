@@ -59,8 +59,6 @@ object ObservableFriendShip {
     private const val PENDING_NOT_NOTIFIED = 1
     private const val ACCEPTED_NOT_NOTIFIED = 3
 
-    private lateinit var myUserId:String
-
 
     private val friendShipWithMe = MutableStateFlow(emptyList<FriendShipInfo>())
     private val _myFriends = MutableStateFlow(emptyList<FriendShipInfo>())
@@ -85,7 +83,7 @@ object ObservableFriendShip {
         shipInfo.forEach { friendShipInfo ->
             if (friendShipInfo.friendStatus == PENDING_NOT_NOTIFIED) {
                 notifyNewFriendRequest(friendShipInfo)
-            } else if (friendShipInfo.friendStatus == ACCEPTED_NOT_NOTIFIED) {
+            } else if (friendShipInfo.iAmSender&&friendShipInfo.friendStatus == ACCEPTED_NOT_NOTIFIED) {
                 notifyRequestAccept(friendShipInfo)
             }
 
@@ -144,7 +142,7 @@ object ObservableFriendShip {
     }
 
 
-    suspend fun observer(userId: String) {
+    suspend fun subscribe(userId: String) {
         val eitherRequestSenderOrReceiver = Filter.or(
             Filter.equalTo(FIELD_RECEIVER_ID, userId),
             Filter.equalTo(FIELD_SENDER_ID, userId)
