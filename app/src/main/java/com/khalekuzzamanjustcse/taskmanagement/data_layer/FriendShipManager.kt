@@ -44,16 +44,14 @@ class FriendShipManager {
     }
 
 
-    suspend fun acceptRequest(senderId: String,myUserId: String): Boolean {
-        val friendShipId=getFriendShipId(senderId,myUserId)
-        return if (friendShipId!=null)  update(
+    suspend fun acceptRequest(friendShipId:String): Boolean {
+        return update(
             Updater(
                 docID = friendShipId,
                 field = FIELD_FRIENDSHIP_STATE,
                 value = ACCEPTED_NOT_NOTIFIED
             )
         )
-        else false
     }
 
     suspend fun acceptRequestNotified(friendShipId: String): Boolean {

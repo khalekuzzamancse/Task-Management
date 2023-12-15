@@ -1,19 +1,14 @@
 package com.khalekuzzamanjustcse.taskmanagement.data_layer.notification
 
-import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.firestore.Filter
+import com.khalekuzzamanjustcse.taskmanagement.BaseApplication
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseCollectionReader
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendShipEntity
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.MyFriend
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendShipManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserCollection
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+
 data class FriendShipInfo(
     val friendPhone: String,
     val friendName: String,
@@ -22,51 +17,115 @@ data class FriendShipInfo(
     val iAmSender: Boolean
 )
 
-@Preview
-@Composable
-fun Demo() {
+data class FriendRequest(
+    val friendShipId: String,
+    val friendPhone: String,
+    val friendName: String,
+    val isSentByMe: Boolean,
+)
 
-    LaunchedEffect(Unit) {
-        ObservableFriendShip._friendShipWithMe.collect {
-            Log.d("friendShipStatus:D", "${it}")
-        }
-
-    }
-    LaunchedEffect(Unit){
-        ObservableFriendShip.observer("01625337883")
-    }
-
-}
+//@Preview
+//@Composable
+//fun Demo() {
+//
+//    LaunchedEffect(Unit) {
+//        ObservableFriendShip.friendShipWithMe.collect {
+//
+//        }
+//    }
+//    LaunchedEffect(Unit) {
+//        ObservableFriendShip.myFriends.collect {
+//            Log.d("friendShipStatus:Friend", "${it}")
+//        }
+//    }
+//    LaunchedEffect(Unit) {
+//        ObservableFriendShip.requests.collect {
+//            Log.d("friendShipStatus:Req", "${it}")
+//        }
+//    }
+//    LaunchedEffect(Unit) {
+//        ObservableFriendShip.observer("01571378537")
+//    }
+//
+//}
 
 
 object ObservableFriendShip {
 
-        private const val TAG = "FriendShipManagerLog: "
-        private const val COLLECTION = "FriendShips"
-        private const val FIELD_RECEIVER_ID = "receiverId"
-        private const val FIELD_SENDER_ID = "senderId"
-        private const val FIELD_FRIENDSHIP_STATE = "friendShipState"
-        private const val PENDING_NOT_NOTIFIED = 1
-        private const val PENDING_NOTIFIED = 2
-        private const val ACCEPTED_NOT_NOTIFIED = 3
-        private const val ACCEPTED_NOTIFIED = 4
+    private const val TAG = "FriendShipManagerLog: "
+    private const val COLLECTION = "FriendShips"
+    private const val FIELD_RECEIVER_ID = "receiverId"
+    private const val FIELD_SENDER_ID = "senderId"
+    private const val PENDING_NOT_NOTIFIED = 1
+    private const val ACCEPTED_NOT_NOTIFIED = 3
+
+    private lateinit var myUserId:String
 
 
-     val _friendShipWithMe = MutableStateFlow(emptyList<FriendShipInfo>())
-
+    private val friendShipWithMe = MutableStateFlow(emptyList<FriendShipInfo>())
+    private val _myFriends = MutableStateFlow(emptyList<FriendShipInfo>())
+    val myFriends = _myFriends.asStateFlow()
+    private val _requests = MutableStateFlow(emptyList<FriendRequest>())
+    val requests = _requests.asStateFlow()
 
 
     private suspend fun onFriendShipChanged(myUserId: String, friendShips: List<FriendShipEntity>) {
-        val shipInfo= friendShips.mapNotNull {
-            val shipInfo = getFriendShipInfo(myUserId, it)
-            //Log.d("friendShipStatus:Ob", "${shipInfo}")
-            shipInfo
+        val shipInfo = friendShips
+            .mapNotNull { getFriendShipInfo(myUserId, it) }
+        //
+        notify(shipInfo)
+        updateFriendshipInfo(shipInfo)
+        updateRequestInfo(shipInfo)
+        updateFriendList(shipInfo)
+
+//        Log.d("friendShipStatus:OFlow", "${_friendShipWithMe.value}")
+    }
+
+    private suspend fun notify(shipInfo: List<FriendShipInfo>) {
+        shipInfo.forEach { friendShipInfo ->
+            if (friendShipInfo.friendStatus == PENDING_NOT_NOTIFIED) {
+                notifyNewFriendRequest(friendShipInfo)
+            } else if (friendShipInfo.friendStatus == ACCEPTED_NOT_NOTIFIED) {
+                notifyRequestAccept(friendShipInfo)
+            }
 
         }
-        _friendShipWithMe.value=shipInfo
-//        Log.d("friendShipStatus:OFlow", "${_friendShipWithMe.value}")
-
     }
+
+    private suspend fun notifyNewFriendRequest(info: FriendShipInfo) {
+        val title = "New Friend Request"
+        val message = "By ${info.friendName} (${info.friendPhone})"
+        BaseApplication.notify(title, message)
+       FriendShipManager().makeRequestNotified(info.friendShipId)
+    }
+
+    private suspend fun notifyRequestAccept(info: FriendShipInfo) {
+        val title = "Friend Request Accepted"
+        val message = "By ${info.friendName} (${info.friendPhone})"
+        BaseApplication.notify(title, message)
+        //
+        FriendShipManager().acceptRequestNotified(info.friendShipId)
+    }
+
+    private fun updateFriendshipInfo(shipInfo: List<FriendShipInfo>) {
+        friendShipWithMe.value = shipInfo
+    }
+
+    private fun updateRequestInfo(shipInfo: List<FriendShipInfo>) {
+        _myFriends.value = shipInfo.filter { it.friendStatus >= 3 }
+    }
+
+    private fun updateFriendList(shipInfo: List<FriendShipInfo>) {
+        _requests.value = shipInfo.filter { it.friendStatus <= 2 }.map {
+            FriendRequest(
+                friendShipId = it.friendShipId,
+                friendPhone = it.friendPhone,
+                friendName = it.friendName,
+                isSentByMe = it.iAmSender
+            )
+        }
+    }
+
 
     private suspend fun getFriendShipInfo(
         myUserId: String, friendShip: FriendShipEntity

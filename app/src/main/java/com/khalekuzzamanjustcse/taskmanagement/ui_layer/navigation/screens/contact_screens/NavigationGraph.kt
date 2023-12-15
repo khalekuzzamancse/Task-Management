@@ -71,7 +71,9 @@ fun ContactScreenNavGraph() {
                 }
 
                 FriendRequestListScreen(
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    onCancelRequest = {},
+                    onAcceptRequest = {}
                 ) {
 
                 }

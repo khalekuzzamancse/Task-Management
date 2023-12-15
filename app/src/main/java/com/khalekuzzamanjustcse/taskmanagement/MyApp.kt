@@ -77,51 +77,7 @@ class BaseApplication : Application() {
 
     }
 
-    private fun notifyAcceptFriendRequest() {
-        val friendShipManager = FriendShipManager()
-        var notificationId = 1
-        CoroutineScope(Dispatchers.IO).launch {
-            val signedUserPhone = AuthManager.signedInUserPhone()
-            if (signedUserPhone != null) {
-                val accepted = friendShipManager.getAcceptNotNotifiedRequest(signedUserPhone)
-                log("$accepted")
-                accepted.forEach { friend ->
-                    Notifier(this@BaseApplication)
-                        .notify(
-                            title = "Friend Request Accepted",
-                            message = "${friend.name} accepted request",
-                            notificationId = notificationId++,
-                        )
-                    friendShipManager.acceptRequestNotified(friend.friendShipId)
-                }
-            }
 
-        }
-    }
-
-    private fun notifyIncomingFriendRequest() {
-        val friendShipManager = FriendShipManager()
-        var notificationId = 1
-        CoroutineScope(Dispatchers.IO).launch {
-            val signedUserPhone = AuthManager.signedInUserPhone()
-            if (signedUserPhone != null) {
-                val request = friendShipManager.getUnNotifiedFriendRequest(signedUserPhone)
-                log("$request")
-                request.forEach { friend ->
-                    log(friend.friendShipId)
-                    Notifier(this@BaseApplication)
-                        .notify(
-                            title = "New Friend Request",
-                            message = "${friend.name} send request",
-                            notificationId = notificationId++,
-                        )
-                    friendShipManager.makeRequestNotified(friend.friendShipId)
-
-                }
-            }
-
-        }
-    }
 
 
     override fun onCreate() {
@@ -130,21 +86,22 @@ class BaseApplication : Application() {
         AuthManager//initialize
         notifyTasksAssigned()
         notifyTasksCompleted()
-        notifyAcceptFriendRequest()
-        notifyIncomingFriendRequest()
+//        notifyAcceptFriendRequest()
+//        notifyIncomingFriendRequest()
 
-//        //
-//
-//        val scope= CoroutineScope(Dispatchers.IO)
+       val scope= CoroutineScope(Dispatchers.IO)
 //        scope.launch {
 //           ObservableFriendShip._friendShipWithMe.collect {
 //                Log.d("friendShipStatus:App", "${it}")
 //            }
 //
 //        }
-//        scope.launch {
-//            ObservableFriendShip.observer("01625337883")
-//        }
+        scope.launch {
+            AuthManager.signedInUserPhone()?.let {
+                ObservableFriendShip.observer(it)
+            }
+
+        }
 
 
 

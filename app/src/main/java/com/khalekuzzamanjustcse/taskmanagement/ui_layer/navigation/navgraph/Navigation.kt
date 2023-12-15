@@ -64,7 +64,7 @@ fun NavGraph(
 
     var taskToOpen: TaskEntity? = remember { null }
     val onTaskDetailsOpen: (TaskEntity) -> Unit = { task ->
-        taskToOpen=task
+        taskToOpen = task
 //        Log.d("onTaskDetailsOpen", "$task")
 //        navigationAction.navigateTo("MyTaskDetails/${task.id}")
         navigationAction.navigateTo("MyTaskDetails")
@@ -82,14 +82,14 @@ fun NavGraph(
 
 
     val context = LocalContext.current
-    val scope= rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
-    val isLogin=AuthManager.loggedIn.collectAsState().value
+    val isLogin = AuthManager.loggedIn.collectAsState().value
 
     NavHost(
         navController = navController,
         route = "MainGraph",
-        startDestination = if(isLogin) Screen.Home.route else Screen.AuthGraph.route
+        startDestination = if (isLogin) Screen.Home.route else Screen.AuthGraph.route
     ) {
 
         //auth nav graph
@@ -172,7 +172,9 @@ fun NavGraph(
                 }
 
                 FriendRequestListScreen(
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    onAcceptRequest = viewModel::acceptFriendRequest,
+                    onCancelRequest = {},
                 ) {
 
                 }
