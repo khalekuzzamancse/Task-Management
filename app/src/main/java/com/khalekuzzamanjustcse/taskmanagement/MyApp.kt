@@ -5,6 +5,7 @@ import android.util.Log
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FriendShipManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.TaskTable2
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.notification.ObservableFriendShip
 import com.khalekuzzamanjustcse.taskmanagement.notification.Notifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -131,6 +132,21 @@ class BaseApplication : Application() {
         notifyTasksCompleted()
         notifyAcceptFriendRequest()
         notifyIncomingFriendRequest()
+
+//        //
+//
+//        val scope= CoroutineScope(Dispatchers.IO)
+//        scope.launch {
+//           ObservableFriendShip._friendShipWithMe.collect {
+//                Log.d("friendShipStatus:App", "${it}")
+//            }
+//
+//        }
+//        scope.launch {
+//            ObservableFriendShip.observer("01625337883")
+//        }
+
+
 
 
     }
