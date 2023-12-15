@@ -1,16 +1,19 @@
 package com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment
 
+import android.util.Log
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Filter
 import com.khalekuzzamanjustcse.taskmanagement.BaseApplication
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseCollectionReader
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseDocumentReader
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.UserCollection
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskDoer
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskOwnedByMe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 data class Task @JvmOverloads constructor(
@@ -57,37 +60,46 @@ object AssignedByMeTasksObserver {
     val _taskOwnedByMe = MutableStateFlow(emptyList<TaskOwnedByMe>())
 
 
-    init {
-        val scope = CoroutineScope(Dispatchers.Main)
-        scope.launch {
-            AuthManager.signedInUserPhone()?.let {
-                observe(it)
-            }
+
+    private suspend fun onTaskEntitiesUpdated(tasks:List<Task>) {
+        _taskEntities.value = tasks
+        //
+        updateTaskByMe(tasks)
+
+    }
+    private suspend fun updateTaskByMe(tasks:List<Task>){
+        _taskOwnedByMe.value = tasks.map { task ->
+            val doers = taskDoers(task)
+            val taskByMe = TaskOwnedByMe(
+                taskId = task.taskId,
+                title = task.title,
+                description = task.description,
+                dueDate = task.dueTime,
+                doers = doers
+            )
+
+            taskByMe
         }
     }
 
-    init {
-        val scope = CoroutineScope(Dispatchers.Main)
-        scope.launch {
-            _taskEntities.collect { tasks ->
-                _taskOwnedByMe.value = tasks.map { task ->
-                    val doers = taskDoers(task)
-                    val ts = TaskOwnedByMe(
-                        taskId = task.taskId,
-                        title = task.title,
-                        description = task.description,
-                        dueDate = task.dueTime,
-                        doers = doers
-                    )
 
-                    ts
-                }
-
-            }
+    suspend fun taskDetails(taskId: String): Flow<TaskOwnedByMe> = flow {
+        DatabaseDocumentReader(
+            collection = TASKS_COLLECTION,
+            docId = taskId
+        ).readObservable(Task::class.java).collect { task ->
+            val doers = taskDoers(task)
+            val taskByMe = TaskOwnedByMe(
+                taskId = task.taskId,
+                title = task.title,
+                description = task.description,
+                dueDate = task.dueTime,
+                doers = doers
+            )
+            emit(taskByMe)
         }
-
-
     }
+
 
     private suspend fun taskDoers(task: Task): List<TaskDoer> {
         return task.assignedUsers.mapNotNull {
@@ -132,9 +144,7 @@ object AssignedByMeTasksObserver {
     }
 
 
-    suspend fun observe(signedInUserId: String) {
-        observerTaskEntityAssignedByMe(signedInUserId)
-    }
+
 
     fun notifyTasksAssigned() {
         BaseApplication.notify(
@@ -144,11 +154,11 @@ object AssignedByMeTasksObserver {
 
     }
 
-    private suspend fun observerTaskEntityAssignedByMe(signedInUserId: String) {
+     suspend fun subscribe(signedInUserId: String) {
         val predicate = Filter.equalTo(FIELD_ASSIGNER_ID, signedInUserId)
         DatabaseCollectionReader(collection = TASKS_COLLECTION)
             .readObservable(Task::class.java, where = predicate).collect { tasks ->
-                _taskEntities.value = tasks
+               onTaskEntitiesUpdated(tasks)
             }
     }
 

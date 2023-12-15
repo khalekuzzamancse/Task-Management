@@ -1,12 +1,27 @@
 package com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment
 
+import com.google.firebase.firestore.DocumentId
 import com.khalekuzzamanjustcse.taskmanagement.BaseApplication
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseCollectionReader
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseDocumentReader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+
+data class TaskEntity @JvmOverloads constructor(
+    @DocumentId val id: String = "",
+    val title: String = "",
+    val description: String = "",
+    val assignerName: String = "",
+    val assigneePhone: String = "",
+    val dueDate: String = "",
+    val notified: Boolean = false,
+    val complete: Boolean = false
+)
 
 
 object AssignedToMeTasksObserver {
@@ -19,7 +34,22 @@ object AssignedToMeTasksObserver {
     val taskToMe = _taskToMe.asStateFlow()
 
 
-
+    suspend fun taskDetails(taskId: String): Flow<TaskEntity> = flow {
+        DatabaseDocumentReader(
+            collection =TASKS_COLLECTION,
+            docId = taskId
+        ).readObservable(Task::class.java).collect { task ->
+            val taskToMe = TaskEntity(
+                id=task.taskId,
+                title = task.title,
+                description = task.description,
+                dueDate = task.dueTime,
+                assignerName = task.assignerId,
+                assigneePhone = task.assignerId
+            )
+            emit(taskToMe)
+        }
+    }
 
 
     init {

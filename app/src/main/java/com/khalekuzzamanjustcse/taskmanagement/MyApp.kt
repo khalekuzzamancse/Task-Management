@@ -5,6 +5,7 @@ import android.util.Log
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedToMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.friend_management.FriendShipObserver
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedByMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.user_managment.UsersObserver
 import com.khalekuzzamanjustcse.taskmanagement.notification.Notifier
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.device_contact.LocalContactsProvider
@@ -60,6 +61,11 @@ class BaseApplication : Application() {
         scope.launch {
             AuthManager.signedInUserPhone()?.let {
                 UsersObserver.subscribe(it)
+            }
+        }
+        scope.launch {
+            AuthManager.signedInUserPhone()?.let {
+                AssignedByMeTasksObserver.subscribe(it)
             }
         }
 

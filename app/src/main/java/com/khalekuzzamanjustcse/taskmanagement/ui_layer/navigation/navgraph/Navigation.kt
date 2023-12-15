@@ -1,11 +1,13 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,10 +19,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import com.khalekuzzamanjustcse.taskmanagement.DeepLink
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseDocumentReader
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedByMeTasksObserver
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedToMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskEntity
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.ScreenWithDrawer
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskFormManager
@@ -33,11 +42,12 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.frien
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friends.FriendListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friends.FriendListScreenViewModel
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.home.Home
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.MyOwnedTaskDetailsScreen
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskAssignedByMeDetails
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskDetailsScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskOwnedByMe
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.UserListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.UsersScreenViewModel
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -46,6 +56,7 @@ fun NavGraph(
 ) {
     val navController: NavHostController = rememberNavController()
     val navigationAction = NavigationActions(navController)
+    val scope = rememberCoroutineScope()
     var drawerState by remember {
         mutableStateOf(DrawerState(DrawerValue.Closed))
     }
@@ -66,13 +77,17 @@ fun NavGraph(
     val onTaskDetailsOpen: (TaskEntity) -> Unit = { task ->
         taskToOpen = task
 //        Log.d("onTaskDetailsOpen", "$task")
-//        navigationAction.navigateTo("MyTaskDetails/${task.id}")
-        navigationAction.navigateTo("MyTaskDetails")
+        navigationAction.navigateTo("MyTaskDetails/${task.id}")
+        // navigationAction.navigateTo("MyTaskDetails")
     }
 
-    var myOwnedTaskToOpen: TaskOwnedByMe? = remember { null }
+    var myOwnedTaskToOpen: TaskOwnedByMe? by remember { mutableStateOf(null) }
     val onMyOwnedTaskOpenDetail: (TaskOwnedByMe) -> Unit = { task ->
-        myOwnedTaskToOpen = task
+        scope.launch {
+            AssignedByMeTasksObserver.taskDetails(task.taskId).collect {
+                myOwnedTaskToOpen = it
+            }
+        }
         navigationAction.navigateTo(Screen.MyOwnedTaskDetails.route)
     }
 
@@ -82,7 +97,7 @@ fun NavGraph(
 
 
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+
 
     val isLogin = AuthManager.loggedIn.collectAsState().value
 
@@ -228,39 +243,37 @@ fun NavGraph(
             }
 
         }
-
         composable(
-            //  route = "Screen.MyTaskDetails.route",
-//            route = "MyTaskDetails/{taskId}",
-//            deepLinks = listOf(navDeepLink { uriPattern = "${DeepLink.DEEP_LINK_URL}/{taskId}" }),
-//            arguments = listOf(navArgument("taskId") { type = NavType.StringType })
-            route = "MyTaskDetails",
+            route = "MyTaskDetails/{taskId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "${DeepLink.DEEP_LINK_URL}/{taskId}" }),
+            arguments = listOf(navArgument("taskId") { type = NavType.StringType })
         ) { navBackStackEntry ->
 
-//            var details by remember {
-//                mutableStateOf<TaskEntity?>(null)
-//            }
+            var details by remember {
+                mutableStateOf<TaskEntity?>(null)
+            }
 //            //finding task by id ,then passing to the details screen
-//            LaunchedEffect(Unit) {
-//                val taskId = navBackStackEntry.arguments?.getString("taskId")
-//                TaskTable().getTasks().collect { tasks ->
-//                    details = tasks.find { it.id == taskId }
-//                }
-//
-//            }
-//            details?.let { task ->
-//                TaskDetailsScreen(task = task, onClose = onTaskDetailsClose)
-//            }
-            taskToOpen?.let { task ->
+            LaunchedEffect(Unit) {
+                val taskId = navBackStackEntry.arguments?.getString("taskId")
+                if (taskId != null) {
+                    AssignedToMeTasksObserver.taskDetails(taskId).collect {
+                        details = it
+                    }
+                }
+            }
+            details?.let { task ->
                 TaskDetailsScreen(task = task, onClose = onTaskDetailsClose)
             }
+//            taskToOpen?.let { task ->
+//                TaskDetailsScreen(task = task, onClose = onTaskDetailsClose)
+//            }
 
         }
         composable(
             route = Screen.MyOwnedTaskDetails.route,
         ) {
             myOwnedTaskToOpen?.let {
-                MyOwnedTaskDetailsScreen(it, onClose = {
+                TaskAssignedByMeDetails(it, onClose = {
                     navController.popBackStack()
                 })
             }
