@@ -1,17 +1,16 @@
-package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.home
+package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskEntity
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskAssignedToMe
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.MyTaskCard
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.MyTaskViewModel
 
 @Composable
 fun TasksAssignedToMeScreen(
     viewModel: MyTaskViewModel,
-    items:List<TaskEntity>,
-    onTaskClick: (TaskEntity)->Unit={}
+    items:List<TaskAssignedToMe>,
+    onTaskClick: (TaskAssignedToMe)->Unit={}
 ) {
 
 

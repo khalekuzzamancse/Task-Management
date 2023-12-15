@@ -14,26 +14,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskEntity
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskAssignedToMe
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.CommonScreen
 
 @Preview
 @Composable
 fun TaskDetailsPreview() {
-    val task =
-        TaskEntity(
-            title = "Task 2",
-            description = "Description for Task 2",
-        )
-    TaskDetailsScreen(
-        task = task,
-        onClose = {}
-    )
+//    val task =
+//        TaskEntity(
+//            title = "Task 2",
+//            description = "Description for Task 2",
+//        )
+//    TaskDetailsScreen(
+//        task = task,
+//        onClose = {}
+//    )
 }
 
 @Composable
 fun TaskDetailsScreen(
-    task: TaskEntity,
+    task: TaskAssignedToMe,
     onClose: () -> Unit,
 ) {
 

@@ -2,20 +2,22 @@ package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_t
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskEntity
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskAssignedToMe
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskUpdater
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MyTaskViewModel : ViewModel() {
     //Handling tasks
-    private val _tasks = MutableStateFlow(emptyList<TaskEntity>())
+    private val _tasks = MutableStateFlow(emptyList<TaskAssignedToMe>())
     val tasks = _tasks.asStateFlow()
-    private val _currentOpenTask = MutableStateFlow<TaskEntity?>(null)
+    private val _currentOpenTask = MutableStateFlow<TaskAssignedToMe?>(null)
     val currentOpenTask = _currentOpenTask.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
-    fun onLongClick(task: TaskEntity) {
+    fun onLongClick(task: TaskAssignedToMe) {
         _currentOpenTask.value = task
     }
 
@@ -23,12 +25,20 @@ class MyTaskViewModel : ViewModel() {
         _currentOpenTask.value = null
     }
 
-    fun onCheckChanged(task: TaskEntity, checked: Boolean) {
+    fun onCheckChanged(task: TaskAssignedToMe, checked: Boolean) {
+
         viewModelScope.launch {
+            val myUserId = AuthManager.signedInUserPhone()
+            myUserId?.let {
+               TaskUpdater().markAsComplete(
+                    myUserId = myUserId,
+                    taskId = task.taskId
+                )
+            }
+
         }
 
     }
-
 
 
 }

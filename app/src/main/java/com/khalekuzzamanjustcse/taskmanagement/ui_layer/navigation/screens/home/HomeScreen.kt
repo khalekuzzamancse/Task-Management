@@ -31,11 +31,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.FirebaseFireStore
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskEntity
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskAssignedToMe
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedByMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedToMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.MyTaskViewModel
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskOwnedByMe
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TasksAssignedToMeScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TasksOwnedByMe
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.theme.TaskManagementTheme
 
@@ -54,7 +55,7 @@ fun Home(
     openDrawer: () -> Unit = {},
     onLogOut: () -> Unit = {},
     onMyOwnedTaskOpenDetail: (TaskOwnedByMe) -> Unit,
-    onTaskDetailsOpen: (TaskEntity) -> Unit = {},
+    onTaskDetailsOpen: (TaskAssignedToMe) -> Unit = {},
 ) {
 
 

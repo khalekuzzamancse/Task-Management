@@ -1,6 +1,5 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
@@ -27,10 +26,9 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.khalekuzzamanjustcse.taskmanagement.DeepLink
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.AuthManager
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseDocumentReader
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedByMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedToMeTasksObserver
-import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskEntity
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskAssignedToMe
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.ScreenWithDrawer
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskFormManager
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskViewModel
@@ -73,11 +71,11 @@ fun NavGraph(
         navigationAction.navigateTo(Screen.Task.route)
     }
 
-    var taskToOpen: TaskEntity? = remember { null }
-    val onTaskDetailsOpen: (TaskEntity) -> Unit = { task ->
+    var taskToOpen: TaskAssignedToMe? = remember { null }
+    val onTaskDetailsOpen: (TaskAssignedToMe) -> Unit = { task ->
         taskToOpen = task
 //        Log.d("onTaskDetailsOpen", "$task")
-        navigationAction.navigateTo("MyTaskDetails/${task.id}")
+        navigationAction.navigateTo("MyTaskDetails/${task.taskId}")
         // navigationAction.navigateTo("MyTaskDetails")
     }
 
@@ -250,7 +248,7 @@ fun NavGraph(
         ) { navBackStackEntry ->
 
             var details by remember {
-                mutableStateOf<TaskEntity?>(null)
+                mutableStateOf<TaskAssignedToMe?>(null)
             }
 //            //finding task by id ,then passing to the details screen
             LaunchedEffect(Unit) {

@@ -1,6 +1,5 @@
 package com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment
 
-import com.google.firebase.firestore.DocumentId
 import com.khalekuzzamanjustcse.taskmanagement.BaseApplication
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseCollectionReader
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.DatabaseDocumentReader
@@ -12,14 +11,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
-data class TaskEntity @JvmOverloads constructor(
-    @DocumentId val id: String = "",
-    val title: String = "",
-    val description: String = "",
-    val assignerName: String = "",
-    val assigneePhone: String = "",
-    val dueDate: String = "",
-    val notified: Boolean = false,
+data class TaskAssignedToMe(
+    val taskId: String,
+    val title: String,
+    val description: String,
+    val assignerName: String,
+    val assigneePhone: String,
+    val dueDate: String,
     val complete: Boolean = false
 )
 
@@ -27,20 +25,20 @@ data class TaskEntity @JvmOverloads constructor(
 object AssignedToMeTasksObserver {
     private const val TASKS_COLLECTION = "NewTaks"
     private const val STATE_CREATED_NOT_NOTIFIED = 1
-   // private const val STATE_COMPLETED_NOT_NOTIFIED = 3
+    // private const val STATE_COMPLETED_NOT_NOTIFIED = 3
 
     private val _taskEntities = MutableStateFlow(emptyList<Task>())
-    private val _taskToMe = MutableStateFlow(emptyList<TaskEntity>())
+    private val _taskToMe = MutableStateFlow(emptyList<TaskAssignedToMe>())
     val taskToMe = _taskToMe.asStateFlow()
 
 
-    suspend fun taskDetails(taskId: String): Flow<TaskEntity> = flow {
+    suspend fun taskDetails(taskId: String): Flow<TaskAssignedToMe> = flow {
         DatabaseDocumentReader(
-            collection =TASKS_COLLECTION,
+            collection = TASKS_COLLECTION,
             docId = taskId
         ).readObservable(Task::class.java).collect { task ->
-            val taskToMe = TaskEntity(
-                id=task.taskId,
+            val taskToMe = TaskAssignedToMe(
+                taskId = task.taskId,
                 title = task.title,
                 description = task.description,
                 dueDate = task.dueTime,
@@ -51,31 +49,34 @@ object AssignedToMeTasksObserver {
         }
     }
 
+    private fun onUpdateTaskEntities(myUserId: String, tasks: List<Task>) {
+        _taskEntities.value = tasks
+        updateTaskToMe(myUserId, tasks)
+    }
 
-    init {
-        val scope = CoroutineScope(Dispatchers.Main)
-        scope.launch {
-            _taskEntities.collect { tasks ->
-                _taskToMe.value = tasks.map { task ->
-                    val res = TaskEntity(
-                        id=task.taskId,
-                        title = task.title,
-                        description = task.description,
-                        dueDate = task.dueTime,
-                        assignerName = task.assignerId,
-                        assigneePhone = "11"
-                    )
-                    notifyNewTasks(task)
-
-                    res
-
-
-                }
-
-            }
+    private fun updateTaskToMe(myUserId: String, tasks: List<Task>) {
+        _taskToMe.value = tasks.map { task ->
+            val res = TaskAssignedToMe(
+                taskId = task.taskId,
+                title = task.title,
+                description = task.description,
+                dueDate = task.dueTime,
+                assignerName = task.assignerId,
+                assigneePhone = "11",
+                complete = isTaskCompleted(myUserId, task.assignedUsers)
+            )
+            notifyNewTasks(task)
+            res
         }
 
+    }
 
+    private fun isTaskCompleted(myUserId: String, assignees: List<AssignedUser>): Boolean {
+        val assignee = assignees.find { it.userId == myUserId }
+        assignee?.let {
+            return it.state >= 3
+        }
+        return false
     }
 
     private fun notifyNewTasks(task: Task) {
@@ -94,8 +95,9 @@ object AssignedToMeTasksObserver {
         DatabaseCollectionReader(collection = TASKS_COLLECTION)
             .readObservable(Task::class.java)
             .collect { tasks ->
-                _taskEntities.value =
-                    tasks.filter { isTaskAssignedToMe(signedInUserId, it.assignedUsers) }
+                onUpdateTaskEntities(
+                    signedInUserId,
+                    tasks.filter { isTaskAssignedToMe(signedInUserId, it.assignedUsers) })
             }
     }
 

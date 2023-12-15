@@ -59,7 +59,8 @@ fun MyTaskCard(
             Checkbox(
                 checked = checked,
                 onCheckedChange = onCheckedChanged,
-                modifier = Modifier.align(Alignment.Top)
+                modifier = Modifier.align(Alignment.Top),
+                enabled = !checked
             )
         }
 
