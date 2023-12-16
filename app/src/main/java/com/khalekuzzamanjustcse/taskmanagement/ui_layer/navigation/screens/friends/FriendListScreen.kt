@@ -1,10 +1,7 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friends
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,9 +17,24 @@ import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.MyFriend
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.GenericListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.ProfileImage
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.SelectedProfileImage
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.UserInfoCard
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.User
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.generic_screen.GenericListComposable
+
+@Composable
+fun FriendList(
+    modifier: Modifier,
+    friends: List<MyFriend>,
+) {
+    GenericListComposable(
+        modifier = modifier
+//            .fillMaxSize()
+//            .padding(start = 16.dp, end = 16.dp)
+        ,
+        items = friends,
+        itemContent = { myFriend ->
+            FriendInfoCard(name = myFriend.name, phone = myFriend.phone)
+        })
+
+}
 
 
 @Composable
@@ -31,7 +43,7 @@ fun FriendListScreen(
     onNavIconClicked: () -> Unit,
 ) {
     GenericListScreen(
-        items = viewModel.users.collectAsState().value,
+        items = viewModel.myFriends.collectAsState().value,
         isLoading = viewModel.isLoading.collectAsState().value,
         itemContent = { contact ->
             FriendInfoCard(name = contact.name, phone = contact.phone)

@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class FriendListScreenViewModel : ViewModel() {
     private val friends = MutableStateFlow<List<MyFriend>>(emptyList())
-    val users = friends.asStateFlow()
+    val myFriends = friends.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 

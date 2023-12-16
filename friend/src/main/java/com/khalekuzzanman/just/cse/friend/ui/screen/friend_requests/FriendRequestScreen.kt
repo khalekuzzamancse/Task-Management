@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.ProfileImage
+import com.khalekuzzanman.just.cse.friend.ui.screen.components.ProfileImage
 import com.khalekuzzanman.just.cse.friend.ui.screen.components.GenericListScreen
 
 data class FriendRequest(

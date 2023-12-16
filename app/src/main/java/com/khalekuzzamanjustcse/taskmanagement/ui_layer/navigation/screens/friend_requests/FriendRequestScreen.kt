@@ -1,6 +1,5 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friend_requests
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +15,39 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.khalekuzzamanjustcse.taskmanagement.data_layer.friend_management.FriendRequest
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.GenericListScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.ProfileImage
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.generic_screen.GenericListComposable
+
+@Composable
+fun FriendRequestList(
+    modifier: Modifier,
+    requests: List<FriendRequest>,
+    onAcceptRequest: (String) -> Unit,
+    onCancelRequest: (String) -> Unit,
+) {
+    GenericListComposable(
+        modifier = modifier
+//            .fillMaxSize()
+//            .padding(start = 16.dp, end = 16.dp)
+        ,
+        items = requests,
+        itemContent = { request ->
+            FriendRequestCard(
+                name = request.friendName,
+                phone = request.friendPhone,
+                isSentByMe = request.isSentByMe,
+                onAccept = {
+                    onAcceptRequest(request.friendShipId)
+                },
+                onCancel = {
+                    onCancelRequest(request.friendShipId)
+                }
+            )
+
+        })
+}
 
 
 @Composable
@@ -36,10 +66,10 @@ fun FriendRequestListScreen(
                 phone = request.friendPhone,
                 isSentByMe = request.isSentByMe,
                 onAccept = {
-                  onAcceptRequest(request.friendShipId)
+                    onAcceptRequest(request.friendShipId)
                 },
                 onCancel = {
-                   onCancelRequest(request.friendShipId)
+                    onCancelRequest(request.friendShipId)
                 }
             )
         },

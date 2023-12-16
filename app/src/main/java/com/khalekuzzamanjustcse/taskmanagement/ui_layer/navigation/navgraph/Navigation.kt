@@ -49,9 +49,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun NavGraph(
-
-) {
+fun NavGraph() {
     val navController: NavHostController = rememberNavController()
     val navigationAction = NavigationActions(navController)
     val scope = rememberCoroutineScope()

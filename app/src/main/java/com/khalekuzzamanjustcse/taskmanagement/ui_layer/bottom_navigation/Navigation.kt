@@ -1,4 +1,4 @@
-package com.khalekuzzanman.just.cse.friend.ui
+package com.khalekuzzamanjustcse.taskmanagement.ui_layer.bottom_navigation
 
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph.Screen
-import com.khalekuzzanman.just.cse.friend.ui.screen.friends.FriendListScreen
+
 
 
 fun NavGraphBuilder.userListGraph(
@@ -19,10 +19,7 @@ fun NavGraphBuilder.userListGraph(
         composable(
             route =Screen.Friends.route
         ) {
-            FriendListScreen(
-                friends = emptyList(),
-                onNavIconClicked = {}
-            )
+
         }
 
     }

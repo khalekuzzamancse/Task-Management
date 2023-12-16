@@ -15,7 +15,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "TaskManagement"
 include(":app")
-include(":auth")
-include(":task")
-include(":friend")
-include(":database")
+//include(":auth")
+//include(":task")
+//include(":friend")
+//
+//include(":database")
+//include(":database:firebase")

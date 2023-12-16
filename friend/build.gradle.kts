@@ -47,15 +47,17 @@ android {
 }
 
 dependencies {
+
+    implementation(project(mapOf("path" to ":database")))
     //permission library
     implementation ("com.google.accompanist:accompanist-permissions:0.29.2-rc")
     //
     implementation("androidx.navigation:navigation-compose:2.7.4")
-    implementation("com.google.firebase:firebase-auth:22.2.0")
-    implementation("com.google.firebase:firebase-firestore:24.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui-graphics")
+    implementation(project(mapOf("path" to ":app")))
+
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
 
     val composeBom = platform("androidx.compose:compose-bom:2023.10.01")

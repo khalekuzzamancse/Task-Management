@@ -24,9 +24,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.ProfileImage
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph.Screen
 
+@Preview
+@Composable
+fun BottomNavPreview() {
+    ContactScreens{
+
+    }
+}
 
 @Composable
 fun ContactScreens(
