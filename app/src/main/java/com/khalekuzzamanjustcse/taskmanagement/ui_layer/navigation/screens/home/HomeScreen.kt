@@ -102,14 +102,14 @@ fun Home(
             Spacer(modifier = Modifier.height(16.dp))
             TasksOwnedByMe(
                 tasks = AssignedByMeTasksObserver._taskOwnedByMe.collectAsState().value,
-                onOpenDetails =onMyOwnedTaskOpenDetail
+                onOpenDetails ={
+                }
             )
             TasksAssignedToMeScreen(
-                viewModel,
                 items = AssignedToMeTasksObserver.taskToMe.collectAsState().value,
                 onTaskClick = { myTask ->
-                    viewModel.onLongClick(myTask)
-                    onTaskDetailsOpen(myTask)
+//                    viewModel.onLongClick(myTask)
+//                    onTaskDetailsOpen(myTask)
                 }
             )
 

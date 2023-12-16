@@ -1,10 +1,7 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -13,8 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -29,24 +24,15 @@ import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.Assigne
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedToMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskAssignedToMe
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.ScreenWithDrawer
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskFormManager
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskViewModel
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.TaskCreationScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friend_requests.FriendRequestListScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friend_requests.FriendRequestScreenViewModel
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friends.FriendListScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friends.FriendListScreenViewModel
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.home.Home
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskAssignedByMeDetails
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskDetailsScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskOwnedByMe
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.UserListScreen
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.users.UsersScreenViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun NavGraphOld() {
+fun NavGraph() {
     val navController: NavHostController = rememberNavController()
     val navigationAction = NavigationActions(navController)
     val scope = rememberCoroutineScope()
@@ -131,111 +117,28 @@ fun NavGraphOld() {
 
         }
 
-        composable(route = Screen.Contact.route) {
-
+        composable(route = Screen.Connections.route) {
             ScreenWithDrawer(
                 drawerState = drawerState,
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
                 FriendShipNavGraph(onBackToPrevious =openDrawer)
-//                val viewModel = remember {
-//                    DeviceContactViewModel(context)
-//                }
-//                ContactScreen(
-//                    viewModel = viewModel,
-//                    onNavIconClicked = openDrawer,
-//                )
             }
 
         }
-        composable(route = Screen.Connections.route) {
-            rememberCoroutineScope()
+        composable(route = Screen.ToDO.route) {
             ScreenWithDrawer(
                 drawerState = drawerState,
                 closeDrawer = onCloseDrawer,
                 onDrawerItemClick = onDrawerItemClick
             ) {
-                val viewModel = remember {
-                    UsersScreenViewModel(context.contentResolver)
-                }
-
-                UserListScreen(
-                    users = viewModel.users.collectAsState().value,
-                    isLoading = viewModel.isLoading.collectAsState().value,
-                    onFriendRequestSent = viewModel::onFriendRequestSent
-                )
+                TaskNavGraph()
             }
 
         }
 
-        composable(route = Screen.FriendRequest.route) {
-            ScreenWithDrawer(
-                drawerState = drawerState,
-                closeDrawer = onCloseDrawer,
-                onDrawerItemClick = onDrawerItemClick
-            ) {
-                val viewModel = remember {
-                    FriendRequestScreenViewModel()
-                }
 
-                FriendRequestListScreen(
-                    viewModel = viewModel,
-                    onAcceptRequest = viewModel::acceptFriendRequest,
-                    onCancelRequest = {},
-                ) {
-
-                }
-
-            }
-
-        }
-        composable(route = Screen.Friends.route) {
-            ScreenWithDrawer(
-                drawerState = drawerState,
-                closeDrawer = onCloseDrawer,
-                onDrawerItemClick = onDrawerItemClick
-            ) {
-
-                val viewModel = remember {
-                    FriendListScreenViewModel()
-                }
-
-                FriendListScreen(
-                    viewModel = viewModel,
-                    onNavIconClicked = {
-                        navController.popBackStack()
-                    },
-                )
-
-            }
-
-        }
-
-        composable(route = Screen.TaskCreate.route) {
-            val containerColor = MaterialTheme.colorScheme.surface
-            val viewModel = remember {
-                CreateTaskViewModel(CreateTaskFormManager(containerColor)) { msg ->
-                    showToast(context, msg)
-                }
-            }
-            val showProgressBar = viewModel.showProgressbar.collectAsState().value
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                TaskCreationScreen(
-                    viewModel,
-                    onBackArrowClick = {
-                        navController.popBackStack()
-                    })
-                if (showProgressBar) {
-                    ProgressBar()
-                }
-
-            }
-
-        }
         composable(
             route = "MyTaskDetails/{taskId}",
             deepLinks = listOf(navDeepLink { uriPattern = "${DeepLink.DEEP_LINK_URL}/{taskId}" }),
@@ -262,17 +165,7 @@ fun NavGraphOld() {
 //            }
 
         }
-        composable(
-            route = Screen.MyOwnedTaskDetails.route,
-        ) {
-            myOwnedTaskToOpen?.let {
-                TaskAssignedByMeDetails(it, onClose = {
-                    navController.popBackStack()
-                })
-            }
 
-
-        }
 
     }
 }

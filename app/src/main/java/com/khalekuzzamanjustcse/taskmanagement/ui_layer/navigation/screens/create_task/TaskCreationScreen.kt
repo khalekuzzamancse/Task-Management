@@ -50,7 +50,7 @@ fun TaskScreenPreview() {
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {
-        TaskScreen(viewModel)
+        TaskCreationScreen(viewModel)
         ProgressBar()
     }
 
@@ -100,11 +100,10 @@ class CreateTaskFormManager(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskScreen(
+fun TaskCreationScreen(
     viewModel: CreateTaskViewModel,
     onBackArrowClick: () -> Unit = {},
 ) {
-
 
     val formManager = remember {
         viewModel.formManager

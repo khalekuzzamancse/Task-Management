@@ -22,8 +22,8 @@ sealed  class Screen {
         override val route = "Contact"
     }
 
-    data object Users : Screen() {
-        override val route = "Users"
+    data object Connections : Screen() {
+        override val route = "Connections"
     }
 
 
@@ -34,16 +34,23 @@ sealed  class Screen {
     data object Friends : Screen() {
         override val route = "Friends"
     }
-    data object Task : Screen() {
+    data object TaskCreate : Screen() {
         override val route = "Task"
     }
-    data object MyTask : Screen() {
-        override val route = "MyTask"
+    data object TasksByMe : Screen() {
+        override val route = "TasksByMe"
+    }
+    data object TasksToMe : Screen() {
+        override val route = "TasksToMe"
+    }
+    data object ToDO : Screen() {
+        override val route = "ToDO"
     }
 
-    data object MyTaskDetails : Screen() {
-        override val route = "MyTaskDetails"
+    data object TaskByMeDetails : Screen() {
+        override val route = "TaskByMeDetails"
     }
+
     data object MyOwnedTaskDetails : Screen() {
         override val route = "MyOwnedTaskDetails"
     }

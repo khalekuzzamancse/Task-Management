@@ -31,6 +31,43 @@ fun TaskDetailsPreview() {
 //    )
 }
 
+
+@Composable
+fun TaskToMeDetailsScreen(
+    task: TaskAssignedToMe,
+) {
+        Column(
+            modifier = Modifier
+                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize()
+        ) {
+            Text(
+                text = task.title,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Assigned by : ${task.assignerName}",
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = task.dueDate,
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = task.description,
+            )
+        }
+
+}
+
+
 @Composable
 fun TaskDetailsScreen(
     task: TaskAssignedToMe,

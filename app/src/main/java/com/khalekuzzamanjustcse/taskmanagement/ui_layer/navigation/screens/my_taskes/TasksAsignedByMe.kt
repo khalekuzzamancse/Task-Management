@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.generic_screen.GenericListComposable
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.CommonScreen
 
 data class TaskDoer(
@@ -33,7 +34,25 @@ data class TaskOwnedByMe(
     val dueDate: String,
     val doers: List<TaskDoer>
 )
+@Composable
+fun TaskByMeList(
+    modifier: Modifier = Modifier,
+    tasks: List<TaskOwnedByMe>,
+    onDetailsRequest: (TaskOwnedByMe) -> Unit,
+) {
+    GenericListComposable(
+        modifier = modifier,
+        items = tasks,
+        itemContent = { task ->
+            MyOwnedTask(
+                title = task.title,
+                dueDate = task.dueDate,
+                onClick = { onDetailsRequest(task) }
+            )
+        }
+    )
 
+}
 
 
 @Composable
@@ -41,6 +60,8 @@ fun TasksOwnedByMe(
     tasks: List<TaskOwnedByMe>,
     onOpenDetails: (TaskOwnedByMe) -> Unit = {}
 ) {
+
+
     LazyColumn {
         items(tasks) { task ->
             MyOwnedTask(

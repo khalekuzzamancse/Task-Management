@@ -44,7 +44,7 @@ fun ContactScreenNavGraph() {
         startDestination = Screen.Home.route
     ) {
 
-        composable(route = Screen.Users.route) {
+        composable(route = Screen.Connections.route) {
             ScreenWithDrawer(
                 drawerState = drawerState,
                 closeDrawer = onCloseDrawer,

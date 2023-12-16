@@ -21,19 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.bottom_navigation.BottomNavBar
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.bottom_navigation.BottomNavigationItem
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.bottom_navigation.items
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph.Screen
 
 
 @Preview
 @Composable
 fun GenericScreenPreview() {
-    GenericScreen(
+    TopNBottomBarDecorator(
         screenTitle = "Demo",
         topBarNavIcon = Icons.AutoMirrored.Filled.ArrowBack,
         onTopBarNavIconClicked = {},
@@ -48,7 +44,7 @@ fun GenericScreenPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GenericScreen(
+fun TopNBottomBarDecorator(
     screenTitle: String,
     topBarNavIcon: ImageVector?,
     onTopBarNavIconClicked: () -> Unit,

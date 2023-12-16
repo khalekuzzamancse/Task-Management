@@ -40,7 +40,7 @@ fun ReplaceAbleContentScreenPreview() {
 
     }
 
-    GenericScreen(
+    TopNBottomBarDecorator(
         screenTitle = "Demo",
         topBarNavIcon = Icons.AutoMirrored.Filled.ArrowBack,
         onTopBarNavIconClicked = {},

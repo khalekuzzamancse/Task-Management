@@ -23,7 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.bottom_navigation.BottomNavigationItem
-import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.generic_screen.GenericScreen
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.generic_screen.TopNBottomBarDecorator
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friend_requests.FriendRequestList
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friend_requests.FriendRequestScreenViewModel
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.friends.FriendList
@@ -57,26 +57,26 @@ val friendshipDestinations = listOf(
 @Preview
 @Composable
 fun FriendShipNavGraphPreview() {
-    val navController= rememberNavController()
-    val navigateTo:(Screen)->Unit={
+    val navController = rememberNavController()
+    val navigateTo: (Screen) -> Unit = {
         navController.navigate(it.route)
     }
-    val navigateBack:()->Unit={
+    val navigateBack: () -> Unit = {
 
     }
     FriendShipNavGraph(
-        navController=navController,
-        onNavigationRequest = navigateTo,
         onBackToPrevious = navigateBack
     )
 }
 
 @Composable
 fun FriendShipNavGraph(
-    navController: NavHostController,
-    onNavigationRequest:(Screen)->Unit,
-    onBackToPrevious:()->Unit
+    onBackToPrevious: () -> Unit
 ) {
+    val navController = rememberNavController()
+    val onNavigationRequest: (Screen) -> Unit = {
+        navController.navigate(it.route)
+    }
     var bottomNavItemSelectedItemIndex by remember {
         mutableIntStateOf(0)
     }
@@ -90,24 +90,25 @@ fun FriendShipNavGraph(
 
         // Now you can use previousBottomNavItemSelectedItemIndex to access the previous index
         when (index) {
-            0 ->{
-                onNavigationRequest(Screen.Users)
-                showTopNavigation=true
+            0 -> {
+                onNavigationRequest(Screen.Connections)
+                showTopNavigation = true
             }
+
             1 -> {
                 onNavigationRequest(Screen.Friends)
-                showTopNavigation=false
+                showTopNavigation = false
             }
 
             2 -> {
                 onNavigationRequest(Screen.FriendRequest)
-                showTopNavigation=false
+                showTopNavigation = false
             }
         }
     }
-    GenericScreen(
+    TopNBottomBarDecorator(
         screenTitle = "FriendShip",
-        topBarNavIcon = if(showTopNavigation) Icons.AutoMirrored.Filled.ArrowBack else null,
+        topBarNavIcon = if (showTopNavigation) Icons.AutoMirrored.Filled.ArrowBack else null,
         onTopBarNavIconClicked = {
             onBackToPrevious()
         },
@@ -120,6 +121,7 @@ fun FriendShipNavGraph(
 
 }
 
+
 @Composable
 fun FriendShipNavGraph(
     modifier: Modifier,
@@ -130,10 +132,10 @@ fun FriendShipNavGraph(
         modifier = modifier,
         navController = navController,
         route = "DemoNavGraph",
-        startDestination = Screen.Users.route
+        startDestination = Screen.Connections.route
     ) {
 
-        composable(route = Screen.Users.route) {
+        composable(route = Screen.Connections.route) {
             val viewModel = remember {
                 UsersScreenViewModel(context.contentResolver)
             }
@@ -149,7 +151,8 @@ fun FriendShipNavGraph(
             }
             FriendList(
                 modifier = Modifier,
-                friends = viewModel.myFriends.collectAsState().value)
+                friends = viewModel.myFriends.collectAsState().value
+            )
         }
         composable(route = Screen.FriendRequest.route) {
             val viewModel = remember {

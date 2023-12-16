@@ -41,10 +41,10 @@ fun ContactScreens(
     navigateTo: (Screen) -> Unit
 ) {
     var currentScreen by remember {
-        mutableStateOf<Screen>(Screen.Users)
+        mutableStateOf<Screen>(Screen.Connections)
     }
     val navigationIcon =
-        if (currentScreen == Screen.Users) Icons.Filled.Menu else Icons.Filled.ArrowBack
+        if (currentScreen == Screen.Connections) Icons.Filled.Menu else Icons.Filled.ArrowBack
 
 
     Scaffold(
@@ -104,7 +104,7 @@ private fun ContactScreensBottomNavigation(navigateTo: (Screen) -> Unit) {
             selected = selected == 1,
             onClick = {
                 selected = 1
-                navigateTo(Screen.Users)
+                navigateTo(Screen.Connections)
             },
             icon = {
                 Icon(Icons.Filled.Contacts, null)

@@ -16,6 +16,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.CommonScreen
 
+@Composable
+fun TaskAssignedByMeDetails1(
+    modifier: Modifier= Modifier,
+    task: TaskOwnedByMe,
+) {
+        Column(
+            modifier = modifier
+                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize()
+        ) {
+            Text(
+                text = task.title,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Due Date :${task.dueDate}",
+                style = MaterialTheme.typography.labelSmall,
+                // modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = task.description,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Assignees",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            task.doers.forEach {
+                TaskDoerInfo(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    doer = it
+                )
+
+            }
+
+
+        }
+    }
+
 
 
 @Composable
