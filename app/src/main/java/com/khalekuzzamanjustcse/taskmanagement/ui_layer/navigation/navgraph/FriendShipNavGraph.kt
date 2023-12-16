@@ -1,20 +1,18 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph
 
-import androidx.compose.animation.scaleIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.PermIdentity
-import androidx.compose.material.icons.filled.Queue
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.PermIdentity
-import androidx.compose.material.icons.outlined.Queue
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -49,8 +47,8 @@ val friendshipDestinations = listOf(
     ),
     BottomNavigationItem(
         label = "Requests",
-        selectedIcon = Icons.Filled.Queue,
-        unselectedIcon = Icons.Outlined.Queue,
+        selectedIcon = Icons.Filled.PersonAdd,
+        unselectedIcon = Icons.Outlined.PersonAdd,
         hasNews = false,
         badgeCount = 45
     ),
@@ -63,9 +61,13 @@ fun FriendShipNavGraphPreview() {
     val navigateTo:(Screen)->Unit={
         navController.navigate(it.route)
     }
+    val navigateBack:()->Unit={
+
+    }
     FriendShipNavGraph(
         navController=navController,
-        onNavigationRequest = navigateTo
+        onNavigationRequest = navigateTo,
+        onBackToPrevious = navigateBack
     )
 }
 
@@ -73,23 +75,42 @@ fun FriendShipNavGraphPreview() {
 fun FriendShipNavGraph(
     navController: NavHostController,
     onNavigationRequest:(Screen)->Unit,
+    onBackToPrevious:()->Unit
 ) {
     var bottomNavItemSelectedItemIndex by remember {
         mutableIntStateOf(0)
     }
+    var showTopNavigation by remember {
+        mutableStateOf(true)
+    }
+
+
     val onItemSelected: (Int) -> Unit = { index ->
         bottomNavItemSelectedItemIndex = index
-        when (index) {
-            0 -> onNavigationRequest(Screen.Users)
-            1 -> onNavigationRequest(Screen.Friends)
-            2 -> onNavigationRequest(Screen.FriendRequest)
-        }
 
+        // Now you can use previousBottomNavItemSelectedItemIndex to access the previous index
+        when (index) {
+            0 ->{
+                onNavigationRequest(Screen.Users)
+                showTopNavigation=true
+            }
+            1 -> {
+                onNavigationRequest(Screen.Friends)
+                showTopNavigation=false
+            }
+
+            2 -> {
+                onNavigationRequest(Screen.FriendRequest)
+                showTopNavigation=false
+            }
+        }
     }
     GenericScreen(
         screenTitle = "FriendShip",
-        topBarNavIcon = Icons.AutoMirrored.Filled.ArrowBack,
-        onTopBarNavIconClicked = {},
+        topBarNavIcon = if(showTopNavigation) Icons.AutoMirrored.Filled.ArrowBack else null,
+        onTopBarNavIconClicked = {
+            onBackToPrevious()
+        },
         bottomNavigationItems = friendshipDestinations,
         bottomNavItemSelectedItemIndex = bottomNavItemSelectedItemIndex,
         onBottomNavItemSelected = onItemSelected
@@ -128,9 +149,7 @@ fun FriendShipNavGraph(
             }
             FriendList(
                 modifier = Modifier,
-                friends = viewModel.myFriends.collectAsState().value,
-
-                )
+                friends = viewModel.myFriends.collectAsState().value)
         }
         composable(route = Screen.FriendRequest.route) {
             val viewModel = remember {
@@ -139,7 +158,7 @@ fun FriendShipNavGraph(
             FriendRequestList(
                 modifier = Modifier,
                 requests = viewModel.requests.collectAsState().value,
-                onAcceptRequest = {},
+                onAcceptRequest = viewModel::acceptFriendRequest,
                 onCancelRequest = {}
             )
         }

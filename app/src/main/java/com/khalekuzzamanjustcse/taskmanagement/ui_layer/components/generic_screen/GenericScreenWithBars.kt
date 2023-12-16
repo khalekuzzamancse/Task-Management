@@ -30,7 +30,6 @@ import com.khalekuzzamanjustcse.taskmanagement.ui_layer.bottom_navigation.items
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph.Screen
 
 
-
 @Preview
 @Composable
 fun GenericScreenPreview() {
@@ -39,18 +38,19 @@ fun GenericScreenPreview() {
         topBarNavIcon = Icons.AutoMirrored.Filled.ArrowBack,
         onTopBarNavIconClicked = {},
         bottomNavigationItems = items,
-        bottomNavItemSelectedItemIndex=0,
-        onBottomNavItemSelected={}
-    ){
-        Text(modifier=it, text = "Place the Nav host here..")
+        bottomNavItemSelectedItemIndex = 0,
+        onBottomNavItemSelected = {}
+    ) {
+        Text(modifier = it, text = "Place the Nav host here..")
     }
 
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenericScreen(
     screenTitle: String,
-    topBarNavIcon: ImageVector,
+    topBarNavIcon: ImageVector?,
     onTopBarNavIconClicked: () -> Unit,
     bottomNavigationItems: List<BottomNavigationItem>,
     bottomNavItemSelectedItemIndex: Int,
@@ -62,9 +62,12 @@ fun GenericScreen(
             TopAppBar(
                 title = { Text(screenTitle) },
                 navigationIcon = {
-                    IconButton(onClick = onTopBarNavIconClicked) {
-                        Icon(imageVector = topBarNavIcon, contentDescription = null)
+                    if (topBarNavIcon != null) {
+                        IconButton(onClick = onTopBarNavIconClicked) {
+                            Icon(imageVector = topBarNavIcon, contentDescription = null)
+                        }
                     }
+
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
