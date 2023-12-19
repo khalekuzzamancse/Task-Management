@@ -1,7 +1,10 @@
 package com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.navgraph
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -10,6 +13,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -24,6 +29,9 @@ import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.Assigne
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedToMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskAssignedToMe
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.ScreenWithDrawer
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskFormManager
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.CreateTaskViewModel
+import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.create_task.TaskCreationScreen
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.home.Home
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskAssignedByMeDetails
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.TaskDetailsScreen
@@ -112,6 +120,30 @@ fun NavGraph() {
                     },
                     onMyOwnedTaskOpenDetail = onMyOwnedTaskOpenDetail
                 )
+
+            }
+
+        }
+        composable(route = Screen.TaskCreate.route) {
+            val containerColor = MaterialTheme.colorScheme.surface
+            val viewModel = remember {
+                CreateTaskViewModel(CreateTaskFormManager(containerColor)) { msg ->
+                    showToast(context, msg)
+                }
+            }
+            val showProgressBar = viewModel.showProgressbar.collectAsState().value
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                TaskCreationScreen(
+                    viewModel,
+                    onBackArrowClick = {
+                        navController.popBackStack()
+                    })
+                if (showProgressBar) {
+                    ProgressBar()
+                }
 
             }
 
