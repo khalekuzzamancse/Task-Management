@@ -4,7 +4,6 @@ androidx-activityCompose = "1.8.2"
 compose-plugin = "1.6.0-alpha01"
 kotlin = "1.9.21"
 voyager = "1.0.0"
-coil-compose = "2.2.2"
 ktor = "2.3.7"
 kamel = "0.8.3"
 [libraries]
@@ -20,6 +19,9 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 kamel = { module = "media.kamel:kamel-image", version.ref = "kamel" }
+
+
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="task-desktop">
+    <output-path>$PROJECT_DIR$/features/task/build/libs</output-path>
+    <root id="archive" name="task-desktop.jar">
+      <element id="module-output" name="TaskManagement.features.task.desktopMain" />
+    </root>
+  </artifact>
+</component>

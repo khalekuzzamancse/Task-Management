@@ -19,10 +19,9 @@ kotlin {
             dependencies {
                 implementation(compose.ui)
                 implementation(compose.material3)
-                implementation(compose.preview)
                 implementation(project(":features:common_ui"))
-                implementation(project(":features:task_creation"))
-                implementation(project(":features:task_graph"))
+                //for 2D graph
+                implementation("io.github.thechance101:chart:Beta-0.0.5")
             }
         }
 //        val androidMain by getting{
@@ -40,10 +39,11 @@ kotlin {
 
 }
 android {
-    namespace = "com.khalekuzzamanjustcse.taskmanagement.features.root_home"
+    namespace = "com.khalekuzzamanjustcse.taskmanagement.features.task_graph"
     compileSdk = 34
     defaultConfig {
         minSdk = 27
     }
 
 }
+

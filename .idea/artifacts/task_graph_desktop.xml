@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="task_graph-desktop">
+    <output-path>$PROJECT_DIR$/features/task_graph/build/libs</output-path>
+    <root id="archive" name="task_graph-desktop.jar">
+      <element id="module-output" name="TaskManagement.features.task_graph.desktopMain" />
+    </root>
+  </artifact>
+</component>

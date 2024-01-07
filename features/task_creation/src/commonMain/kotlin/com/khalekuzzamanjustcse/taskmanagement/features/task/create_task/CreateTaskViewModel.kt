@@ -13,12 +13,10 @@ val taskAssignedUserList: List<TaskAssignedUser> = listOf(
 
 class CreateTaskViewModel(
     val onShowToast: (message: String) -> Unit,
-    val scope: CoroutineScope
-
-) {
+    val scope: CoroutineScope) {
     companion object {
-        const val ENABLE_USER_SELECTION_MODE = true
-        const val DISABLE_USER_SELECTION_MODE = false
+      private  const val ENABLE_USER_SELECTION_MODE = true
+       private const val DISABLE_USER_SELECTION_MODE = false
     }
 
     private val _userSelectedMode = MutableStateFlow(false)
@@ -44,7 +42,7 @@ class CreateTaskViewModel(
 
     fun onCreateTaskConfirm() {
         _userSelectedMode.value = DISABLE_USER_SELECTION_MODE
-        println(formState.getCreatedTaskInfo())
+        println("${formState.getCreatedTaskInfo()}+\n+${getSelectedUsers()}")
     }
     fun onCreateTaskCancel() {
         _userSelectedMode.value = DISABLE_USER_SELECTION_MODE
@@ -56,6 +54,10 @@ class CreateTaskViewModel(
         tmp.removeAt(index)
         tmp.add(user.copy(selected = !user.selected))
         updateUsers(tmp)
+    }
+    fun getSelectedUsers():List<TaskAssignedUser>{
+        return _users.value.filter { it.selected }
+
     }
 
 
