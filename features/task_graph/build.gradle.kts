@@ -21,7 +21,6 @@ kotlin {
                 implementation(compose.material3)
                 implementation(project(":features:common_ui"))
                 //for 2D graph
-                implementation("io.github.thechance101:chart:Beta-0.0.5")
             }
         }
 //        val androidMain by getting{
