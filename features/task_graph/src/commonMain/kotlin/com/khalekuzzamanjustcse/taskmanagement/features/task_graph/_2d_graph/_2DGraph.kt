@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
@@ -23,8 +25,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun _2dGraph() {
-    val size = 16.dp
-    val numberModifier = Modifier.sizeIn(minWidth = size, minHeight = size).background(
+    val size = 8.dp
+    val size2 = 16.dp
+    val numberModifier = Modifier.sizeIn(minWidth = size2, minHeight = size2).background(
         Color.Green
     )
     _2DPlane(
@@ -78,6 +81,7 @@ fun CoordinatePoint(size: Dp) {
     Box(
         modifier = Modifier
             .size(size)
+            .clip(CircleShape)
             .background(Color.Blue).clickable { }
     )
 }
@@ -179,7 +183,9 @@ class PlacementUtils(
             val numbersOfGap=numberOfYValues-1
             val totalGap=numbersOfGap*gapBetweenValuePx
             val y = yAxisNumbersPlaceableList.reversed().take(numberOfYValues).sumOf { it.height }+totalGap
-            placeable.placeRelative(x = x, y = yAxisHeight-y)
+            val offsetY=yAxisNumbersPlaceableList[numberOfYValues-1].height/2
+            val offsetX=xAxisNumbersPlaceableList[numberOfXValues-1].width/2
+            placeable.placeRelative(x = x+offsetX, y = yAxisHeight-y+offsetY)
         }
     }
 
