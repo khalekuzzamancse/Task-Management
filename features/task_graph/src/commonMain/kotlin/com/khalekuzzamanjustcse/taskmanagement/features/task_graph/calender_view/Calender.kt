@@ -46,7 +46,7 @@ fun dummyData(): List<Day> {
     val dummyDays = (1..31).map { day ->
         Day(
             day = day,
-            tasksCount =Random.nextInt(3)
+            tasksCount = Random.nextInt(3)
         )
     }
     return dummyDays
@@ -56,18 +56,18 @@ fun dummyData(): List<Day> {
 fun _2dCalender() {
     CalenderComposable(
         days = dummyData(),
-        monthName = "January",
+        monthName = "January 2024",
     )
 
 }
 
 @Composable
 fun CalenderComposable(
-    monthName:String,
+    monthName: String,
     days: List<Day>,
-    onDayClick:(day:Int)->Unit={},
+    onDayClick: (day: Int) -> Unit = {},
 ) {
-    Column (
+    Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.primaryContainer)
             .border(
@@ -75,15 +75,15 @@ fun CalenderComposable(
                 color = Color.Black
             ),
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
+    ) {
         Text(
             text = monthName,
             style = MaterialTheme.typography.titleMedium,
 
-        )
+            )
         Spacer(Modifier.height(8.dp))
         Days(
-            days=days,
+            days = days,
             onDayClick = onDayClick
         )
     }
@@ -91,32 +91,32 @@ fun CalenderComposable(
 
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun Days(
     days: List<Day>,
-    onDayClick:(day:Int)->Unit={},
+    onDayClick: (day: Int) -> Unit = {},
 ) {
 
 
-        FlowRow(
-            modifier = Modifier
-                .padding( 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            days.forEachIndexed{index,item ->
-                    Day(
-                        day=item.day,
-                        badgeCount = item.tasksCount,
-                        onDayClick = onDayClick,
-                        visibilityDelay = (index+1)*100L
-                    )
-
-            }
-
+    FlowRow(
+        modifier = Modifier
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        days.forEachIndexed { index, item ->
+            Day(
+                day = item.day,
+                badgeCount = item.tasksCount,
+                onDayClick = onDayClick,
+                visibilityDelay = (index + 1) * 50L
+            )
 
         }
+
+
+    }
 
 
 }
@@ -129,41 +129,41 @@ private fun Day(
     visibilityDelay: Long,
     onDayClick: (day: Int) -> Unit = {},
 ) {
-    val primary=MaterialTheme.colorScheme.primary
+    val primary = MaterialTheme.colorScheme.primary
     var color by remember {
         mutableStateOf(primary)
     }
     var textColor by remember(color) {
-      mutableStateOf(  if (isColorDark(color)) Color.White else Color.Black)
+        mutableStateOf(if (isColorDark(color)) Color.White else Color.Black)
     }
-    var visibile by remember {
+    var visible by remember {
         mutableStateOf(false)
     }
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         delay(visibilityDelay)
-        visibile=true
+        visible = true
     }
 
-    LaunchedEffect(color){
-        delay(1000)
-        if (badgeCount>0){
-            color= Color(
+    LaunchedEffect(color) {
+        delay(5000)
+        if (badgeCount > 0) {
+            color = Color(
                 Random.nextInt(255),
                 Random.nextInt(255),
                 Random.nextInt(255),
 
-            )
-            textColor= if (isColorDark(color)) Color.White else Color.Black
+                )
+            textColor = if (isColorDark(color)) Color.White else Color.Black
 
         }
 
     }
 
     AnimatedVisibility(
-        visible = visibile,
+        visible = visible,
         enter = fadeIn() + expandVertically(),
         exit = fadeOut() + shrinkVertically()
-    ){
+    ) {
         Surface(
             shadowElevation = 8.dp,
             modifier = Modifier
@@ -171,14 +171,13 @@ private fun Day(
                 .clip(RoundedCornerShape(4.dp))
                 .clickable {
                     onDayClick(day)
-                }
-            ,
+                },
             color = color
         ) {
             BadgedBox(
                 modifier = Modifier.padding(8.dp).size(50.dp),
                 badge = {
-                    if (badgeCount>0){
+                    if (badgeCount > 0) {
                         Badge {
                             Text(text = "$badgeCount")
                         }
@@ -187,8 +186,9 @@ private fun Day(
                 }
             ) {
                 Text(
-                    text="$day",
-                    color=textColor)
+                    text = "$day",
+                    color = textColor
+                )
             }
 
 
@@ -197,6 +197,7 @@ private fun Day(
 
 
 }
+
 private fun isColorDark(color: Color): Boolean {
     val luminance = 0.299 * color.red + 0.587 * color.green + 0.114 * color.blue
     return luminance < 0.5
