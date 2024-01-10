@@ -5,9 +5,11 @@ import androidx.compose.ui.layout.Placeable
 class PlacementUtils(
     private val yAxisNumbersPlaceableList: List<Placeable>,
     private val xAxisNumbersPlaceableList: List<Placeable>,
+    private val yAxisLinePlaceable:Placeable,
+    private val xAxisLinePlaceable: Placeable,
     private val gapBetweenValuePx: Int
 ) {
-    private val yAxisWidth = yAxisNumbersPlaceableList.maxBy { it.width }.width
+    private val yAxisWidth = yAxisNumbersPlaceableList.maxBy { it.width }.width+yAxisLinePlaceable.width
     private val yAxisHeight = yAxisNumbersPlaceableList.sumOf { it.height } +
             (yAxisNumbersPlaceableList.size - 1) * gapBetweenValuePx
 
@@ -15,26 +17,31 @@ class PlacementUtils(
         pointsPlaceable: List<Placeable>,
         points: List<Point>
     ) {
-        pointsPlaceable.forEachIndexed { index, placeable ->
-            val numberOfYValues = points[index].y
-            val numberOfXValues = points[index].x
-            val numbersOfHorizontalGap = numberOfYValues - 1
+        pointsPlaceable.forEachIndexed { index, point ->
+            val pointY = points[index].y
+            val pointX = points[index].x
+            val numbersOfHorizontalGap = pointX-1
             val totalHorizontalGap = numbersOfHorizontalGap * gapBetweenValuePx
-            val x = xAxisNumbersPlaceableList.take(numberOfXValues)
-                .sumOf { it.width } + totalHorizontalGap
-            val numbersOfGap = numberOfYValues - 1
+            val x = yAxisWidth+xAxisNumbersPlaceableList.take(pointX-1).sumOf { it.width }+totalHorizontalGap
+
+            val numbersOfGap = pointY - 1
             val totalGap = numbersOfGap * gapBetweenValuePx
-            val y = yAxisNumbersPlaceableList.reversed().take(numberOfYValues)
-                .sumOf { it.height } + totalGap
-//            val offsetY = yAxisNumbersPlaceableList[numberOfYValues - 1].height / 2
-//            val offsetX = xAxisNumbersPlaceableList[numberOfXValues - 1].width / 2
-            val offsetY = 0
-            val offsetX = 0
-            placeable.placeRelative(x = x + offsetX, y = yAxisHeight - y + offsetY)
+            val y = yAxisNumbersPlaceableList.reversed().take(pointY).sumOf { it.height } + totalGap
+            val xAxisPointXThXValueWidth=xAxisNumbersPlaceableList[pointX - 1].width
+            val pointWidth =point.width
+            val widthDiff =xAxisPointXThXValueWidth-pointWidth
+            val offsetX=widthDiff/2
+            //
+            val yAxisPointYThValueHeight = yAxisNumbersPlaceableList[pointY - 1].height
+            val pointHeight =point.height
+            val heightDiff =yAxisPointYThValueHeight-pointHeight
+            val offsetY=heightDiff/2
+            //
+            point.placeRelative(x = x+offsetX, y = yAxisHeight - y+offsetY)
         }
     }
 
-    fun Placeable.PlacementScope.placeXAxisBar(xAxisLinePlaceable: Placeable) {
+    fun Placeable.PlacementScope.placeXAxisBar() {
         xAxisLinePlaceable.placeRelative(x = yAxisWidth, y = yAxisHeight)
     }
 
@@ -58,7 +65,7 @@ class PlacementUtils(
         }
     }
 
-    fun Placeable.PlacementScope.placeYAxisBar(yAxisLinePlaceable: Placeable) {
+    fun Placeable.PlacementScope.placeYAxisBar() {
         yAxisLinePlaceable.placeRelative(yAxisWidth, 0)
     }
 

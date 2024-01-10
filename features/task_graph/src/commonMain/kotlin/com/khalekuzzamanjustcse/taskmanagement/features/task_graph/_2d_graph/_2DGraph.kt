@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,9 +35,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun _2dGraph() {
     val pointSize = 8.dp
-    val size2 = 16.dp
+    val valueSize = 16.dp
     val sizePx = with(LocalDensity.current) { pointSize.toPx() }
-    val numberModifier = Modifier.sizeIn(minWidth = size2, minHeight = size2)
+    val numberModifier = Modifier.sizeIn(minWidth = valueSize, minHeight = valueSize).background(Color.Green)
     var pointsOffsets by remember { mutableStateOf(emptySet<Offset>()) }
     val onPositioned: (Offset) -> Unit = { offset ->
         val centerOffset = offset + Offset(sizePx / 2, sizePx / 2)
@@ -48,29 +49,29 @@ fun _2dGraph() {
         listOf(
             Point(x = 1, y = 1) {
                 CoordinatePoint(
-                    size = pointSize, onPositioned = {
-                        onPositioned(it)
-                    })
+                    size = pointSize,
+                    onPositioned ={onPositioned(it)} ,
+                )
+            },
+            Point(x = 2, y = 2) {
+                CoordinatePoint(
+                    size = pointSize,
+                    onPositioned ={onPositioned(it)} ,
+                )
             },
             Point(x = 3, y = 3) {
                 CoordinatePoint(
-                    size = pointSize, onPositioned = {
-                        onPositioned(it)
-                    })
+                    size = pointSize,
+                    onPositioned ={onPositioned(it)} ,
+                )
             },
-            Point(x = 5, y = 1) {
+            Point(x = 4, y =1 ) {
                 CoordinatePoint(
-                    size = pointSize, onPositioned = {
-                        onPositioned(it)
-                    })
-            },
+                    size = pointSize,
+                    onPositioned ={onPositioned(it)} ,
+                )
+            }
         )
-//            Point(x = 4, y = 7) {
-//                CoordinatePoint(
-//                    size = pointSize, onPositioned = {
-//                        onPositioned(it)
-//                    })
-//            },
     }
 
     _2DPlane(
@@ -128,6 +129,15 @@ fun addCurveBetweenPoints(path: Path, startPoint: Offset, endPoint: Offset) {
     path.apply {
         moveTo(startPoint.x, startPoint.y)
         val control = (startPoint + endPoint) / 2f
+        val isUpward=startPoint.y<endPoint.y
+        val isDownward=startPoint.y>endPoint.y
+        val bendingOffset=if(isUpward)
+            Offset(x=20f,y=-20f)
+        else if(isDownward)
+            Offset(-20f,-20f)
+        else
+            Offset(0f,0f)
+//        quadraticBezierTo(control.x+bendingOffset.x, control.y+bendingOffset.y, endPoint.x, endPoint.y)
         quadraticBezierTo(control.x, control.y, endPoint.x, endPoint.y)
     }
 }
@@ -144,8 +154,10 @@ fun Value(label: String, modifier: Modifier = Modifier) {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoordinatePoint(
+    label: String?=null,
     size: Dp,
     onPositioned: (Offset) -> Unit
 ) {
@@ -161,8 +173,13 @@ fun CoordinatePoint(
             }
             .onGloballyPositioned {
                 onPositioned(it.positionInParent())
-            }
-    )
+            },
+        contentAlignment = Alignment.Center
+    ){
+        if (label != null) {
+            Text(label)
+        }
+    }
 }
 
 @Composable
@@ -223,14 +240,16 @@ fun _2DPlane(
             val placementUtils = PlacementUtils(
                 yAxisNumbersPlaceableList = yAxisNumbersPlaceable,
                 xAxisNumbersPlaceableList = xAxisNumbersPlaceable,
-                gapBetweenValuePx = gapBetweenNumbersPx
+                gapBetweenValuePx = gapBetweenNumbersPx,
+                xAxisLinePlaceable = xAxisLinePlaceable,
+                yAxisLinePlaceable = yAxisLinePlaceable
             )
             //placings between
             placementUtils.run {
                 placeYCoordinates()
-                placeYAxisBar(yAxisLinePlaceable)
+                placeYAxisBar()
                 placeXAxisCoordinates()
-                placeXAxisBar(xAxisLinePlaceable)
+                placeXAxisBar()
                 placePoints(pointsPlaceable = pointsPlaceable, points = points)
             }
         })
