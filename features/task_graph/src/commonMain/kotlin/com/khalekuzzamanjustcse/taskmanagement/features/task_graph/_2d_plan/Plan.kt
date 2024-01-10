@@ -16,7 +16,7 @@ fun _2DPlane(
     xAxisNumbers: @Composable () -> Unit,
     xAxisLabel: @Composable () -> Unit,
     yAxisLabel: @Composable () -> Unit,
-    arrowHeadLengthPx: Int = 10,
+    arrowHeadLengthPx: Int,
 ) {
     val density = LocalDensity.current.density
     val gapBetweenNumbersPx = (gap.value * density).toInt()
@@ -49,7 +49,8 @@ fun _2DPlane(
         val xAxisLabelPlaceable = measureUtils.measureXAxisLabel(constraints)
         val yAxisLabelPlaceable = measureUtils.measureYAxisLabel(constraints)
 
-        layout(width = constraints.maxWidth, height = constraints.maxHeight, placementBlock
+
+        layout(width = 500, height = 500, placementBlock
         = {
             val placementUtils = PlanComponentPlacer(
                 ordinates = yAxisNumbersPlaceable,
