@@ -11,36 +11,98 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun _2dGraph() {
-    val size = 8.dp
+    val pointSize = 8.dp
     val size2 = 16.dp
-    val numberModifier = Modifier.sizeIn(minWidth = size2, minHeight = size2).background(
-        Color.Green
-    )
+    val sizePx = with(LocalDensity.current) { pointSize.toPx() }
+    val numberModifier = Modifier.sizeIn(minWidth = size2, minHeight = size2)
+    var pointsOffsets by remember { mutableStateOf(emptySet<Offset>()) }
+    val onPositioned: (Offset) -> Unit = { offset ->
+        val centerOffset = offset + Offset(sizePx / 2, sizePx / 2)
+        val tmpList = pointsOffsets.toMutableList()
+        tmpList.add(centerOffset)
+        pointsOffsets = tmpList.toSet()
+    }
+    val pointsComposable = remember {
+        listOf(
+            Point(x = 1, y = 1) {
+                CoordinatePoint(
+                    size = pointSize, onPositioned = {
+                        onPositioned(it)
+                    })
+            },
+            Point(x = 3, y = 3) {
+                CoordinatePoint(
+                    size = pointSize, onPositioned = {
+                        onPositioned(it)
+                    })
+            },
+            Point(x = 5, y = 1) {
+                CoordinatePoint(
+                    size = pointSize, onPositioned = {
+                        onPositioned(it)
+                    })
+            },
+        )
+//            Point(x = 4, y = 7) {
+//                CoordinatePoint(
+//                    size = pointSize, onPositioned = {
+//                        onPositioned(it)
+//                    })
+//            },
+    }
+
     _2DPlane(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(16.dp).drawBehind {
+            val path = Path()
+            if (pointsOffsets.size == pointsComposable.size) {
+                val points = pointsOffsets.toList()
+                val startPoint = pointsOffsets.first()
+                path.apply {
+                    moveTo(startPoint.x, startPoint.y)
+                    for (i in 1 until pointsOffsets.size) {
+                        addCurveBetweenPoints(
+                            path=path,
+                            startPoint=points[i-1],
+                            endPoint=points[i]
+                        )
+                    }
+                }
+                drawThePath(path)
+
+
+            }
+        },
         xAxisNumbers = {
             for (i in 1..8) {
-                Value(label = "$i",modifier = numberModifier)
+                Value(label = "$i", modifier = numberModifier)
             }
         },
         gap = 10.dp,
         yAxisNumbers = {
             for (i in 1..10) {
-                Value(label = "$i",modifier = numberModifier)
+                Value(label = "$i", modifier = numberModifier)
             }
         },
         yAxisLine = {
@@ -49,40 +111,57 @@ fun _2dGraph() {
         xAxisLine = {
             XAxisBar()
         },
-        points = listOf(
-            Point(x = 1, y = 1) { CoordinatePoint(size)},
-            Point(x = 2, y = 2) { CoordinatePoint(size)},
-            Point(x = 3, y = 3) { CoordinatePoint(size)},
-            Point(x = 4, y = 4) { CoordinatePoint(size)},
-            Point(x = 5, y = 5) { CoordinatePoint(size)},
-            Point(x = 6, y = 6) { CoordinatePoint(size)},
-            Point(x = 7, y = 7) { CoordinatePoint(size)},
-            Point(x = 8, y = 8) { CoordinatePoint(size)},
-
-
-        )
+        points = pointsComposable
     )
 
 }
+fun DrawScope.drawThePath(path: Path){
+    drawPath(
+        path = path,
+        style = Stroke(2f),
+        color = Color.Black
+
+    )
+}
+
+fun addCurveBetweenPoints(path: Path, startPoint: Offset, endPoint: Offset) {
+    path.apply {
+        moveTo(startPoint.x, startPoint.y)
+        val control = (startPoint + endPoint) / 2f
+        quadraticBezierTo(control.x, control.y, endPoint.x, endPoint.y)
+    }
+}
 
 @Composable
-fun Value(label: String, modifier: Modifier=Modifier) {
+fun Value(label: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
-    ){
+    ) {
         Text(text = label)
     }
 
 
 }
+
 @Composable
-fun CoordinatePoint(size: Dp) {
+fun CoordinatePoint(
+    size: Dp,
+    onPositioned: (Offset) -> Unit
+) {
+    var color by remember {
+        mutableStateOf(Color.Blue)
+    }
     Box(
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .background(Color.Blue).clickable { }
+            .background(color).clickable {
+                color = if (color == Color.Blue) Color.Red else Color.Blue
+            }
+            .onGloballyPositioned {
+                onPositioned(it.positionInParent())
+            }
     )
 }
 
@@ -107,12 +186,6 @@ fun XAxisBar() {
 }
 
 
-data class Point(
-    val x: Int,
-    val y: Int,
-    val content: @Composable () -> Unit,
-)
-
 @Composable
 fun _2DPlane(
     modifier: Modifier = Modifier,
@@ -127,7 +200,7 @@ fun _2DPlane(
     val gapBetweenNumbersPx = (gap.value * density).toInt()
 
     val pointsComposable = @Composable {
-        points.forEach {point-> point.content()}
+        points.forEach { point -> point.content() }
     }
     val contents = listOf(xAxisNumbers, yAxisNumbers, pointsComposable, yAxisLine, xAxisLine)
     Layout(modifier = modifier, contents = contents) { listOfMeasurableList, constraints ->
@@ -147,129 +220,25 @@ fun _2DPlane(
 
         layout(width = constraints.maxWidth, height = constraints.maxHeight, placementBlock
         = {
-                val placementUtils = PlacementUtils(
-                    yAxisNumbersPlaceableList = yAxisNumbersPlaceable,
-                    xAxisNumbersPlaceableList = xAxisNumbersPlaceable,
-                    gapBetweenValuePx = gapBetweenNumbersPx
-                )
-                //placings between
-                placementUtils.run {
-                    placeYCoordinates()
-                    placeYAxisBar(yAxisLinePlaceable)
-                    placeXAxisCoordinates()
-                    placeXAxisBar(xAxisLinePlaceable)
-                    placePoints(pointsPlaceable = pointsPlaceable, points = points)
-                }
-            })
-    }
-}
-
-class PlacementUtils(
-    private val yAxisNumbersPlaceableList: List<Placeable>,
-    private val xAxisNumbersPlaceableList: List<Placeable>,
-    private val gapBetweenValuePx: Int
-) {
-    private val yAxisWidth = yAxisNumbersPlaceableList.maxBy { it.width }.width
-    private val yAxisHeight = yAxisNumbersPlaceableList.sumOf { it.height } +
-            (yAxisNumbersPlaceableList.size - 1) * gapBetweenValuePx
-
-    fun Placeable.PlacementScope.placePoints(pointsPlaceable: List<Placeable>, points: List<Point>) {
-        pointsPlaceable.forEachIndexed { index, placeable ->
-            val numberOfYValues = points[index].y
-            val numberOfXValues = points[index].x
-            val numbersOfHorizontalGap=numberOfYValues-1
-            val totalHorizontalGap=numbersOfHorizontalGap*gapBetweenValuePx
-            val x = xAxisNumbersPlaceableList.take(numberOfXValues).sumOf { it.width } + totalHorizontalGap
-            val numbersOfGap=numberOfYValues-1
-            val totalGap=numbersOfGap*gapBetweenValuePx
-            val y = yAxisNumbersPlaceableList.reversed().take(numberOfYValues).sumOf { it.height }+totalGap
-            val offsetY=yAxisNumbersPlaceableList[numberOfYValues-1].height/2
-            val offsetX=xAxisNumbersPlaceableList[numberOfXValues-1].width/2
-            placeable.placeRelative(x = x+offsetX, y = yAxisHeight-y+offsetY)
-        }
-    }
-
-    fun Placeable.PlacementScope.placeXAxisBar(xAxisLinePlaceable: Placeable) {
-        xAxisLinePlaceable.placeRelative(x = yAxisWidth, y = yAxisHeight )
-    }
-
-    fun Placeable.PlacementScope.placeXAxisCoordinates() {
-        var totalWidth = yAxisWidth
-        xAxisNumbersPlaceableList.forEachIndexed { index, placeable ->
-            val prevComposableWidth = xAxisNumbersPlaceableList.getOrNull(index - 1)?.width ?: 0
-            //no gap for the first element of x axis
-            totalWidth += prevComposableWidth + if (index > 0) gapBetweenValuePx else 0
-            placeable.placeRelative(x = totalWidth, y = yAxisHeight)
-        }
-    }
-
-    fun Placeable.PlacementScope.placeYCoordinates() {
-        var totalHeight = 0
-        yAxisNumbersPlaceableList.reversed().forEachIndexed { index, it ->
-            val prevComposableHeight =
-                yAxisNumbersPlaceableList.getOrNull(index - 1)?.height ?: 0
-            totalHeight += prevComposableHeight + if (index > 0||index==yAxisNumbersPlaceableList.size-1) gapBetweenValuePx else 0
-            it.placeRelative(x = 0, y = totalHeight)
-        }
-    }
-    fun Placeable.PlacementScope.placeYAxisBar(yAxisLinePlaceable: Placeable) {
-        yAxisLinePlaceable.placeRelative(yAxisWidth, 0)
-    }
-
-}
-
-
-class MeasureUtils(
-    private val gapBetweenNumbersPx: Int,
-    private val xAxisNumberMeasurableList: List<Measurable>,
-    private val yAxisBar: Measurable,
-    private val yAxisNumberMeasurableList: List<Measurable>,
-    private val xAxisBar: Measurable,
-) {
-    private val noOfXCoordinates = xAxisNumberMeasurableList.size
-    private val noOfYCoordinates = yAxisNumberMeasurableList.size
-
-    private lateinit var yAxisNumbersPlaceable: List<Placeable>
-    private lateinit var xAxisNumbersPlaceable: List<Placeable>
-    private lateinit var yAxisBarPlaceable: Placeable
-    private lateinit var xAxisBarPlaceable: Placeable
-    private val yAxisNumbersHeight: Int
-        get() {
-            val totalGap = noOfYCoordinates - 1
-            return totalGap * gapBetweenNumbersPx + yAxisNumbersPlaceable.sumOf { it.height }
-        }
-    private val xAxisWidth: Int
-        get() {
-            return xAxisNumbersPlaceable.sumOf { it.width } + (noOfXCoordinates - 1) * gapBetweenNumbersPx
-        }
-
-    fun measureXAxisNumbers(constraints: Constraints): List<Placeable> {
-        xAxisNumbersPlaceable = xAxisNumberMeasurableList.map { it.measure(constraints) }
-        return xAxisNumbersPlaceable
-    }
-
-    fun measureYAxisNumbers(constraints: Constraints): List<Placeable> {
-        yAxisNumbersPlaceable = yAxisNumberMeasurableList.map { it.measure(constraints) }
-        return yAxisNumbersPlaceable
-    }
-
-    fun measureYAxisBar(constraints: Constraints): Placeable {
-        yAxisBarPlaceable = yAxisBar.measure(
-            constraints.copy(
-                minHeight = yAxisNumbersHeight,
-                maxHeight = yAxisNumbersHeight
+            val placementUtils = PlacementUtils(
+                yAxisNumbersPlaceableList = yAxisNumbersPlaceable,
+                xAxisNumbersPlaceableList = xAxisNumbersPlaceable,
+                gapBetweenValuePx = gapBetweenNumbersPx
             )
-        )
-        return yAxisBarPlaceable
+            //placings between
+            placementUtils.run {
+                placeYCoordinates()
+                placeYAxisBar(yAxisLinePlaceable)
+                placeXAxisCoordinates()
+                placeXAxisBar(xAxisLinePlaceable)
+                placePoints(pointsPlaceable = pointsPlaceable, points = points)
+            }
+        })
     }
-
-    fun measureXAxisBar(constraints: Constraints): Placeable {
-        xAxisBarPlaceable =
-            xAxisBar.measure(constraints.copy(minWidth = xAxisWidth, maxWidth = xAxisWidth))
-        return xAxisBarPlaceable
-    }
-
-
 }
+
+
+
+
 
 
