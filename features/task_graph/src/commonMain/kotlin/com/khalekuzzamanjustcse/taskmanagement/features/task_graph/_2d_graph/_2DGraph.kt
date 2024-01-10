@@ -129,15 +129,6 @@ fun addCurveBetweenPoints(path: Path, startPoint: Offset, endPoint: Offset) {
     path.apply {
         moveTo(startPoint.x, startPoint.y)
         val control = (startPoint + endPoint) / 2f
-        val isUpward=startPoint.y<endPoint.y
-        val isDownward=startPoint.y>endPoint.y
-        val bendingOffset=if(isUpward)
-            Offset(x=20f,y=-20f)
-        else if(isDownward)
-            Offset(-20f,-20f)
-        else
-            Offset(0f,0f)
-//        quadraticBezierTo(control.x+bendingOffset.x, control.y+bendingOffset.y, endPoint.x, endPoint.y)
         quadraticBezierTo(control.x, control.y, endPoint.x, endPoint.y)
     }
 }
