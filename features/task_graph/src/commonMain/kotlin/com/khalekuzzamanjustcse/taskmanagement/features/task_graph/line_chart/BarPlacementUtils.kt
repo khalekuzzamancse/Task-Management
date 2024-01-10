@@ -7,11 +7,17 @@ class BarPlacementUtils(
     private val xAxisNumbersPlaceableList: List<Placeable>,
     private val yAxisLinePlaceable:Placeable,
     private val xAxisLinePlaceable: Placeable,
-    private val gapBetweenValuePx: Int
+    private val gapBetweenValuePx: Int,
+    private val xAxisLabel:Placeable,
+    private val yAxisLabel:Placeable,
+    private val axisArrowLength:Int,
 ) {
     private val yAxisWidth = yAxisNumbersPlaceableList.maxBy { it.width }.width+yAxisLinePlaceable.width
     private val yAxisHeight = yAxisNumbersPlaceableList.sumOf { it.height } +
-            (yAxisNumbersPlaceableList.size - 1) * gapBetweenValuePx
+            (yAxisNumbersPlaceableList.size - 1) * gapBetweenValuePx+axisArrowLength
+    private val xAxisWidth = xAxisNumbersPlaceableList.sumOf { it.width }+
+            (xAxisNumbersPlaceableList.size-1)*gapBetweenValuePx+
+            yAxisWidth+gapBetweenValuePx+axisArrowLength
 
     fun Placeable.PlacementScope.placeBars(
         bars: List<Placeable>,
@@ -54,17 +60,26 @@ class BarPlacementUtils(
     }
 
     fun Placeable.PlacementScope.placeYCoordinates() {
-        var totalHeight = 0
+        var iThPlaceableY = axisArrowLength
         yAxisNumbersPlaceableList.reversed().forEachIndexed { index, it ->
             val prevComposableHeight =
                 yAxisNumbersPlaceableList.getOrNull(index - 1)?.height ?: 0
-            totalHeight += prevComposableHeight + if (index > 0 || index == yAxisNumbersPlaceableList.size - 1) gapBetweenValuePx else 0
-            it.placeRelative(x = 0, y = totalHeight)
+            iThPlaceableY += prevComposableHeight+ if (index > 0 || index == yAxisNumbersPlaceableList.size - 1) gapBetweenValuePx else 0
+            it.placeRelative(x = 0, y = iThPlaceableY)
         }
     }
 
     fun Placeable.PlacementScope.placeYAxisBar() {
         yAxisLinePlaceable.placeRelative(yAxisWidth, 0)
+    }
+    fun Placeable.PlacementScope.placeXAxisLabel() {
+        val offsetY=xAxisNumbersPlaceableList.maxBy { it.height }.height/2
+        xAxisLabel.placeRelative(x=xAxisWidth,y=yAxisHeight-offsetY)
+    }
+    fun Placeable.PlacementScope.placeYAxisLabel() {
+        val offsetY=yAxisLabel.height
+        val offsetX=yAxisLinePlaceable.width/2
+        yAxisLabel.placeRelative(x=yAxisWidth-offsetX,y=0-offsetY)
     }
 
 }

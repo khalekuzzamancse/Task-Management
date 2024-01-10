@@ -12,10 +12,13 @@ class BarMeasureUtils(
     private val barsMeasurable: List<Measurable>,
     private val barsYCoordinate: List<Int>,
     private val xAxisBar: Measurable,
+    private val yAxisLabel: Measurable,
+    private val xAxisLabel: Measurable,
+    private val arrowHeadLengthPx:Int,
+
 ) {
     private val noOfXCoordinates = xAxisNumberMeasurableList.size
     private val noOfYCoordinates = yAxisNumberMeasurableList.size
-
     private lateinit var yAxisNumbersPlaceable: List<Placeable>
     private lateinit var xAxisNumbersPlaceable: List<Placeable>
     private lateinit var yAxisBarPlaceable: Placeable
@@ -41,18 +44,19 @@ class BarMeasureUtils(
     }
 
     fun measureYAxisBar(constraints: Constraints): Placeable {
+        val height = yAxisNumbersHeight+arrowHeadLengthPx
         yAxisBarPlaceable = yAxisBar.measure(
             constraints.copy(
-                minHeight = yAxisNumbersHeight,
-                maxHeight = yAxisNumbersHeight
+                minHeight =height ,
+                maxHeight = height
             )
         )
         return yAxisBarPlaceable
     }
 
     fun measureXAxisBar(constraints: Constraints): Placeable {
-        xAxisBarPlaceable =
-            xAxisBar.measure(constraints.copy(minWidth = xAxisWidth, maxWidth = xAxisWidth))
+        val width = xAxisWidth+arrowHeadLengthPx
+        xAxisBarPlaceable =xAxisBar.measure(constraints.copy(minWidth = width, maxWidth = width))
         return xAxisBarPlaceable
     }
 
@@ -65,6 +69,12 @@ class BarMeasureUtils(
             bar.measure(constraints.copy(minHeight = barHeight, maxHeight = barHeight))
         }
         return barsPlaceable
+    }
+    fun measureXAxisLabels(constraints: Constraints):Placeable{
+       return xAxisLabel.measure(constraints)
+    }
+    fun measureYAxisLabels(constraints: Constraints):Placeable{
+        return yAxisLabel.measure(constraints)
     }
 
 

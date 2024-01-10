@@ -76,9 +76,7 @@ fun BarComponent(
     }
 
 }
-// A function that returns a random gradient brush
 fun randomGradient(): Brush {
-    // Generate a list of random colors
     val colors = List(3) {
         randomDarkColor()
     }
@@ -86,12 +84,8 @@ fun randomGradient(): Brush {
 
 }
 fun randomDarkColor(): Color {
-    // Generate random values between 0 and 100 for the red, green, and blue components
     val red = Random.nextInt(255)
     val green = Random.nextInt(255)
     val blue = Random.nextInt(255)
-
-    // Return a color object with the generated values and full alpha
     return Color(red, green,blue)
 }
-// A function that uses the random gradient as a background
