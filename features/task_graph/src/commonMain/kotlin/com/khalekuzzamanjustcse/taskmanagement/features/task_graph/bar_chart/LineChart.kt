@@ -1,7 +1,5 @@
-package com.khalekuzzamanjustcse.taskmanagement.features.task_graph.line_chart
+package com.khalekuzzamanjustcse.taskmanagement.features.task_graph.bar_chart
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
@@ -10,10 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.khalekuzzamanjustcse.taskmanagement.features.task_graph.XAxisLineArrow
-import com.khalekuzzamanjustcse.taskmanagement.features.task_graph.YAxisLineArrow
+import com.khalekuzzamanjustcse.taskmanagement.features.task_graph._2d_plan.components.XAxisLineArrow
+import com.khalekuzzamanjustcse.taskmanagement.features.task_graph._2d_plan.components.YAxisLineArrow
 import com.khalekuzzamanjustcse.taskmanagement.features.task_graph._2d_graph.Value
 
 @Composable

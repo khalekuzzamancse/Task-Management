@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement.features.task_graph.line_chart
+package com.khalekuzzamanjustcse.taskmanagement.features.task_graph.bar_chart
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically

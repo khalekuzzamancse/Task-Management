@@ -1,14 +1,17 @@
-package com.khalekuzzamanjustcse.taskmanagement.features.task_graph._2d_graph
+package com.khalekuzzamanjustcse.taskmanagement._2d_graph
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,16 +33,14 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.khalekuzzamanjustcse.taskmanagement.features.task_graph._2d_plan.components.XAxisLineArrow
-import com.khalekuzzamanjustcse.taskmanagement.features.task_graph._2d_plan.components.YAxisLineArrow
+
 
 @Composable
 fun _2dGraph() {
     val pointSize = 8.dp
-    val valueSize = 16.dp
     val sizePx = with(LocalDensity.current) { pointSize.toPx() }
-    val numberModifier =
-        Modifier.sizeIn(minWidth = valueSize, minHeight = valueSize).background(Color.Green)
+    val numberModifier = Modifier
+
     var pointsOffsets by remember { mutableStateOf(emptySet<Offset>()) }
     val onPositioned: (Offset) -> Unit = { offset ->
         val centerOffset = offset + Offset(sizePx / 2, sizePx / 2)
@@ -77,29 +78,33 @@ fun _2dGraph() {
     }
 
     _2DPlane(
-        modifier = Modifier.padding(16.dp).drawBehind {
-            val path = Path()
-            if (pointsOffsets.size == pointsComposable.size) {
-                val points = pointsOffsets.toList()
-                val startPoint = pointsOffsets.first()
-                path.apply {
-                    moveTo(startPoint.x, startPoint.y)
-                    for (i in 1 until pointsOffsets.size) {
-                        addCurveBetweenPoints(
-                            path = path,
-                            startPoint = points[i - 1],
-                            endPoint = points[i]
-                        )
+        modifier = Modifier
+            .padding(start = 8.dp, bottom = 8.dp, end = 8.dp, top = 36.dp)
+            .verticalScroll(rememberScrollState())
+            .horizontalScroll(rememberScrollState())
+            .drawBehind {
+                val path = Path()
+                if (pointsOffsets.size == pointsComposable.size) {
+                    val points = pointsOffsets.toList()
+                    val startPoint = pointsOffsets.first()
+                    path.apply {
+                        moveTo(startPoint.x, startPoint.y)
+                        for (i in 1 until pointsOffsets.size) {
+                            addCurveBetweenPoints(
+                                path = path,
+                                startPoint = points[i - 1],
+                                endPoint = points[i]
+                            )
+                        }
                     }
+                    drawThePath(path)
+
+
                 }
-                drawThePath(path)
-
-
-            }
-        },
+            },
         xAxisNumbers = {
             for (i in 1..8) {
-                Value(label = "$i", modifier = numberModifier)
+                Value(label = "Jan $i", modifier = numberModifier)
             }
         },
         gap = 10.dp,
@@ -109,8 +114,9 @@ fun _2dGraph() {
             }
         },
         yAxisLine = {
-            YAxisLineArrow(modifier = Modifier
-                .width(2.dp)
+            YAxisLineArrow(
+                modifier = Modifier
+                    .width(2.dp)
             )
 
         },
@@ -118,10 +124,10 @@ fun _2dGraph() {
             XAxisLineArrow(modifier = Modifier.height(2.dp))
         },
         xAxisLabel = {
-            Text("X")
+            Text("Date")
         },
         yAxisLabel = {
-            Text("Y")
+            Text("Completed Task")
         },
         points = pointsComposable
     )
@@ -170,7 +176,8 @@ fun CoordinatePoint(
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .background(color).clickable {
+            .background(color)
+            .clickable {
                 color = if (color == Color.Blue) Color.Red else Color.Blue
             }
             .onGloballyPositioned {
@@ -183,7 +190,6 @@ fun CoordinatePoint(
         }
     }
 }
-
 
 
 @Composable

@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement.features.task_graph.line_chart
+package com.khalekuzzamanjustcse.taskmanagement.bar_chart
 
 import androidx.compose.ui.layout.Placeable
 

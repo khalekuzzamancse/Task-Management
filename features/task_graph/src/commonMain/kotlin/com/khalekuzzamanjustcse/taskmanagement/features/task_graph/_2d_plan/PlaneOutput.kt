@@ -25,8 +25,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.khalekuzzamanjustcse.taskmanagement.features.task_graph.XAxisLineArrow
-import com.khalekuzzamanjustcse.taskmanagement.features.task_graph.YAxisLineArrow
+import com.khalekuzzamanjustcse.taskmanagement.features.task_graph._2d_plan.components.XAxisLineArrow
+import com.khalekuzzamanjustcse.taskmanagement.features.task_graph._2d_plan.components.YAxisLineArrow
 import kotlin.math.abs
 
 data class CoordinatesInfo(

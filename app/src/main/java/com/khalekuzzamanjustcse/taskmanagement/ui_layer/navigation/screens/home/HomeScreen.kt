@@ -60,7 +60,7 @@ fun Home(
 
 
     var username by remember {
-        mutableStateOf("NULL")
+        mutableStateOf("")
     }
     val viewModel = remember {
         MyTaskViewModel()
@@ -133,7 +133,7 @@ fun UserInfo(
             .fillMaxWidth()
     ) {
         Text(
-            text = "Hello , $username !",
+            text = "Hello User!",
             style = MaterialTheme.typography.titleLarge,
         )
         Text(

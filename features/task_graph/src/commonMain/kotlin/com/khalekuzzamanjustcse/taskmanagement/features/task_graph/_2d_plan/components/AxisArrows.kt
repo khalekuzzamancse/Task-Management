@@ -1,4 +1,4 @@
-package com.khalekuzzamanjustcse.taskmanagement.features.task_graph
+package com.khalekuzzamanjustcse.taskmanagement.features.task_graph._2d_plan.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable

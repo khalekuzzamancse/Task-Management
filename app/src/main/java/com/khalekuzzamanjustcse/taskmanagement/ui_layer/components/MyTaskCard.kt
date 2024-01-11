@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 data class MyTask(
@@ -50,6 +51,7 @@ fun MyTaskCard(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
+                    color = if (checked) Color.Green else Color.Red
                 )
                 Text(
                     text = "Assigned by : $assigner",

@@ -4,7 +4,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.automirrored.outlined.ListAlt
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Task
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.ListAlt
 import androidx.compose.material.icons.outlined.Task
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +35,9 @@ import com.khalekuzzamanjustcse.taskmanagement.DeepLink
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedByMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.AssignedToMeTasksObserver
 import com.khalekuzzamanjustcse.taskmanagement.data_layer.task_managment.TaskAssignedToMe
+import com.khalekuzzamanjustcse.taskmanagement._2d_graph._2dGraph
+import com.khalekuzzamanjustcse.taskmanagement.bar_chart.BarChart
+import com.khalekuzzamanjustcse.taskmanagement.calender_view._2dCalender
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.bottom_navigation.BottomNavigationItem
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.components.generic_screen.TopNBottomBarDecorator
 import com.khalekuzzamanjustcse.taskmanagement.ui_layer.navigation.screens.my_taskes.MyTaskViewModel
@@ -51,6 +61,25 @@ private val taskDestinations = listOf(
         unselectedIcon = Icons.AutoMirrored.Outlined.ListAlt,
         hasNews = false,
     ),
+    BottomNavigationItem(
+        label = "History",
+        selectedIcon = Icons.Filled.History,
+        unselectedIcon = Icons.Outlined.History,
+        hasNews = false,
+    ),
+    BottomNavigationItem(
+        label = "BarChart",
+        selectedIcon = Icons.Filled.BarChart,
+        unselectedIcon = Icons.Outlined.BarChart,
+        hasNews = false,
+    ),
+    BottomNavigationItem(
+        label = "Calendar",
+        selectedIcon = Icons.Filled.CalendarMonth,
+        unselectedIcon = Icons.Outlined.CalendarMonth,
+        hasNews = false,
+    ),
+
 
     )
 
@@ -102,8 +131,16 @@ fun TaskNavGraph() {
             }
 
             2 -> {
-//                onNavigationRequest(Screen.FriendRequest)
-//                showTopNavigation = false
+                onNavigationRequest(Screen.TaskHistory)
+                topNavigationEnabled = false
+            }
+            3 -> {
+                onNavigationRequest(Screen.TaskBarChar)
+                topNavigationEnabled = false
+            }
+            4 -> {
+                onNavigationRequest(Screen.CalenderView)
+                topNavigationEnabled = false
             }
         }
     }
@@ -209,6 +246,15 @@ private fun ContentSection(
                 TaskToMeDetailsScreen(task = task)
             }
 
+        }
+        composable(Screen.TaskHistory.route){
+            _2dGraph()
+        }
+        composable(Screen.TaskBarChar.route){
+            BarChart()
+        }
+        composable(Screen.CalenderView.route){
+            _2dCalender()
         }
     }
 }
